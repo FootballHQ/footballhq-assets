@@ -1,4 +1,19 @@
 
+/* FOOTBALL HQ FIX5.7.2 — COLLECTIONS GLOBAL META SAFETY */
+try{
+  window.FHQ_COLLECTION_SET_META = window.FHQ_COLLECTION_SET_META || {
+    'The Gridiron':{
+      slug:'gridiron',
+      label:'The Gridiron',
+      copy:'Football HQ original character collection.',
+      rewardCoins:1200,
+      rewardTitle:'Gridiron Founder'
+    }
+  };
+  window.__FHQ_COLLECTION_SET_META = window.__FHQ_COLLECTION_SET_META || window.FHQ_COLLECTION_SET_META;
+}catch(e){}
+
+
 (function(){
   const TEAM_META = {
     ARI:['NFC','West'],ATL:['NFC','South'],BAL:['AFC','North'],BUF:['AFC','East'],CAR:['NFC','South'],CHI:['NFC','North'],
@@ -5338,7 +5353,7 @@
 
               cards=sourceCards.map(function(c,i){return {card:c,index:i}}).sort(function(a,b){
 
-                const ar=fhqV87NormalizeRarity(a.card),br=fhqV87NormalizeRarity(b.card);
+                const ar=String((a.card&&a.card.rarity)||'common').toLowerCase(),br=String((b.card&&b.card.rarity)||'common').toLowerCase();
 
                 return (fhqV889RarityOrder[ar]??99)-(fhqV889RarityOrder[br]??99)||a.index-b.index;
 
