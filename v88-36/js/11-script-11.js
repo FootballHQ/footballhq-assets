@@ -5517,6 +5517,8 @@
     }
 
 
+  window.fhqV823RenderCollections=fhqV823RenderCollections;
+
 
   function fhqV833OpenCollectionCard(card){
 
@@ -6184,10 +6186,6 @@
     if(!inv.some(function(x){return x&&x.type==='title'})){
       inv.unshift({type:'title',value:FHQ_STARTER_TITLE,name:FHQ_STARTER_TITLE,source:'Starter',rarity:'common'});
     }
-    collection.forEach(function(id){
-      const card=catalog.find(function(x){return String(x.id)===String(id)});
-      if(card)inv.push({type:'card',value:id,name:card.name||id,set:card.set||'',rarity:card.rarity||'common',source:'Collection'});
-    });
 
     const list=inv.filter(function(x){return x&&x.type!=='coins'&&x.type!=='welcome'&&(fhqLockerPageFilter==='all'||x.type===fhqLockerPageFilter)});
     if(!list.length){
@@ -7897,7 +7895,7 @@
   function fhqFix4LockerItemAllowed(x,ownedCards,cardCatalog){
     if(!x)return false;
     const type=String(x.type||'').toLowerCase();
-    if(!['avatar','title','ring','banner','card'].includes(type))return false;
+    if(!['avatar','title','ring','banner'].includes(type))return false;
 
     const blob=[
       x.id,x.name,x.value,x.source,x.periodLabel,x.rewardType
@@ -7905,12 +7903,6 @@
 
     // Daily reward/account ledger records are not Locker cosmetics.
     if(/daily reward|daily gift|free daily pack|freepack|coin grant|welcome reward/.test(blob))return false;
-    if(type==='card'){
-      const value=String(x.value||x.cardId||x.id||'');
-      const owned=(ownedCards||[]).some(id=>String(id)===value);
-      const known=(cardCatalog||[]).some(c=>String(c&&c.id||'')===value);
-      return owned && known;
-    }
     return true;
   }
 
@@ -7936,12 +7928,12 @@
 
   function fhqOwnedPreview(x){return fhqFix4CleanCosmeticPreview(x)}
   function fhqRenderLocker(){
+    if(fhqLockerPageFilter==='card')fhqLockerPageFilter='all';
     const grid=document.getElementById('fhqLockerGrid');if(!grid)return;
     const p=getAccountProfile(),c=window.__fhqCosmetics||{},cardCatalog=Array.isArray(window.__fhqCardCatalog)?window.__fhqCardCatalog:[],ownedCards=Array.isArray(c.collection)?c.collection:[],inv=(Array.isArray(c.inventory)?c.inventory.slice():[]).filter(x=>fhqFix4LockerItemAllowed(x,ownedCards,cardCatalog)),level=fhqLevelInfo(Math.max(Number(p.points)||0,fhqLastKnownLifetimePoints())).level;
     FHQ_PASS_REWARDS.filter(r=>['avatar','title','ring','banner'].includes(String(r.type||''))&&level>=r.level).forEach(r=>{if(!inv.some(x=>x.type===r.type&&x.value===r.value))inv.push({id:'pass|'+r.level+'|'+r.value,type:r.type,value:r.value,name:r.name,source:'HQ Pass',rarity:r.rarity||'common'})});
     if(!inv.some(x=>x.type==='avatar'&&x.value===FHQ_STARTER_AVATAR))inv.unshift({id:'starter-avatar',type:'avatar',value:FHQ_STARTER_AVATAR,name:'HQ Starter',source:'Starter',rarity:'common'});
     if(!inv.some(x=>x.type==='title'&&x.value===FHQ_STARTER_TITLE))inv.unshift({id:'starter-title',type:'title',value:FHQ_STARTER_TITLE,name:FHQ_STARTER_TITLE,source:'Starter',rarity:'common'});
-    ownedCards.forEach(function(id){const card=cardCatalog.find(x=>x.id===id);if(card&&!inv.some(x=>x.type==='card'&&x.value===id))inv.push({id:'card|'+id,type:'card',value:id,name:card.name,set:card.set,rarity:card.rarity,source:'Collection'})});
     const eq=function(x){return (x.type==='avatar'&&fhqProfilePrefs().avatar===x.value)||(x.type==='ring'&&c.ring===x.value)||(x.type==='banner'&&c.banner===x.value)||(x.type==='title'&&fhqEquippedTitle()===x.value)};
     const typeOrder={avatar:0,ring:1,banner:2,title:3,card:4},rarityOrder={signature:0,obsidian:1,legendary:2,epic:3,rare:4,uncommon:5,common:6};
     let list=inv.filter(x=>fhqLockerPageFilter==='all'||x.type===fhqLockerPageFilter);
@@ -8074,32 +8066,72 @@ const FHQ_COLLECTION_SET_META={
   function fhqWriteCollectionCache(x){try{localStorage.setItem(fhqCollectionCacheKey(),JSON.stringify(x))}catch(e){};if(x&&x.sets){window.__fhqCardCatalog=[];Object.keys(x.sets).forEach(k=>(x.sets[k]||[]).forEach(c=>window.__fhqCardCatalog.push(c)))}}
 
 
-  let fhqDailyRewardState=null;
+  let fhqDailyRewardState=null,fhqDailyRewardStateToken='';
   function fhqRenderDailyRewards(state){
-    state=state||fhqDailyRewardState||{giftClaimed:false,packClaimed:false,giftCoins:50};
-    fhqDailyRewardState=state;
-    const gift=document.getElementById('fhqDailyGiftCard'),pack=document.getElementById('fhqFreePackCard'),gb=document.getElementById('fhqDailyGiftBtn'),pb=document.getElementById('fhqFreePackBtn'),gd=document.getElementById('fhqDailyGiftDot'),pd=document.getElementById('fhqFreePackDot');
-    if(gift)gift.classList.toggle('claimed',!!state.giftClaimed);if(gift)gift.classList.toggle('available',!state.giftClaimed);
-    if(pack)pack.classList.toggle('claimed',!!state.packClaimed);if(pack)pack.classList.toggle('available',!state.packClaimed);
+    const loading=!!(state&&state.loading);
+    if(!loading){
+      state=state||fhqDailyRewardState||{giftClaimed:false,packClaimed:false,giftCoins:50};
+      fhqDailyRewardState=state;
+    }
+    const gift=document.getElementById('fhqDailyGiftCard'),
+          pack=document.getElementById('fhqFreePackCard'),
+          gb=document.getElementById('fhqDailyGiftBtn'),
+          pb=document.getElementById('fhqFreePackBtn'),
+          gd=document.getElementById('fhqDailyGiftDot'),
+          pd=document.getElementById('fhqFreePackDot');
+
+    if(loading){
+      if(gift){gift.classList.remove('available');gift.classList.remove('claimed');gift.classList.add('checking')}
+      if(pack){pack.classList.remove('available');pack.classList.remove('claimed');pack.classList.add('checking')}
+      if(gb){gb.textContent='CHECKING…';gb.disabled=true}
+      if(pb){pb.textContent='CHECKING…';pb.disabled=true}
+      if(gd)gd.style.display='none';
+      if(pd)pd.style.display='none';
+      return;
+    }
+
+    if(gift){gift.classList.remove('checking');gift.classList.toggle('claimed',!!state.giftClaimed);gift.classList.toggle('available',!state.giftClaimed)}
+    if(pack){pack.classList.remove('checking');pack.classList.toggle('claimed',!!state.packClaimed);pack.classList.toggle('available',!state.packClaimed)}
     if(gb){gb.textContent=state.giftClaimed?'CLAIMED':'CLAIM';gb.disabled=!!state.giftClaimed}
     if(pb){pb.textContent=state.packClaimed?'OPENED':'OPEN';pb.disabled=!!state.packClaimed}
-    if(gd)gd.style.display=state.giftClaimed?'none':'inline-block';if(pd)pd.style.display=state.packClaimed?'none':'inline-block';
+    if(gd)gd.style.display=state.giftClaimed?'none':'inline-block';
+    if(pd)pd.style.display=state.packClaimed?'none':'inline-block';
   }
+
   function fhqLoadDailyRewards(){
-    fhqRenderDailyRewards(fhqDailyRewardState);
-    if(!fhqHasServer())return;
+    const token=String(fhqGetToken()||'guest');
+    if(fhqDailyRewardStateToken!==token){
+      fhqDailyRewardStateToken=token;
+      fhqDailyRewardState=null;
+    }
+
+    // Never assume an unclaimed reward while server state is unknown.
+    fhqRenderDailyRewards({loading:true});
+
+    if(!fhqHasServer()){
+      fhqRenderDailyRewards(fhqDailyRewardState||{giftClaimed:false,packClaimed:false,giftCoins:50});
+      return;
+    }
+
     google.script.run.withSuccessHandler(function(r){
       if(r&&r.profile){fhqSetRuntimeIdentity(r.profile);fhqUpdateAccountUI(r.profile)}
+      fhqDailyRewardStateToken=String(fhqGetToken()||token);
       if(r&&r.state)fhqRenderDailyRewards(r.state);
-    }).withFailureHandler(function(e){console.warn('Daily rewards unavailable',e)}).getFootballHQDailyRewards(fhqGetToken());
+      else fhqRenderDailyRewards({giftClaimed:true,packClaimed:true,giftCoins:50});
+    }).withFailureHandler(function(e){
+      console.warn('Daily rewards unavailable',e);
+      // On a failed status check, keep actions disabled rather than expose a false claim.
+      fhqRenderDailyRewards({loading:true});
+    }).getFootballHQDailyRewards(fhqGetToken());
   }
+
   function fhqClaimDailyReward(kind){
     if(!fhqHasServer())return;
     const before=fhqCachedCoins();
     google.script.run.withSuccessHandler(function(r){
       if(r&&r.profile){const after=Number(r.profile.hqCoins)||0;fhqSetRuntimeIdentity(r.profile);fhqUpdateAccountUI(r.profile);if(after>before)fhqShowCoinAward(after-before,after)}
       if(r&&r.state)fhqRenderDailyRewards(r.state);
-      if(r&&r.alreadyClaimed){fhqBalanceMessage('Already claimed today.',true);return}
+      if(r&&r.alreadyClaimed){if(r.state)fhqRenderDailyRewards(r.state);return}
       if(kind==='gift'){
         const o=document.getElementById('fhqDailyGiftOverlay');if(o)o.classList.add('open');
       }else if(kind==='pack'&&r&&r.reward){
