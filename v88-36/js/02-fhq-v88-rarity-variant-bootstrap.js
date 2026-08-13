@@ -1,0 +1,2 @@
+
+window.FHQ_V88_RARITY_VARIANTS = window.FHQ_V88_RARITY_VARIANTS || {};
