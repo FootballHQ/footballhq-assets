@@ -9438,3 +9438,15 @@ body.leaderboard-page .fhq-podium-card.first .fhq-podium-avatar{
   width:70px!important;
   height:70px!important;
 }
+
+
+/* FOOTBALL HQ V88.36 FIX4.3 */
+#fhqDailyGiftCard.checking,
+#fhqFreePackCard.checking{
+  opacity:.72!important;
+}
+#fhqDailyGiftCard.checking button,
+#fhqFreePackCard.checking button{
+  cursor:wait!important;
+  filter:saturate(.55)!important;
+}
