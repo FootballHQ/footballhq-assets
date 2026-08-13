@@ -9400,3 +9400,28 @@ body.leaderboard-page .fhq-rank-dailies{
   }
   body.leaderboard-page .fhq-rank-row>*:nth-child(4){display:none!important}
 }
+
+
+/* FOOTBALL HQ V88.36 FIX4.1 — podium hierarchy */
+body.leaderboard-page .fhq-podium-card.first{
+  border-color:#d5b451!important;
+  background:radial-gradient(circle at 50% 0%,rgba(224,190,89,.12),transparent 44%),linear-gradient(180deg,#211f18,#11191d)!important;
+  box-shadow:0 0 0 1px rgba(224,190,89,.10),0 14px 34px rgba(0,0,0,.28)!important;
+}
+body.leaderboard-page .fhq-podium-card.second{
+  border-color:#91a5b1!important;
+  background:radial-gradient(circle at 50% 0%,rgba(179,198,209,.10),transparent 44%),linear-gradient(180deg,#192126,#10181c)!important;
+}
+body.leaderboard-page .fhq-podium-card.third{
+  border-color:#a96f4d!important;
+  background:radial-gradient(circle at 50% 0%,rgba(190,121,78,.10),transparent 44%),linear-gradient(180deg,#211b18,#11191c)!important;
+}
+body.leaderboard-page .fhq-podium-card.first .fhq-podium-rank{color:#fff2b5!important;background:#4b3b12!important;border-color:#d9b94f!important}
+body.leaderboard-page .fhq-podium-card.second .fhq-podium-rank{color:#edf5f8!important;background:#33434c!important;border-color:#9fb2bd!important}
+body.leaderboard-page .fhq-podium-card.third .fhq-podium-rank{color:#ffe0ce!important;background:#4b2d20!important;border-color:#b97852!important}
+body.leaderboard-page .fhq-podium-card.is-me{box-shadow:0 14px 34px rgba(0,0,0,.28)!important}
+body.leaderboard-page .fhq-podium-card.first.is-me{box-shadow:0 0 0 1px rgba(224,190,89,.10),0 14px 34px rgba(0,0,0,.28)!important}
+body.leaderboard-page .fhq-rank-row.is-me{
+  background:linear-gradient(90deg,rgba(42,158,205,.18),rgba(15,24,30,.96))!important;
+  box-shadow:inset 3px 0 #69d7ff!important;
+}
