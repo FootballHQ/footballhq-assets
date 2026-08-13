@@ -7857,11 +7857,33 @@
     const p=fhqPendingPurchase;if(!p)return;if(p.kind==='pack')fhqBuyPack(p.id,true);else fhqBuyShopItem(p.id,true);fhqClosePurchaseConfirm();
   }
 
+
+  function fhqFix52HydrateCardReward(x){
+    if(!x || x.type!=='card')return x;
+    const key=String(x.value||x.cardId||x.id||x.cardID||x.card_id||'').trim();
+    const meta=(window.FHQ_FIX5_META&&window.FHQ_FIX5_META[key])||null;
+    if(!meta)return x;
+    return Object.assign({},x,{
+      id:meta.id,
+      cardId:meta.id,
+      value:meta.id,
+      name:meta.name,
+      subtitle:meta.subtitle,
+      flavor:meta.flavor,
+      set:meta.set,
+      rarity:String(x.rarity||meta.rarity||'common').toLowerCase(),
+      index:meta.index,
+      total:meta.total,
+      stats:meta.stats,
+      art:meta.art
+    });
+  }
+
   function fhqBuyPack(id,confirmed){
     const pack=FHQ_PACK_FALLBACK.find(x=>x.id===id)||{};if(!confirmed)return fhqOpenPurchaseConfirm('pack',id,pack.name||'Pack',Number(pack.price||0));
     if(!fhqHasServer())return;const before=fhqCachedCoins();
     google.script.run.withSuccessHandler(function(r){
-      const rewards=r&&Array.isArray(r.rewards)?r.rewards:[],
+      const rewards=(r&&Array.isArray(r.rewards)?r.rewards:[]).map(fhqFix52HydrateCardReward),
         finalProfile=r&&r.profile?r.profile:null,
         finalAfter=Math.max(0,Number(finalProfile&&finalProfile.hqCoins)||0),
         refundTotal=rewards.reduce(function(sum,x){
