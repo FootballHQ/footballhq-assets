@@ -535,7 +535,12 @@
     return n;
   }
   function fhqRememberCoins(value){
-    const n=Math.max(0,Number(value)||0);
+    const incoming=Math.max(0,Number(value)||0);
+    let previous=0;
+    try{previous=Math.max(0,Number(localStorage.getItem(fhqCoinDisplayKey()))||0)}catch(e){}
+    // FIX1: transient/incorrect zero-profile responses may not wipe a confirmed balance.
+    // Any legitimate non-zero increase or decrease still updates normally.
+    const n=(incoming===0&&previous>0)?previous:incoming;
     try{localStorage.setItem(fhqCoinDisplayKey(),String(n))}catch(e){}
     const ids=['fhqGlobalCoins','fhqShopCoins','fhqPassCoins','fhqLockerCoins'];
     ids.forEach(function(id){const el=document.getElementById(id);if(el)el.textContent=String(n)});
