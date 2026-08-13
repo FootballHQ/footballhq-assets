@@ -5182,6 +5182,17 @@
 
 
 
+
+  function fhqFix4CollectionMeta(){
+    try{
+      if(typeof FHQ_COLLECTION_SET_META!=='undefined' && FHQ_COLLECTION_SET_META){
+        window.__FHQ_COLLECTION_SET_META=FHQ_COLLECTION_SET_META;
+        return FHQ_COLLECTION_SET_META;
+      }
+    }catch(e){}
+    return window.__FHQ_COLLECTION_SET_META||{};
+  }
+
   function fhqLoadCollections(){
 
       function mergeExpandedCollections(x){
@@ -5210,7 +5221,7 @@
 
         });
 
-        return {owned:owned,sets:sets,setMeta:Object.assign({},FHQ_COLLECTION_SET_META,x.setMeta||{})};
+        return {owned:owned,sets:sets,setMeta:Object.assign({},fhqFix4CollectionMeta(),x.setMeta||{})};
 
       }
 
@@ -5284,7 +5295,7 @@
 
             sets=x&&x.sets?x.sets:{},
 
-            meta=Object.assign({},FHQ_COLLECTION_SET_META,x&&x.setMeta||{}),
+            meta=Object.assign({},fhqFix4CollectionMeta(),x&&x.setMeta||{}),
 
             names=Object.keys(sets);
 
@@ -5654,7 +5665,7 @@
 
         });
 
-        return {owned:owned,sets:sets,setMeta:Object.assign({},FHQ_COLLECTION_SET_META,x.setMeta||{})};
+        return {owned:owned,sets:sets,setMeta:Object.assign({},fhqFix4CollectionMeta(),x.setMeta||{})};
 
       }
 
@@ -6167,10 +6178,10 @@
     console.error('FootballHQ Locker primary renderer failed',error);
     const grid=document.getElementById('fhqLockerGrid');if(!grid)return;
     const c=window.__fhqCosmetics||{};
-    const inv=Array.isArray(c.inventory)?c.inventory.slice():[];
     const collection=Array.isArray(c.collection)?c.collection:[];
     const catalog=Array.isArray(window.__fhqCardCatalog)?window.__fhqCardCatalog:
       (Array.isArray(FHQ_CARD_CATALOG_FALLBACK)?FHQ_CARD_CATALOG_FALLBACK:[]);
+    const inv=(Array.isArray(c.inventory)?c.inventory.slice():[]).filter(x=>fhqFix4LockerItemAllowed(x,collection,catalog));
 
     if(!inv.some(function(x){return x&&x.type==='avatar'})){
       inv.unshift({type:'avatar',value:FHQ_STARTER_AVATAR,name:'HQ Starter',source:'Starter',rarity:'common'});
@@ -6241,7 +6252,7 @@
       el.onclick=function(){
         try{
           window.__fhqOpenCollectionSet=this.dataset.fix3Set;
-          const state={owned:owned,sets:sets,setMeta:FHQ_COLLECTION_SET_META||{}};
+          const state={owned:owned,sets:sets,setMeta:fhqFix4CollectionMeta()};
           fhqV823RenderCollections(state);
         }catch(e){console.error(e)}
       };
@@ -6568,7 +6579,7 @@
       podium.innerHTML=podiumSlots.map(function(slot){
         if(!slot)return '<div></div>';
         const p=slot.p,dailyCount=Number(p.totalDailies||0);
-        return '<div class="fhq-podium-card '+slot.place+' '+fhqBannerClass(p.equippedBanner)+'">'+
+        return '<div class="fhq-podium-card '+slot.place+' '+(p.isMe?'is-me ':'')+fhqBannerClass(p.equippedBanner)+'">'+
           '<span class="fhq-podium-rank">#'+slot.rank+'</span>'+
           fhqLeaderboardAvatarHTML(p,true)+
           '<strong>'+esc(p.isMe?'YOU':(p.username||p.name||'Player'))+'</strong>'+
@@ -6587,7 +6598,7 @@
       }else{
         board.forEach(function(p,i){
           try{
-            const row=document.createElement('div');row.className='fhq-rank-row '+(i<3?'podium-duplicate':'');
+            const row=document.createElement('div');row.className='fhq-rank-row '+(i<3?'podium-duplicate ':'')+(p.isMe?'is-me':'');
             const rank=document.createElement('strong');rank.textContent='#'+(i+1);
             const player=document.createElement('span');player.className='fhq-player-with-avatar';
             player.innerHTML=fhqLeaderboardAvatarHTML(p,false)+'<span>'+esc(p.isMe?'YOU':(p.username||p.name||'Player'))+(p.isMe?' <span class="fhq-shared-badge">YOU</span>':'')+'<small class="fhq-player-title">'+fhqTitleHTML(p.equippedTitle||FHQ_STARTER_TITLE)+'</small></span>';
@@ -7888,14 +7899,48 @@
   }
   function fhqClosePack(){const o=document.getElementById('fhqPackOverlay');if(o){o.classList.remove('open','fhq-pack-cinematic','fhq-pack-results','fhq-v8831-owned','fhq-v8831-interactive','fhq-v8832-owned','fhq-v8832-interactive','fhq-v8832-results');const x=o.querySelector('.fhq-v8833-result-close');if(x)x.remove();o.onclick=null}try{if(window.FHQRevealEngine)FHQRevealEngine.stop()}catch(e){}try{if(window.FHQDuplicateEngine)FHQDuplicateEngine.stop()}catch(e){}fhqAudioStopAll();try{stopGameConfetti()}catch(e){}}
   let fhqLockerPageFilter='all';
-  function fhqOwnedPreview(x){if(x.type==='avatar')return fhqAvatarTokenHTML(x.value);if(x.type==='ring')return '<span class="fhq-leader-avatar '+fhqRingClass(x.value)+'">'+fhqAvatarTokenHTML(FHQ_STARTER_AVATAR)+'</span>';if(x.type==='banner')return '<div style="width:88%;height:62px;border-radius:9px" class="'+fhqBannerClass(x.value)+'"></div>';if(x.type==='card')return fhqCardArtHTML(x);return '<span style="font-size:14px;font-weight:1000">'+esc(x.value||x.name)+'</span>'}
+  function fhqFix4LockerItemAllowed(x,ownedCards,cardCatalog){
+    if(!x)return false;
+    const type=String(x.type||'').toLowerCase();
+    if(!['avatar','title','ring','banner','card'].includes(type))return false;
+
+    const blob=[
+      x.id,x.name,x.value,x.source,x.periodLabel,x.rewardType
+    ].map(v=>String(v||'').toLowerCase()).join(' | ');
+
+    // Daily reward/account ledger records are not Locker cosmetics.
+    if(/daily reward|daily gift|free daily pack|freepack|coin grant|welcome reward/.test(blob))return false;
+    if(type==='card'){
+      const value=String(x.value||x.cardId||x.id||'');
+      const owned=(ownedCards||[]).some(id=>String(id)===value);
+      const known=(cardCatalog||[]).some(c=>String(c&&c.id||'')===value);
+      return owned && known;
+    }
+    return true;
+  }
+
+  function fhqFix4CleanCosmeticPreview(x){
+    try{
+      if(x.type==='avatar'){
+        const h=String(fhqAvatarTokenHTML(x.value)||'');
+        if(h && !/ARTWORK COMING SOON/i.test(h))return h;
+        return '<span class="fhq-fix4-cosmetic-placeholder">HQ</span>';
+      }
+      if(x.type==='ring')return '<span class="fhq-leader-avatar '+fhqRingClass(x.value)+'">'+fhqAvatarTokenHTML(FHQ_STARTER_AVATAR)+'</span>';
+      if(x.type==='banner')return '<div class="fhq-fix4-banner-preview '+fhqBannerClass(x.value)+'"></div>';
+      if(x.type==='title')return '<span class="fhq-fix4-title-preview">'+esc(x.value||x.name||'Title')+'</span>';
+      if(x.type==='card')return fhqCardArtHTML(x);
+    }catch(e){console.warn('Locker preview fallback',e)}
+    return '<span class="fhq-fix4-cosmetic-placeholder">HQ</span>';
+  }
+
+  function fhqOwnedPreview(x){return fhqFix4CleanCosmeticPreview(x)}
   function fhqRenderLocker(){
     const grid=document.getElementById('fhqLockerGrid');if(!grid)return;
-    const p=getAccountProfile(),c=window.__fhqCosmetics||{},inv=(Array.isArray(c.inventory)?c.inventory.slice():[]).filter(x=>x&&x.type!=='coins'&&x.type!=='welcome'),level=fhqLevelInfo(Math.max(Number(p.points)||0,fhqLastKnownLifetimePoints())).level;
-    FHQ_PASS_REWARDS.filter(r=>r.type!=='coins'&&level>=r.level).forEach(r=>{if(!inv.some(x=>x.type===r.type&&x.value===r.value))inv.push({id:'pass|'+r.level+'|'+r.value,type:r.type,value:r.value,name:r.name,source:'HQ Pass',rarity:r.rarity||'common'})});
+    const p=getAccountProfile(),c=window.__fhqCosmetics||{},cardCatalog=Array.isArray(window.__fhqCardCatalog)?window.__fhqCardCatalog:[],ownedCards=Array.isArray(c.collection)?c.collection:[],inv=(Array.isArray(c.inventory)?c.inventory.slice():[]).filter(x=>fhqFix4LockerItemAllowed(x,ownedCards,cardCatalog)),level=fhqLevelInfo(Math.max(Number(p.points)||0,fhqLastKnownLifetimePoints())).level;
+    FHQ_PASS_REWARDS.filter(r=>['avatar','title','ring','banner'].includes(String(r.type||''))&&level>=r.level).forEach(r=>{if(!inv.some(x=>x.type===r.type&&x.value===r.value))inv.push({id:'pass|'+r.level+'|'+r.value,type:r.type,value:r.value,name:r.name,source:'HQ Pass',rarity:r.rarity||'common'})});
     if(!inv.some(x=>x.type==='avatar'&&x.value===FHQ_STARTER_AVATAR))inv.unshift({id:'starter-avatar',type:'avatar',value:FHQ_STARTER_AVATAR,name:'HQ Starter',source:'Starter',rarity:'common'});
     if(!inv.some(x=>x.type==='title'&&x.value===FHQ_STARTER_TITLE))inv.unshift({id:'starter-title',type:'title',value:FHQ_STARTER_TITLE,name:FHQ_STARTER_TITLE,source:'Starter',rarity:'common'});
-    const cardCatalog=Array.isArray(window.__fhqCardCatalog)?window.__fhqCardCatalog:[],ownedCards=Array.isArray(c.collection)?c.collection:[];
     ownedCards.forEach(function(id){const card=cardCatalog.find(x=>x.id===id);if(card&&!inv.some(x=>x.type==='card'&&x.value===id))inv.push({id:'card|'+id,type:'card',value:id,name:card.name,set:card.set,rarity:card.rarity,source:'Collection'})});
     const eq=function(x){return (x.type==='avatar'&&fhqProfilePrefs().avatar===x.value)||(x.type==='ring'&&c.ring===x.value)||(x.type==='banner'&&c.banner===x.value)||(x.type==='title'&&fhqEquippedTitle()===x.value)};
     const typeOrder={avatar:0,ring:1,banner:2,title:3,card:4},rarityOrder={signature:0,obsidian:1,legendary:2,epic:3,rare:4,uncommon:5,common:6};
@@ -8014,6 +8059,8 @@ const FHQ_COLLECTION_SET_META={
     'Rivalry Week':{slug:'rivalry',label:'RIVALRY WEEK',copy:'The grudges, family arguments, split households, and annual chaos that make rivalry games different.',rewardCoins:750,rewardTitle:'Rivalry Royalty'},
     'HQ Originals':{slug:'originals',label:'HQ ORIGINALS',copy:'Football HQ-only characters designed to become the signature personalities of the collectible universe.',rewardCoins:1000,rewardTitle:'HQ Original'}
   };
+  window.__FHQ_COLLECTION_SET_META=FHQ_COLLECTION_SET_META;
+
   function fhqCollectionCacheKey(){return 'footballHQCollectionsV77:'+String(fhqGetToken()||'guest')}
   function fhqReadCollectionCache(){try{return JSON.parse(localStorage.getItem(fhqCollectionCacheKey())||'null')}catch(e){return null}}
   function fhqWriteCollectionCache(x){try{localStorage.setItem(fhqCollectionCacheKey(),JSON.stringify(x))}catch(e){};if(x&&x.sets){window.__fhqCardCatalog=[];Object.keys(x.sets).forEach(k=>(x.sets[k]||[]).forEach(c=>window.__fhqCardCatalog.push(c)))}}
