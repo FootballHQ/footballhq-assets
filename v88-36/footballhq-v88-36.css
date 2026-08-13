@@ -9957,3 +9957,88 @@ body.leaderboard-page .fhq-podium-card.first .fhq-podium-avatar{
   transform:none!important;
   backface-visibility:hidden!important;
 }
+
+
+/* ==================================================================
+   FOOTBALL HQ FIX5.6 — CLEAN SINGLE-LAYER CHARACTER ART
+   Fixes the "picture/card inside another picture/card" effect.
+   ================================================================== */
+
+/* The art window itself keeps the same premium-card proportions. */
+.fhq-fix5-card:not(.fhq-fix5-exact-card) .f5-art{
+  left:15px!important;
+  right:15px!important;
+  top:79px!important;
+  height:auto!important;
+  aspect-ratio:10 / 7!important;
+  overflow:hidden!important;
+  padding:0!important;
+  margin:0!important;
+  background:#060b0f!important;
+  border-radius:2px!important;
+}
+
+/* ONE artwork layer only. Never zoom, never create a second background copy. */
+.fhq-fix5-card:not(.fhq-fix5-exact-card) .f5-art > img{
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  transform:none!important;
+  scale:1!important;
+  filter:none!important;
+  image-rendering:auto!important;
+}
+
+/* Keep effects above the character image, but they may never create a duplicate image. */
+.fhq-fix5-card .f5-art-vignette,
+.fhq-fix5-card .f5-art-glint{
+  pointer-events:none!important;
+  background-image:none!important;
+}
+
+/* Common / Uncommon stay intentionally restrained. */
+.rarity-common .f5-art-glint,
+.rarity-common .f5-art-vignette{
+  opacity:.08!important;
+}
+.rarity-uncommon .f5-art-glint{
+  opacity:.10!important;
+}
+
+/* Premium tiers can add light/foil without affecting image fit. */
+.rarity-rare .f5-art-glint{opacity:.18!important}
+.rarity-epic .f5-art-glint{opacity:.24!important}
+.rarity-legendary .f5-art-glint{opacity:.30!important}
+
+/* Never crop the two exact approved premium cards. */
+.fhq-fix5-exact-card .f5-exact-full-card{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  transform:none!important;
+  filter:none!important;
+}
+
+/* Pack carousel + collection cards keep the exact whole-card ratio. */
+#fhqPackOverlay .fhq-fix5-card,
+#fhqAlbumGrid .fhq-fix5-card,
+#fhqV833CardOverlay .fhq-fix5-card{
+  aspect-ratio:720 / 1040!important;
+  overflow:hidden!important;
+}
+
+/* Stop parent transforms from making the card image soft during the resting state. */
+#fhqPackOverlay.fhq-v8832-results .fhq-v8832-card.is-current .fhq-fix5-card,
+#fhqAlbumGrid .fhq-fix5-card{
+  transform:translateZ(0)!important;
+  backface-visibility:hidden!important;
+}
