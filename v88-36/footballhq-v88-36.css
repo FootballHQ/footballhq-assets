@@ -9450,3 +9450,201 @@ body.leaderboard-page .fhq-podium-card.first .fhq-podium-avatar{
   cursor:wait!important;
   filter:saturate(.55)!important;
 }
+
+
+/* =====================================================================
+   FOOTBALL HQ FIX5 — PREMIUM COLLECTIBLE CARDS + FULL RARITY CINEMATICS
+   Backend-safe: visual layer only.
+   ===================================================================== */
+
+.fhq-fix5-card{
+  --f5:#9aa7ae;--f5b:#566169;--f5glow:rgba(190,205,214,.22);
+  position:relative!important;width:100%!important;aspect-ratio:36/55!important;height:auto!important;
+  overflow:hidden!important;border-radius:16px!important;background:#050a0e!important;
+  color:#f5fbff!important;font-family:Arial,sans-serif!important;isolation:isolate!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.38)!important;transform:translateZ(0);
+}
+.fhq-fix5-card.rarity-common{--f5:#b9c0c5;--f5b:#5f686f;--f5glow:rgba(190,200,208,.18)}
+.fhq-fix5-card.rarity-uncommon{--f5:#8fe45a;--f5b:#2e741f;--f5glow:rgba(105,230,78,.28)}
+.fhq-fix5-card.rarity-rare{--f5:#4dbdff;--f5b:#135fa8;--f5glow:rgba(58,169,255,.34)}
+.fhq-fix5-card.rarity-epic{--f5:#d366ff;--f5b:#7724ad;--f5glow:rgba(194,70,255,.38)}
+.fhq-fix5-card.rarity-legendary{--f5:#ffd253;--f5b:#a66a00;--f5glow:rgba(255,191,42,.45)}
+.fhq-fix5-card.rarity-obsidian{--f5:#e2ddff;--f5b:#6e4f9d;--f5glow:rgba(135,93,214,.50)}
+.fhq-fix5-card.rarity-signature{--f5:#ffe174;--f5b:#b8791d;--f5glow:rgba(255,196,48,.58)}
+
+.f5-frame{
+  position:absolute;inset:0;border:3px solid var(--f5);border-radius:16px;
+  background:
+    linear-gradient(180deg,rgba(8,14,18,.93),rgba(3,8,12,.99)),
+    radial-gradient(circle at 50% 28%,var(--f5glow),transparent 42%);
+  box-shadow:inset 0 0 0 2px #05090d,inset 0 0 0 4px color-mix(in srgb,var(--f5) 48%,transparent);
+  overflow:hidden;z-index:1;
+}
+.f5-frame::before{
+  content:"";position:absolute;inset:7px;border:1px solid color-mix(in srgb,var(--f5) 66%,transparent);
+  clip-path:polygon(0 8%,8% 0,92% 0,100% 8%,100% 92%,92% 100%,8% 100%,0 92%);
+  pointer-events:none;z-index:9;
+}
+.f5-frame::after{
+  content:"";position:absolute;inset:-40% -65%;background:linear-gradient(112deg,transparent 38%,rgba(255,255,255,.0) 43%,rgba(255,255,255,.22) 49%,rgba(255,255,255,.0) 55%,transparent 62%);
+  transform:translateX(-42%) rotate(8deg);opacity:.45;pointer-events:none;z-index:15;
+}
+.fhq-fix5-card:hover .f5-frame::after{animation:f5Sweep 1.25s ease}
+@keyframes f5Sweep{to{transform:translateX(42%) rotate(8deg)}}
+
+.f5-head{position:absolute;left:16px;right:14px;top:13px;height:66px;display:flex;justify-content:space-between;gap:8px;z-index:8}
+.f5-title{min-width:0;display:flex;flex-direction:column}
+.f5-title small{font-size:11px;font-weight:900;color:#d4dde2;letter-spacing:.04em}
+.f5-title strong{margin-top:2px;font-size:23px;line-height:.95;font-weight:1000;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f5-title span{font-size:10px;font-weight:800;color:#b7c4ca;margin-top:4px;text-transform:uppercase;letter-spacing:.035em}
+.f5-rarity{flex:0 0 auto;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.f5-rarity b{font-size:9px;line-height:1;color:var(--f5);letter-spacing:.06em}
+.f5-rarity i{width:30px;height:34px;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:1000;border:2px solid var(--f5);color:#f5fbff;background:#081116;clip-path:polygon(50% 0,94% 17%,87% 72%,50% 100%,13% 72%,6% 17%)}
+
+.f5-art{position:absolute;left:14px;right:14px;top:82px;height:55%;border:2px solid var(--f5);overflow:hidden;background:#091015;z-index:4;clip-path:polygon(0 4%,4% 0,96% 0,100% 4%,100% 96%,96% 100%,4% 100%,0 96%)}
+.f5-art img{width:100%;height:100%;display:block;object-fit:cover;object-position:center;transform:scale(1.035);filter:saturate(1.02) contrast(1.04)}
+.f5-art-vignette{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),transparent 45%,rgba(0,0,0,.38)),radial-gradient(circle at 50% 45%,transparent 42%,rgba(0,0,0,.30));pointer-events:none}
+.f5-art-glint{position:absolute;inset:0;opacity:0;pointer-events:none;background:linear-gradient(115deg,transparent 28%,rgba(255,255,255,.24) 48%,transparent 67%);transform:translateX(-120%)}
+.fhq-fix5-card.rarity-rare .f5-art-glint,
+.fhq-fix5-card.rarity-epic .f5-art-glint,
+.fhq-fix5-card.rarity-legendary .f5-art-glint,
+.fhq-fix5-card.rarity-obsidian .f5-art-glint,
+.fhq-fix5-card.rarity-signature .f5-art-glint{opacity:.52;animation:f5ArtGlint 4.5s ease-in-out infinite}
+@keyframes f5ArtGlint{0%,55%{transform:translateX(-120%)}80%,100%{transform:translateX(120%)}}
+
+.f5-flavor{position:absolute;left:16px;right:16px;bottom:95px;min-height:30px;display:grid;place-items:center;text-align:center;padding:5px 9px;border:1px solid color-mix(in srgb,var(--f5) 50%,#25343d);background:rgba(3,9,13,.91);font-size:8.5px;line-height:1.2;color:#d8e2e7;z-index:7}
+.f5-stats{position:absolute;left:14px;right:14px;bottom:42px;height:46px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--f5);border-bottom:1px solid color-mix(in srgb,var(--f5) 45%,transparent);background:rgba(4,10,14,.92);z-index:7}
+.f5-stats span{display:grid;place-items:center;border-right:1px solid rgba(255,255,255,.10);padding:3px 0}
+.f5-stats span:last-child{border-right:0}
+.f5-stats b{font-size:7px;color:#9fb0b8;letter-spacing:.06em}
+.f5-stats strong{font-size:14px;line-height:1;color:#fff}
+.f5-foot{position:absolute;left:14px;right:14px;bottom:12px;height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;border:1px solid color-mix(in srgb,var(--f5) 55%,transparent);background:#071014;z-index:7;font-size:7px;color:#9eb0b9;font-weight:900;letter-spacing:.05em}
+.f5-foot b{color:var(--f5)}
+
+/* Progressive frame detail */
+.f5-corner{position:absolute;width:48px;height:22px;border-top:4px solid var(--f5);top:3px;z-index:12}
+.f5-corner.c1{left:5px;border-left:4px solid var(--f5);clip-path:polygon(0 0,100% 0,80% 100%,0 100%)}
+.f5-corner.c2{right:5px;border-right:4px solid var(--f5);clip-path:polygon(0 0,100% 0,100% 100%,20% 100%)}
+.f5-notch{position:absolute;top:0;width:38px;height:8px;background:var(--f5);opacity:.8;z-index:11}.f5-notch.n1{left:27%}.f5-notch.n2{right:27%}
+.f5-crystal{position:absolute;top:3px;width:34px;height:34px;border:2px solid var(--f5);transform:rotate(45deg);opacity:.56;z-index:2}.f5-crystal.k1{left:-17px}.f5-crystal.k2{right:-17px}
+.f5-wing{position:absolute;top:0;width:39%;height:10px;background:linear-gradient(90deg,transparent,var(--f5));z-index:12}.f5-wing.w1{left:0}.f5-wing.w2{right:0;transform:scaleX(-1)}
+.f5-crownmark{position:absolute;left:50%;top:-1px;transform:translateX(-50%);width:34px;height:15px;background:var(--f5);clip-path:polygon(0 100%,15% 20%,35% 70%,50% 0,65% 70%,85% 20%,100% 100%);z-index:13}
+
+/* OBSIDIAN: unmistakably advanced crystalline black frame */
+.rarity-obsidian .f5-frame{
+  border-width:5px;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(91,52,145,.28),transparent 42%),
+    repeating-conic-gradient(from 14deg at 50% 50%,#06080b 0 5deg,#14111b 5deg 10deg,#06080b 10deg 15deg),
+    #030407;
+  box-shadow:inset 0 0 0 2px #b6a2dc,inset 0 0 0 7px #09070d,0 0 28px rgba(110,72,170,.38)!important;
+}
+.rarity-obsidian .f5-frame::before{inset:10px;border:2px solid #8d70c4;filter:drop-shadow(0 0 5px #7450aa)}
+.f5-shard{position:absolute;background:linear-gradient(135deg,#07080b,#8b6fc0 55%,#14101c);clip-path:polygon(50% 0,100% 35%,73% 100%,18% 82%,0 25%);z-index:14;filter:drop-shadow(0 0 5px #7e5ca8)}
+.f5-shard.s1{width:28px;height:54px;left:-4px;top:84px;transform:rotate(13deg)}
+.f5-shard.s2{width:24px;height:45px;right:-3px;top:133px;transform:rotate(-19deg)}
+.f5-shard.s3{width:22px;height:42px;left:-3px;bottom:79px;transform:rotate(164deg)}
+.f5-shard.s4{width:27px;height:52px;right:-5px;bottom:45px;transform:rotate(196deg)}
+.f5-gem{position:absolute;left:50%;top:1px;transform:translateX(-50%) rotate(45deg);width:17px;height:17px;border:2px solid #e1d8ff;background:#27163f;box-shadow:0 0 12px #9c72dc;z-index:16}
+
+/* SIGNATURE: top chase card */
+.rarity-signature .f5-frame{
+  border-width:5px;
+  background:
+    radial-gradient(circle at 50% 20%,rgba(255,194,50,.16),transparent 34%),
+    linear-gradient(135deg,#081019,#111117 40%,#0a1115 70%,#171007);
+  box-shadow:inset 0 0 0 2px #fff2b0,inset 0 0 0 7px #181007,0 0 34px rgba(255,190,47,.50)!important;
+}
+.rarity-signature .f5-frame::before{
+  inset:9px;border:2px solid transparent;
+  background:linear-gradient(#0a1014,#0a1014) padding-box,
+             linear-gradient(120deg,#ffd24f,#7ceaff,#cf7bff,#ff8b47,#fff09a) border-box;
+  clip-path:polygon(0 8%,8% 0,92% 0,100% 8%,100% 92%,92% 100%,8% 100%,0 92%);
+}
+.f5-signature{position:absolute;left:29px;right:29px;bottom:117px;height:42px;z-index:10;display:flex;align-items:center;justify-content:center;transform:rotate(-5deg);pointer-events:none}
+.f5-signature span{font-family:cursive;font-style:italic;font-size:27px;line-height:1;color:#ffd65c;text-shadow:0 0 5px #120d02,0 0 13px #ffbc25}
+.f5-sig-gem{position:absolute;left:50%;top:-2px;transform:translateX(-50%) rotate(45deg);width:19px;height:19px;background:linear-gradient(135deg,#fff3a4,#ffb738,#b96fff,#68e8ff);border:2px solid #fff4c0;box-shadow:0 0 16px #ffc843;z-index:18}
+.f5-sig-ray{position:absolute;top:4px;width:34%;height:3px;background:linear-gradient(90deg,transparent,#ffe07a,transparent);z-index:14}
+.f5-sig-ray.r1{left:3%;transform:rotate(-4deg)}.f5-sig-ray.r2{right:3%;transform:rotate(4deg)}.f5-sig-ray.r3{left:33%;top:16px;width:34%;opacity:.6}
+
+/* Card back */
+.fhq-fix5-back{position:absolute;inset:0;border-radius:16px;overflow:hidden;background:
+  repeating-linear-gradient(45deg,#071017 0 8px,#0b151d 8px 16px),#071017;
+  border:4px solid #4ebce9;box-shadow:inset 0 0 0 3px #101e27,inset 0 0 35px #000}
+.fhq-fix5-back::before{content:"";position:absolute;inset:12px;border:1px solid #39738c;clip-path:polygon(0 8%,8% 0,92% 0,100% 8%,100% 92%,92% 100%,8% 100%,0 92%)}
+.f5-back-core{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:3px;color:#dff7ff}
+.f5-back-core span{color:#79d8ff;font-size:14px;letter-spacing:8px}.f5-back-core strong{font-size:43px;line-height:1}.f5-back-core small{font-size:8px;font-weight:1000;letter-spacing:2px;color:#78b9d4}
+
+/* Universal fit: never crop card shell in Collections, viewer, pack carousel, results. */
+#fhqAlbumGrid .fhq-fix5-card,
+#fhqV833CardOverlay .fhq-fix5-card,
+#fhqPackOverlay .fhq-fix5-card{width:100%!important;height:auto!important;aspect-ratio:36/55!important;max-width:100%!important}
+#fhqAlbumGrid .fhq-v823-card{aspect-ratio:36/55!important;height:auto!important;overflow:visible!important}
+#fhqAlbumGrid .fhq-v823-card .fhq-fix5-card{position:absolute!important;inset:0!important}
+#fhqV833CardOverlay .fhq-fix5-card{width:min(420px,74vw)!important;margin:auto!important}
+#fhqPackOverlay.fhq-v8832-interactive .fhq-v8832-front{padding:0!important;overflow:visible!important}
+#fhqPackOverlay.fhq-v8832-interactive .fhq-v8832-front .fhq-fix5-card{height:100%!important;width:auto!important;max-width:100%!important;margin:auto!important}
+#fhqPackOverlay.fhq-v8832-results .fhq-fix5-card{width:100%!important}
+.fhq-v8832-result-art{aspect-ratio:36/55!important;overflow:visible!important}
+
+/* Rarer pulls should physically feel more premium in the carousel. */
+#fhqPackOverlay .fhq-v8832-slide[data-rarity="legendary"] .fhq-fix5-card{filter:drop-shadow(0 0 16px rgba(255,199,52,.28))}
+#fhqPackOverlay .fhq-v8832-slide[data-rarity="obsidian"] .fhq-fix5-card{filter:drop-shadow(0 0 22px rgba(122,80,194,.42))}
+#fhqPackOverlay .fhq-v8832-slide[data-rarity="signature"] .fhq-fix5-card{filter:drop-shadow(0 0 26px rgba(255,196,50,.48))}
+
+/* FULL animation treatment — uses the existing V88.33 reveal timing/audio hooks. */
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="rare"] .fhq-v8832-card-shell{
+  animation:f5RareBuild 1.25s ease both!important
+}
+@keyframes f5RareBuild{0%{filter:brightness(.72)}48%{filter:brightness(1.5) drop-shadow(0 0 28px #4cbcff)}100%{filter:brightness(1)}}
+
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="epic"] .fhq-v8832-card-shell{
+  animation:f5EpicBuild 1.55s cubic-bezier(.2,.8,.2,1) both!important
+}
+@keyframes f5EpicBuild{0%{transform:scale(.96);filter:brightness(.65)}40%{transform:scale(1.055);filter:brightness(1.4) drop-shadow(0 0 38px #bd58ff)}100%{transform:scale(1);filter:brightness(1)}}
+
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="legendary"] .fhq-v8832-card-shell{
+  animation:f5LegendBuild 1.95s cubic-bezier(.18,.86,.2,1) both!important
+}
+@keyframes f5LegendBuild{0%,15%{transform:scale(.92);filter:brightness(.42)}35%{transform:scale(1.07);filter:brightness(1.75) drop-shadow(0 0 44px #ffc72e)}52%{transform:scale(.99)}70%{transform:scale(1.045)}100%{transform:scale(1);filter:brightness(1)}}
+
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="obsidian"] .fhq-v8832-card-shell::before{
+  content:"";position:absolute;inset:-42px;border-radius:50%;z-index:-1;
+  background:conic-gradient(transparent,#7c52ca,#06020e,#b58cff,transparent);
+  filter:blur(8px);animation:f5ObVortex 2.2s cubic-bezier(.15,.75,.2,1) both
+}
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="obsidian"] .fhq-v8832-card-shell{
+  animation:f5ObBuild 2.2s cubic-bezier(.16,.82,.2,1) both!important
+}
+@keyframes f5ObVortex{0%{opacity:0;transform:scale(.2) rotate(0)}25%,70%{opacity:.92;transform:scale(1) rotate(540deg)}100%{opacity:0;transform:scale(1.6) rotate(820deg)}}
+@keyframes f5ObBuild{0%,32%{transform:scale(.89);filter:brightness(.18) saturate(.4)}52%{transform:scale(1.075);filter:brightness(1.45) drop-shadow(0 0 48px #8b62d2)}70%{transform:scale(.985)}100%{transform:scale(1);filter:none}}
+
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="signature"] .fhq-v8832-card-shell::before{
+  content:"";position:absolute;inset:-55px;z-index:-1;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent,#ffd650,#6ce5ff,#c76cff,#ff9251,#fff3a4,transparent);
+  filter:blur(12px);animation:f5SigHalo 2.35s ease both
+}
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="signature"] .fhq-v8832-card-shell{
+  animation:f5SigBuild 2.35s cubic-bezier(.15,.86,.2,1) both!important
+}
+@keyframes f5SigHalo{0%{opacity:0;transform:scale(.25) rotate(-120deg)}30%,78%{opacity:1;transform:scale(1) rotate(260deg)}100%{opacity:0;transform:scale(1.45) rotate(420deg)}}
+@keyframes f5SigBuild{0%,26%{transform:scale(.9);filter:brightness(.38)}44%{transform:scale(1.09);filter:brightness(1.7) drop-shadow(0 0 54px #ffd34f)}58%{transform:scale(.985)}74%{transform:scale(1.055)}100%{transform:scale(1);filter:none}}
+
+/* Make legacy V88.33 FX richer instead of replacing their approved timing. */
+.fhq-v8833-fx.legendary .fhq-v8833-flash{box-shadow:inset 0 0 100px rgba(255,191,37,.20)}
+.fhq-v8833-fx.obsidian .fhq-v8833-vortex{box-shadow:0 0 90px 32px rgba(83,47,147,.35)}
+.fhq-v8833-fx.signature .fhq-v8833-sign path{stroke-width:10!important;filter:drop-shadow(0 0 12px #ffd02b) drop-shadow(0 0 34px rgba(255,192,0,.9))!important}
+
+/* Common is intentionally restrained; it must read as the lowest rarity. */
+.rarity-common .f5-art-glint{display:none!important}
+.rarity-common .f5-frame{box-shadow:inset 0 0 0 2px #05090d,inset 0 0 0 4px rgba(184,192,198,.22)!important}
+
+@media(max-width:700px){
+  .f5-title strong{font-size:19px}
+  .f5-title span{font-size:8px}
+  .f5-flavor{font-size:7.5px}
+  .f5-signature span{font-size:22px}
+}
+@media(prefers-reduced-motion:reduce){
+  .fhq-fix5-card *,.fhq-fix5-card::before,.fhq-fix5-card::after{animation:none!important;transition:none!important}
+}
