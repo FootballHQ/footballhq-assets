@@ -9425,3 +9425,16 @@ body.leaderboard-page .fhq-rank-row.is-me{
   background:linear-gradient(90deg,rgba(42,158,205,.18),rgba(15,24,30,.96))!important;
   box-shadow:inset 3px 0 #69d7ff!important;
 }
+
+
+/* FOOTBALL HQ V88.36 FIX4.2 — first place emphasis */
+body.leaderboard-page .fhq-podium-card.first{
+  min-height:198px!important;
+  transform:translateY(-12px)!important;
+  margin-bottom:-12px!important;
+  box-shadow:0 0 0 1px rgba(224,190,89,.14),0 0 26px rgba(214,178,68,.10),0 18px 38px rgba(0,0,0,.30)!important;
+}
+body.leaderboard-page .fhq-podium-card.first .fhq-podium-avatar{
+  width:70px!important;
+  height:70px!important;
+}
