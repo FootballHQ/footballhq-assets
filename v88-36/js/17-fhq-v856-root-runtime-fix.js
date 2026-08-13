@@ -2,6 +2,7 @@
   'use strict';
 
   function reclaimImageRenderer(){
+    if(window.FHQ_FIX5_CARD_RENDERER)return;
     if(typeof window.fhqV85CardMarkup==='function')window.fhqCardArtHTML=window.fhqV85CardMarkup;
   }
   function root(){return document.getElementById('fhqAlbumGrid')}

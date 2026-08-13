@@ -7150,8 +7150,7 @@
 
  function fhqCardArtHTML(card){
     card=card||{};
-    // V85 HARD SWITCH: collectible artwork is image-only.
-    // No procedural SVG renderer is allowed to render a collectible card.
+    if(typeof window.FHQFix5CardMarkup==='function')return window.FHQFix5CardMarkup(card);
     return fhqV85CardMarkup(card);
  }
 
@@ -7629,8 +7628,9 @@
 
         function cardFrontHTML(x){
           if(x.type==='card'){
+            if(typeof window.FHQFix5CardMarkup==='function')return window.FHQFix5CardMarkup(x);
             const src=typeof fhqV85ImageForCard==='function'?fhqV85ImageForCard(x):'';
-            return '<div class="fhq-v8832-art-wrap"><img class="fhq-v8832-card-art" src="'+esc(src)+'" alt="'+esc(x.name||'Football HQ card')+'" draggable="false"></div>';
+            return '<div class="fhq-v8832-art-wrap"><img class="fhq-v8832-card-art" src="'+esc(src)+'" alt="" draggable="false"></div>';
           }
           if(x.type==='avatar')return '<div class="fhq-v8832-special-front">'+fhqAvatarTokenHTML(x.value)+'<strong>'+esc(x.name||'Avatar')+'</strong></div>';
           if(x.type==='coins')return '<div class="fhq-v8832-special-front"><span class="fhq-pass-coin-reward"></span><strong>'+esc(x.name||('+'+Number(x.value||0)+' HQ Coins'))+'</strong></div>';
@@ -7642,7 +7642,7 @@
           return '<div class="fhq-v8832-slide '+(i===0?'active':'')+'" data-i="'+i+'" data-rarity="'+esc(rarity)+'">'+
             '<div class="fhq-v8832-card-shell">'+
               '<div class="fhq-v8832-card-inner">'+
-                '<div class="fhq-v8832-face fhq-v8832-back"><span class="fhq-v8832-back-shield">HQ</span></div>'+
+                '<div class="fhq-v8832-face fhq-v8832-back"><div class="fhq-fix5-back"><div class="f5-back-core"><span>★</span><strong>HQ</strong><small>FOOTBALL HQ</small></div></div></div>'+
                 '<div class="fhq-v8832-face fhq-v8832-front">'+cardFrontHTML(x)+'</div>'+
               '</div>'+
               '<div class="fhq-v8832-rarity-burst"></div>'+
