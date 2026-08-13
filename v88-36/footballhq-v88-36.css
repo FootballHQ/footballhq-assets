@@ -9648,3 +9648,312 @@ body.leaderboard-page .fhq-podium-card.first .fhq-podium-avatar{
 @media(prefers-reduced-motion:reduce){
   .fhq-fix5-card *,.fhq-fix5-card::before,.fhq-fix5-card::after{animation:none!important;transition:none!important}
 }
+
+
+/* FOOTBALL HQ FIX5.1 — artwork mapping fallback */
+.fhq-fix5-card .f5-art-missing{
+  position:absolute;inset:0;place-items:center;
+  background:radial-gradient(circle at 50% 42%,var(--f5glow),transparent 42%),#071016;
+  color:var(--f5);font-size:34px;font-weight:1000;letter-spacing:.08em;
+}
+
+
+/* FOOTBALL HQ FIX5.2 — force approved character artwork visible */
+.fhq-fix5-card .f5-art img{
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+
+/* ================================================================
+   FOOTBALL HQ FIX5.3 — PREMIUM RARITY FRAME UPGRADE
+   ================================================================ */
+
+/* More room for art and better premium hierarchy. */
+.fhq-fix5-card .f5-art{top:79px;height:56.5%!important}
+.fhq-fix5-card .f5-flavor{bottom:94px;font-size:8.2px!important}
+.fhq-fix5-card .f5-stats{bottom:42px!important}
+
+/* COMMON: deliberately restrained silver/graphite. */
+.fhq-fix5-card.rarity-common .f5-frame{
+  border-color:#9ba5ab!important;
+  background:linear-gradient(180deg,#0a0e11,#05080b)!important;
+  box-shadow:inset 0 0 0 2px #050709,inset 0 0 0 4px rgba(172,182,188,.20)!important;
+}
+.fhq-fix5-card.rarity-common .f5-frame::before{border-color:rgba(185,195,201,.36)!important}
+
+/* UNCOMMON: green metal trim, still restrained. */
+.fhq-fix5-card.rarity-uncommon .f5-frame{
+  background:
+    linear-gradient(180deg,rgba(15,30,16,.96),rgba(4,11,8,.99)),
+    radial-gradient(circle at 50% 30%,rgba(91,220,73,.13),transparent 40%)!important;
+  box-shadow:inset 0 0 0 2px #071008,inset 0 0 0 5px rgba(104,214,76,.24)!important;
+}
+
+/* RARE: layered blue tech frame. */
+.fhq-fix5-card.rarity-rare .f5-frame{
+  border-width:4px!important;
+  background:
+    linear-gradient(135deg,rgba(8,25,39,.98),rgba(3,9,15,.99)),
+    radial-gradient(circle at 50% 28%,rgba(61,180,255,.22),transparent 44%)!important;
+  box-shadow:inset 0 0 0 2px #04101a,inset 0 0 0 6px rgba(57,171,255,.23),
+             0 0 18px rgba(55,164,255,.14)!important;
+}
+.rarity-rare .f5-frame::before{border-width:2px!important}
+
+/* EPIC: faceted purple frame and illuminated corners. */
+.fhq-fix5-card.rarity-epic .f5-frame{
+  border-width:4px!important;
+  background:
+    linear-gradient(145deg,rgba(31,10,44,.98),rgba(6,6,15,.99)),
+    radial-gradient(circle at 50% 25%,rgba(191,67,255,.25),transparent 43%)!important;
+  box-shadow:inset 0 0 0 2px #12051a,inset 0 0 0 7px rgba(186,70,245,.24),
+             0 0 25px rgba(190,72,255,.20)!important;
+}
+.rarity-epic .f5-frame::before{border:2px solid rgba(222,132,255,.72)!important}
+.rarity-epic .f5-art{box-shadow:0 0 15px rgba(194,85,255,.22)}
+
+/* LEGENDARY: premium gold architecture, crown and double rails. */
+.fhq-fix5-card.rarity-legendary .f5-frame{
+  border-width:5px!important;
+  background:
+    radial-gradient(circle at 50% 21%,rgba(255,197,43,.22),transparent 35%),
+    linear-gradient(135deg,#171107,#090b0d 42%,#0c0904 72%,#1c1407)!important;
+  box-shadow:inset 0 0 0 2px #fff0a4,inset 0 0 0 7px #3a2809,
+             inset 0 0 0 9px rgba(255,196,54,.24),
+             0 0 30px rgba(255,187,39,.28)!important;
+}
+.rarity-legendary .f5-frame::before{
+  border:2px solid #dfad31!important;
+  filter:drop-shadow(0 0 5px rgba(255,196,54,.50))
+}
+.rarity-legendary .f5-art{
+  border-width:3px!important;
+  box-shadow:0 0 0 2px rgba(255,229,144,.20),0 0 20px rgba(255,187,39,.18)
+}
+
+/* OBSIDIAN: distinctive advanced black crystal frame. */
+.fhq-fix5-card.rarity-obsidian{
+  filter:drop-shadow(0 0 10px rgba(128,83,205,.38))
+}
+.fhq-fix5-card.rarity-obsidian .f5-frame{
+  border:6px solid #15101d!important;
+  background:
+    linear-gradient(120deg,rgba(74,41,112,.19),transparent 22%,rgba(179,141,255,.09) 38%,transparent 50%,rgba(77,43,123,.20) 70%,transparent),
+    repeating-conic-gradient(from 20deg at 50% 50%,#030407 0 4deg,#111019 4deg 8deg,#040407 8deg 12deg)!important;
+  box-shadow:
+    inset 0 0 0 2px #ddd1ff,
+    inset 0 0 0 5px #2a1d3f,
+    inset 0 0 0 9px #07070a,
+    0 0 34px rgba(119,77,190,.50)!important;
+}
+.rarity-obsidian .f5-frame::before{
+  inset:11px!important;border:2px solid #9c7bd0!important;
+  box-shadow:inset 0 0 16px rgba(115,75,184,.26);
+}
+.rarity-obsidian .f5-art{
+  border:3px solid #a98ad9!important;
+  box-shadow:0 0 0 2px #110c19,0 0 26px rgba(114,70,185,.36)
+}
+.f53-rail{position:absolute;top:82px;bottom:40px;width:6px;z-index:13;background:
+  linear-gradient(180deg,transparent,#bea4ec 12%,#513778 33%,#e2d5ff 50%,#513778 72%,#bea4ec 88%,transparent);
+  filter:drop-shadow(0 0 4px #7a55b5)}
+.f53-rail.l{left:5px}.f53-rail.r{right:5px}
+.rarity-obsidian .f5-gem{width:21px!important;height:21px!important;background:
+  linear-gradient(135deg,#e9ddff,#6f4c9f 42%,#171021 70%,#d7c7ff)!important}
+
+/* SIGNATURE: chase-card showpiece with layered gold/iridescent frame. */
+.fhq-fix5-card.rarity-signature{
+  filter:drop-shadow(0 0 13px rgba(255,194,49,.48))
+}
+.fhq-fix5-card.rarity-signature .f5-frame{
+  border:6px solid #e3ac29!important;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,221,108,.25),transparent 31%),
+    linear-gradient(135deg,#130d04,#07131a 25%,#171019 47%,#071419 72%,#160e04)!important;
+  box-shadow:
+    inset 0 0 0 2px #fff4bd,
+    inset 0 0 0 5px #6f4b0c,
+    inset 0 0 0 9px #0b0c0d,
+    inset 0 0 0 11px rgba(255,218,100,.18),
+    0 0 42px rgba(255,187,40,.52)!important;
+}
+.rarity-signature .f5-frame::before{
+  inset:11px!important;border:3px solid transparent!important;
+  background:
+    linear-gradient(#080d11,#080d11) padding-box,
+    linear-gradient(120deg,#ffe278,#7ee7ff,#ca79ff,#ff9962,#fff2a3,#ffe278) border-box!important;
+}
+.rarity-signature .f5-art{
+  border:3px solid #ffd864!important;
+  box-shadow:0 0 0 2px rgba(255,245,190,.20),
+             0 0 30px rgba(255,190,44,.36)!important;
+}
+.f53-sig-rail{position:absolute;top:82px;bottom:40px;width:7px;z-index:13;
+  background:linear-gradient(180deg,transparent,#ffe178,#7ee7ff,#d177ff,#ffac5f,#ffe178,transparent);
+  filter:drop-shadow(0 0 5px rgba(255,211,82,.75))}
+.f53-sig-rail.l{left:5px}.f53-sig-rail.r{right:5px}
+.f53-sig-crown{
+  position:absolute;left:50%;top:2px;transform:translateX(-50%);
+  width:68px;height:26px;z-index:16;
+  background:linear-gradient(90deg,#d99c21,#fff0a2,#ffc33f,#fff0a2,#d99c21);
+  clip-path:polygon(0 100%,8% 35%,25% 70%,38% 8%,50% 60%,62% 8%,75% 70%,92% 35%,100% 100%);
+  filter:drop-shadow(0 0 8px rgba(255,200,64,.75));
+}
+.rarity-signature .f5-signature span{
+  font-size:30px!important;color:#ffe16c!important;
+  text-shadow:0 0 3px #000,0 0 10px #ffbf31,0 0 22px rgba(255,181,33,.8)!important
+}
+
+/* Tiny rarity accent chips so each tier reads immediately. */
+.fhq-fix5-card .f5-rarity b{
+  padding:4px 7px;border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--f5) 65%,transparent);
+  background:rgba(2,8,12,.62)
+}
+.rarity-legendary .f5-rarity b,.rarity-signature .f5-rarity b{background:rgba(62,39,5,.72)}
+.rarity-obsidian .f5-rarity b{background:rgba(30,18,48,.78)}
+
+/* Preserve the tall card shape everywhere. */
+.fhq-fix5-card{aspect-ratio:36/55!important}
+#fhqPackOverlay .fhq-v8832-front .fhq-fix5-card{aspect-ratio:36/55!important}
+
+
+/* ================================================================
+   FOOTBALL HQ FIX5.4 — ARTWORK FRAMING
+   Characters are intentionally backed off inside the art window.
+   ================================================================ */
+.fhq-fix5-card .f5-art img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  transform:none!important;
+  max-width:100%!important;
+  max-height:100%!important;
+}
+.fhq-fix5-card .f5-art{
+  background:#071017!important;
+}
+
+
+/* ================================================================
+   FOOTBALL HQ FIX5.5 — APPROVED 001 GRIDIRON FINAL CARD FIT
+   - 720x1040 canonical card canvas everywhere
+   - no crop, no forced zoom, no stretch
+   - common/uncommon restrained
+   - rare -> signature progressively more complex
+   - exact approved 023 Obsidian and 024 Signature are full-card assets
+   ================================================================ */
+:root{--fhq-fix55-card-ratio:720 / 1040}
+
+.fhq-fix5-card{
+  aspect-ratio:var(--fhq-fix55-card-ratio)!important;
+  border-radius:14px!important;
+  image-rendering:auto!important;
+}
+#fhqAlbumGrid .fhq-v823-card,
+#fhqAlbumGrid .fhq-fix5-card,
+#fhqV833CardOverlay .fhq-fix5-card,
+#fhqPackOverlay .fhq-fix5-card,
+#fhqPackOverlay .fhq-v8832-result-art{
+  aspect-ratio:var(--fhq-fix55-card-ratio)!important;
+}
+
+/* Never crop or zoom the character art. */
+.fhq-fix5-card:not(.fhq-fix5-exact-card) .f5-art{
+  left:16px!important;right:16px!important;top:80px!important;height:55%!important;
+  overflow:hidden!important;background:#050b0f!important;
+}
+.fhq-fix5-card:not(.fhq-fix5-exact-card) .f5-art img{
+  width:100%!important;height:100%!important;
+  object-fit:contain!important;object-position:50% 50%!important;
+  transform:none!important;scale:1!important;
+  filter:saturate(1.03) contrast(1.03)!important;
+}
+
+/* Exact approved premium cards: entire 720x1040 image is shown. */
+.fhq-fix5-exact-card{
+  background:#03070a!important;
+  overflow:hidden!important;
+  box-shadow:none!important;
+  filter:none!important;
+}
+.fhq-fix5-exact-card .f5-exact-full-card{
+  position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;
+  object-fit:contain!important;object-position:center!important;
+  transform:none!important;
+  display:block!important;
+  image-rendering:auto!important;
+}
+
+/* Common = basic graphite; no premium animation or extra geometry. */
+.fhq-fix5-card.rarity-common .f5-frame{
+  border-width:3px!important;border-color:#8c969c!important;
+  background:linear-gradient(180deg,#0a0e11,#05080a)!important;
+  box-shadow:inset 0 0 0 2px #030507,inset 0 0 0 4px rgba(175,185,191,.12)!important;
+}
+.rarity-common .f5-frame::after,.rarity-common .f5-art-glint{display:none!important}
+.rarity-common .f5-corner{border-width:2px!important;opacity:.58!important}
+
+/* Uncommon = simple green trim; still intentionally basic. */
+.fhq-fix5-card.rarity-uncommon .f5-frame{
+  border-width:3px!important;
+  box-shadow:inset 0 0 0 2px #050a06,inset 0 0 0 4px rgba(117,218,74,.17)!important;
+}
+.rarity-uncommon .f5-frame::after{opacity:.16!important}
+.rarity-uncommon .f5-corner{border-width:3px!important}
+.rarity-uncommon .f5-notch{height:5px!important;opacity:.52!important}
+
+/* Rare begins the premium progression. */
+.fhq-fix5-card.rarity-rare .f5-frame{
+  border-width:4px!important;
+  box-shadow:inset 0 0 0 2px #03101a,inset 0 0 0 6px rgba(55,174,255,.24),
+             0 0 16px rgba(55,174,255,.16)!important;
+}
+.rarity-rare .f5-art{box-shadow:0 0 12px rgba(55,174,255,.18)!important}
+
+/* Epic visibly above Rare. */
+.fhq-fix5-card.rarity-epic .f5-frame{
+  border-width:5px!important;
+  box-shadow:inset 0 0 0 2px #13051b,inset 0 0 0 7px rgba(195,74,255,.25),
+             0 0 23px rgba(195,74,255,.22)!important;
+}
+.rarity-epic .f5-art{box-shadow:0 0 18px rgba(195,74,255,.24)!important}
+
+/* Legendary is a major gold jump. */
+.fhq-fix5-card.rarity-legendary .f5-frame{
+  border-width:5px!important;
+  box-shadow:inset 0 0 0 2px #fff0a4,inset 0 0 0 7px #3a2809,
+             inset 0 0 0 10px rgba(255,196,54,.23),
+             0 0 31px rgba(255,187,39,.30)!important;
+}
+
+/* Keep pack and collection slots centered around the entire card, never the art window. */
+#fhqPackOverlay.fhq-v8832-interactive .fhq-v8832-front{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  overflow:visible!important;padding:0!important;
+}
+#fhqPackOverlay.fhq-v8832-interactive .fhq-v8832-front .fhq-fix5-card{
+  width:auto!important;height:min(69vh,680px)!important;
+  max-width:min(86vw,471px)!important;max-height:100%!important;
+  margin:auto!important;
+}
+#fhqPackOverlay.fhq-v8832-results .fhq-fix5-card{
+  width:100%!important;height:auto!important;max-width:100%!important;
+}
+#fhqAlbumGrid .fhq-v823-card{
+  overflow:hidden!important;background:#03070a!important;
+}
+#fhqAlbumGrid .fhq-v823-card .fhq-fix5-card{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+}
+
+/* No browser-side blur from oversized transforms on the card itself. */
+#fhqPackOverlay .fhq-fix5-card,
+#fhqAlbumGrid .fhq-fix5-card,
+#fhqV833CardOverlay .fhq-fix5-card{
+  transform:none!important;
+  backface-visibility:hidden!important;
+}
