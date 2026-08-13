@@ -1,100 +1,80 @@
-
 (function(){
   'use strict';
 
   function reclaimImageRenderer(){
-    if(typeof window.fhqV85CardMarkup==='function'){
-      window.fhqCardArtHTML=window.fhqV85CardMarkup;
-    }
+    if(typeof window.fhqV85CardMarkup==='function')window.fhqCardArtHTML=window.fhqV85CardMarkup;
   }
-  reclaimImageRenderer();
-
-  function showCollectionRenderError(err,setName){
-    try{
-      console.error('[Football HQ V85.6 collection render]',setName,err);
-      var root=document.getElementById('fhqAlbumGrid');
-      if(!root)return;
-      root.innerHTML=
-        '<div style="max-width:760px;margin:70px auto;padding:28px;border:1px solid #35586a;border-radius:18px;background:#101b22;color:#eef9ff;text-align:center">'+
-          '<h2 style="margin:0 0 10px">Collection could not render</h2>'+
-          '<p style="color:#91a8b5;margin:0 0 10px">Football HQ caught the collection error instead of leaving this button unresponsive.</p>'+
-          '<p style="color:#66808f;font-size:11px;margin:0 0 18px">'+fhqV85EscapeHTML(err&&err.message?err.message:String(err||''))+'</p>'+
-          '<button type="button" id="fhqV856CollectionRetry" style="border:1px solid #4cc9ff;background:#176b91;color:#fff;border-radius:10px;padding:11px 18px;font-weight:900">BACK TO COLLECTIONS</button>'+
-        '</div>';
-      var b=document.getElementById('fhqV856CollectionRetry');
-      if(b)b.onclick=function(){
-        window.__fhqOpenCollectionSet='';
-        if(typeof window.fhqV823RenderCollections==='function'){
-          window.fhqV823RenderCollections(window.__fhqLastCollectionsState);
-        }
-      };
-    }catch(_){}
+  function root(){return document.getElementById('fhqAlbumGrid')}
+  function state(){return window.__fhqLastCollectionsState||null}
+  function hasHome(r){return !!(r&&(r.querySelector('.fhq-v823-cover[data-v823-set]')||r.querySelector('[data-fix3-set]')||r.querySelector('[data-open-set]')))}
+  function hasDetail(r){return !!(r&&(r.querySelector('.fhq-v823-detail')||r.querySelector('.fhq-collection-detail')))}
+  function render(s){
+    reclaimImageRenderer();
+    if(typeof window.fhqV823RenderCollections!=='function')throw new Error('Collections renderer unavailable.');
+    window.fhqV823RenderCollections(s);
   }
-
-  window.fhqOpenModernCollection=function(setName){
-    setName=String(setName||'');
-    try{
-      reclaimImageRenderer();
-
-      var state=window.__fhqLastCollectionsState;
-      if(!state || !state.sets)throw new Error('Collections state is unavailable.');
-      if(!Object.prototype.hasOwnProperty.call(state.sets,setName)){
-        throw new Error('Collection set not found: '+setName);
-      }
-      if(typeof window.fhqV823RenderCollections!=='function'){
-        throw new Error('Modern Collections renderer is unavailable.');
-      }
-
-      window.__fhqOpenCollectionSet=setName;
-      window.fhqV823RenderCollections(state);
-
-      var root=document.getElementById('fhqAlbumGrid');
-      if(!root || !root.querySelector('.fhq-v823-detail')){
-        throw new Error('Detail renderer returned without creating the collection detail screen.');
-      }
-
-      try{window.scrollTo({top:0,behavior:'smooth'});}
-      catch(_scroll){window.scrollTo(0,0);}
+  function home(attempt){
+    attempt=Number(attempt||0);
+    var s=state();
+    if(!s||!s.sets){
+      if(attempt<5)return setTimeout(function(){home(attempt+1)},50+attempt*40);
       return false;
+    }
+    window.__fhqOpenCollectionSet='';
+    try{
+      render(s);
+      if(!hasHome(root()))throw new Error('Collection home did not finish rendering.');
+      return true;
     }catch(err){
-      showCollectionRenderError(err,setName);
+      console.warn('[Football HQ FIX4.1 collection home retry '+attempt+']',err);
+      if(attempt<4)setTimeout(function(){home(attempt+1)},60+attempt*50);
       return false;
     }
+  }
+  function openSet(name,attempt){
+    name=String(name||'');attempt=Number(attempt||0);
+    var s=state();
+    if(!s||!s.sets){
+      if(attempt<5)return setTimeout(function(){openSet(name,attempt+1)},45+attempt*45);
+      return home(0);
+    }
+    if(!Object.prototype.hasOwnProperty.call(s.sets,name))return home(0);
+    try{
+      window.__fhqOpenCollectionSet=name;
+      render(s);
+      if(!hasDetail(root()))throw new Error('Collection detail did not finish rendering.');
+      try{window.scrollTo({top:0,behavior:'smooth'})}catch(_){window.scrollTo(0,0)}
+    }catch(err){
+      console.warn('[Football HQ FIX4.1 collection detail retry '+attempt+']',name,err);
+      if(attempt<4)setTimeout(function(){openSet(name,attempt+1)},60+attempt*55);
+      else home(0);
+    }
+  }
+
+  window.fhqOpenModernCollection=function(name){
+    requestAnimationFrame(function(){openSet(name,0)});
+    return false;
   };
 
   document.addEventListener('click',function(e){
-    var root=document.getElementById('fhqAlbumGrid');
-    if(!root)return;
-
-    var cover=e.target && e.target.closest
-      ? e.target.closest('.fhq-v823-cover[data-v823-set]')
-      : null;
-
-    if(cover && root.contains(cover)){
-      e.preventDefault();
-      e.stopPropagation();
+    var r=root();if(!r)return;
+    var cover=e.target&&e.target.closest?e.target.closest('.fhq-v823-cover[data-v823-set]'):null;
+    if(cover&&r.contains(cover)){
+      e.preventDefault();e.stopImmediatePropagation();
       window.fhqOpenModernCollection(cover.getAttribute('data-v823-set'));
       return;
     }
-
-    var back=e.target && e.target.closest ? e.target.closest('#fhqV823Back') : null;
-    if(back && root.contains(back)){
-      e.preventDefault();
-      e.stopPropagation();
+    var back=e.target&&e.target.closest?e.target.closest('#fhqV823Back'):null;
+    if(back&&r.contains(back)){
+      e.preventDefault();e.stopImmediatePropagation();
       window.__fhqOpenCollectionSet='';
-      try{
-        reclaimImageRenderer();
-        window.fhqV823RenderCollections(window.__fhqLastCollectionsState);
-        try{window.scrollTo({top:0,behavior:'smooth'});}catch(_){window.scrollTo(0,0);}
-      }catch(err){
-        showCollectionRenderError(err,'BACK');
-      }
+      requestAnimationFrame(function(){home(0);try{window.scrollTo({top:0,behavior:'smooth'})}catch(_){window.scrollTo(0,0)}});
     }
-  },false);
+  },true);
 
-  /* Deferred legacy startup code can overwrite globals after DOMContentLoaded.
-     Reclaim once immediately and again after startup settles. */
+  reclaimImageRenderer();
   setTimeout(reclaimImageRenderer,0);
-  setTimeout(reclaimImageRenderer,500);
-  setTimeout(reclaimImageRenderer,1500);
+  setTimeout(reclaimImageRenderer,300);
+  setTimeout(reclaimImageRenderer,900);
+  window.FHQ_FIX41_COLLECTIONS=true;
 })();

@@ -5184,13 +5184,8 @@
 
 
   function fhqFix4CollectionMeta(){
-    try{
-      if(typeof FHQ_COLLECTION_SET_META!=='undefined' && FHQ_COLLECTION_SET_META){
-        window.__FHQ_COLLECTION_SET_META=FHQ_COLLECTION_SET_META;
-        return FHQ_COLLECTION_SET_META;
-      }
-    }catch(e){}
-    return window.__FHQ_COLLECTION_SET_META||{};
+    // Never touch the later lexical const before its declaration.
+    return window.__FHQ_COLLECTION_SET_META||window.FHQ_COLLECTION_SET_META||{};
   }
 
   function fhqLoadCollections(){
@@ -7929,7 +7924,12 @@
       if(x.type==='ring')return '<span class="fhq-leader-avatar '+fhqRingClass(x.value)+'">'+fhqAvatarTokenHTML(FHQ_STARTER_AVATAR)+'</span>';
       if(x.type==='banner')return '<div class="fhq-fix4-banner-preview '+fhqBannerClass(x.value)+'"></div>';
       if(x.type==='title')return '<span class="fhq-fix4-title-preview">'+esc(x.value||x.name||'Title')+'</span>';
-      if(x.type==='card')return fhqCardArtHTML(x);
+      if(x.type==='card'){
+        const catalog=Array.isArray(window.__fhqCardCatalog)?window.__fhqCardCatalog:
+          (Array.isArray(FHQ_CARD_CATALOG_FALLBACK)?FHQ_CARD_CATALOG_FALLBACK:[]);
+        const card=catalog.find(c=>String(c&&c.id||'')===String(x.value||x.cardId||''));
+        return card ? fhqCardArtHTML(card) : '<span class="fhq-fix4-cosmetic-placeholder">HQ</span>';
+      }
     }catch(e){console.warn('Locker preview fallback',e)}
     return '<span class="fhq-fix4-cosmetic-placeholder">HQ</span>';
   }
@@ -7945,7 +7945,15 @@
     const eq=function(x){return (x.type==='avatar'&&fhqProfilePrefs().avatar===x.value)||(x.type==='ring'&&c.ring===x.value)||(x.type==='banner'&&c.banner===x.value)||(x.type==='title'&&fhqEquippedTitle()===x.value)};
     const typeOrder={avatar:0,ring:1,banner:2,title:3,card:4},rarityOrder={signature:0,obsidian:1,legendary:2,epic:3,rare:4,uncommon:5,common:6};
     let list=inv.filter(x=>fhqLockerPageFilter==='all'||x.type===fhqLockerPageFilter);
-    list.sort(function(a,b){return Number(eq(b))-Number(eq(a))+(typeOrder[a.type]??99)-(typeOrder[b.type]??99)+(rarityOrder[a.rarity]??9)-(rarityOrder[b.rarity]??9)||String(a.name||a.value).localeCompare(String(b.name||b.value))});
+    list.sort(function(a,b){
+      const equippedDiff=Number(eq(b))-Number(eq(a));
+      if(equippedDiff)return equippedDiff;
+      const typeDiff=(typeOrder[a.type]??99)-(typeOrder[b.type]??99);
+      if(typeDiff)return typeDiff;
+      const rarityDiff=(rarityOrder[a.rarity]??9)-(rarityOrder[b.rarity]??9);
+      if(rarityDiff)return rarityDiff;
+      return String(a.name||a.value).localeCompare(String(b.name||b.value));
+    });
     const cw=document.getElementById('fhqLockerCoins');if(cw)cw.textContent=String(fhqCachedCoins());
     if(!list.length){
       const names={avatar:'Avatars',title:'Titles',ring:'Rings',banner:'Banners',card:'Cards',all:'Items'},name=names[fhqLockerPageFilter]||'Items';
