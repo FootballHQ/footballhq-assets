@@ -10099,3 +10099,121 @@ body.leaderboard-page .fhq-podium-card.first .fhq-podium-avatar{
   z-index:50!important;
   margin-top:14px!important;
 }
+
+
+/* ================================================================
+   FOOTBALL HQ FIX5.8 — RARITY CINEMATIC UPGRADE
+   Visual FX only. Does NOT alter card geometry, fit, or renderer.
+   ================================================================ */
+
+#fhqPackOverlay .fhq-v8833-fx{
+  overflow:hidden!important;
+  pointer-events:none!important;
+}
+
+/* particle field */
+.fhq-v58-particles{
+  position:absolute;inset:0;pointer-events:none;z-index:14;
+}
+.fhq-v58-particles i{
+  --x:calc((var(--i) * 37) % 100);
+  position:absolute;
+  left:calc(var(--x) * 1%);
+  top:50%;
+  width:5px;height:5px;border-radius:50%;
+  background:currentColor;
+  opacity:0;
+  box-shadow:0 0 14px currentColor;
+  animation:fhqV58Particle var(--fxdur,1.5s) ease-out forwards;
+  animation-delay:calc(var(--i) * 22ms);
+}
+@keyframes fhqV58Particle{
+  0%{opacity:0;transform:translate3d(0,0,0) scale(.5)}
+  18%{opacity:.9}
+  100%{opacity:0;transform:translate3d(calc((var(--i) - 9)*11px),calc(-220px + (var(--i)%5)*80px),0) scale(1.4)}
+}
+
+/* rare */
+.fhq-v8833-fx.rare{color:#50c8ff}
+.fhq-v8833-fx.rare .fhq-v58-glow-ring,
+.fhq-v8833-fx.uncommon .fhq-v58-glow-ring{
+  position:absolute;left:50%;top:50%;width:180px;height:250px;border:2px solid currentColor;border-radius:24px;
+  transform:translate(-50%,-50%) scale(.55);opacity:0;
+  animation:fhqV58Ring var(--fxdur,1.4s) ease-out forwards;
+}
+@keyframes fhqV58Ring{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
+  28%{opacity:.8}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.7)}
+}
+
+/* epic */
+.fhq-v8833-fx.epic{color:#d55cff}
+.fhq-v58-energy-cross{
+  position:absolute;left:50%;top:50%;width:80%;height:80%;transform:translate(-50%,-50%);
+  background:
+    linear-gradient(90deg,transparent 48%,rgba(220,80,255,.75) 50%,transparent 52%),
+    linear-gradient(0deg,transparent 48%,rgba(220,80,255,.75) 50%,transparent 52%);
+  filter:blur(5px);opacity:0;
+  animation:fhqV58Energy var(--fxdur,1.9s) ease-in-out forwards;
+}
+@keyframes fhqV58Energy{0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(0)}45%{opacity:.85;transform:translate(-50%,-50%) scale(1.05) rotate(20deg)}}
+
+/* legendary */
+.fhq-v8833-fx.legendary{color:#ffd84a}
+.fhq-v58-gold-halo{
+  position:absolute;left:50%;top:50%;width:390px;height:520px;transform:translate(-50%,-50%);
+  border-radius:50%;opacity:0;
+  background:radial-gradient(circle,rgba(255,220,80,.46),rgba(255,175,0,.14) 45%,transparent 70%);
+  filter:blur(8px);
+  animation:fhqV58Gold var(--fxdur,2.3s) ease-in-out forwards;
+}
+@keyframes fhqV58Gold{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}45%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.25)}}
+
+/* obsidian */
+.fhq-v8833-fx.obsidian{color:#a46cff;background:rgba(0,0,0,.22)}
+.fhq-v58-obsidian-shards{
+  position:absolute;inset:8%;opacity:0;
+  background:
+    linear-gradient(132deg,transparent 0 18%,rgba(130,70,255,.42) 19% 20%,transparent 21% 44%,rgba(70,0,130,.48) 45% 47%,transparent 48%),
+    linear-gradient(48deg,transparent 0 30%,rgba(180,105,255,.32) 31% 33%,transparent 34% 70%,rgba(90,25,160,.52) 71% 73%,transparent 74%);
+  filter:drop-shadow(0 0 15px #7b35ff);
+  animation:fhqV58Shards var(--fxdur,2.8s) ease-in-out forwards;
+}
+@keyframes fhqV58Shards{0%{opacity:0;transform:scale(.65) rotate(-7deg)}42%{opacity:1}100%{opacity:0;transform:scale(1.22) rotate(8deg)}}
+
+/* signature — strongest, longest payoff */
+.fhq-v8833-fx.signature{color:#ffe27a}
+.fhq-v58-signature-dim{
+  position:absolute;inset:-20%;background:rgba(0,0,0,.72);opacity:0;
+  animation:fhqV58Dim var(--fxdur,3.3s) ease-in-out forwards;
+}
+@keyframes fhqV58Dim{0%{opacity:0}18%,55%{opacity:.78}100%{opacity:0}}
+.fhq-v58-signature-rainbow{
+  position:absolute;left:50%;top:50%;width:430px;height:590px;transform:translate(-50%,-50%) scale(.62);
+  border-radius:34px;opacity:0;
+  background:
+    conic-gradient(from 0deg,#ffd45a,#ff7bd5,#7ef1ff,#9aff6b,#ffd45a);
+  filter:blur(15px);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  padding:11px;
+  animation:fhqV58SigRainbow var(--fxdur,3.3s) cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes fhqV58SigRainbow{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.62) rotate(-8deg)}
+  36%{opacity:.95}
+  72%{opacity:1;transform:translate(-50%,-50%) scale(1.03) rotate(5deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.18) rotate(8deg)}
+}
+
+/* Stronger rarity hit without changing card dimensions */
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="legendary"] .fhq-v8832-card-shell{
+  filter:drop-shadow(0 0 22px rgba(255,205,55,.75));
+}
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="obsidian"] .fhq-v8832-card-shell{
+  filter:drop-shadow(0 0 28px rgba(137,68,255,.85));
+}
+#fhqPackOverlay .fhq-v8832-slide.revealing[data-rarity="signature"] .fhq-v8832-card-shell{
+  filter:drop-shadow(0 0 36px rgba(255,210,80,.95));
+}
