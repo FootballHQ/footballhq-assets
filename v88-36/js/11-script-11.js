@@ -7705,20 +7705,21 @@ try{
           centerTrack(true);
         }
         function revealDuration(rarity){
-          return rarity==='signature'?2450:rarity==='obsidian'?2300:rarity==='legendary'?2050:rarity==='epic'?1750:rarity==='rare'?1450:rarity==='uncommon'?1120:900;
+          return rarity==='signature'?3300:rarity==='obsidian'?2850:rarity==='legendary'?2350:rarity==='epic'?1900:rarity==='rare'?1500:rarity==='uncommon'?1100:820;
         }
         function fxLead(rarity){
-          return rarity==='signature'?1180:rarity==='obsidian'?1050:rarity==='legendary'?900:rarity==='epic'?760:rarity==='rare'?620:rarity==='uncommon'?480:340;
+          return rarity==='signature'?1650:rarity==='obsidian'?1370:rarity==='legendary'?1040:rarity==='epic'?800:rarity==='rare'?590:rarity==='uncommon'?410:260;
         }
         function fxHTML(rarity){
           const flash='<div class="fhq-v8833-flash"></div>';
+          const particles='<div class="fhq-v58-particles">'+Array.from({length:18},(_,i)=>'<i style="--i:'+i+'"></i>').join('')+'</div>';
           if(rarity==='common')return flash+'<div class="fhq-v8833-yard"></div>';
-          if(rarity==='uncommon')return flash+'<div class="fhq-v8833-sweep"></div>';
-          if(rarity==='rare')return flash+'<div class="fhq-v8833-ring"></div>';
-          if(rarity==='epic')return flash+'<div class="fhq-v8833-clock">0:04</div>';
-          if(rarity==='legendary')return flash+'<i class="fhq-v8833-bolt b1"></i><i class="fhq-v8833-bolt b2"></i><i class="fhq-v8833-bolt b3"></i>';
-          if(rarity==='obsidian')return flash+'<div class="fhq-v8833-vortex"></div>';
-          if(rarity==='signature')return flash+'<svg class="fhq-v8833-sign" viewBox="0 0 700 180"><path d="M45 120 C92 40,126 155,171 90 S245 58,265 118 C280 152,302 60,337 80 C369 98,359 140,390 118 C423 95,447 55,469 80 C489 101,480 137,520 110 C552 87,574 68,596 92 C615 114,610 134,657 100"/></svg>';
+          if(rarity==='uncommon')return flash+'<div class="fhq-v8833-sweep"></div><div class="fhq-v58-glow-ring"></div>';
+          if(rarity==='rare')return flash+'<div class="fhq-v8833-ring"></div>'+particles;
+          if(rarity==='epic')return flash+'<div class="fhq-v8833-clock">0:04</div><div class="fhq-v58-energy-cross"></div>'+particles;
+          if(rarity==='legendary')return flash+'<i class="fhq-v8833-bolt b1"></i><i class="fhq-v8833-bolt b2"></i><i class="fhq-v8833-bolt b3"></i><div class="fhq-v58-gold-halo"></div>'+particles;
+          if(rarity==='obsidian')return flash+'<div class="fhq-v8833-vortex"></div><div class="fhq-v58-obsidian-shards"></div>'+particles;
+          if(rarity==='signature')return flash+'<div class="fhq-v58-signature-dim"></div><div class="fhq-v58-signature-rainbow"></div><svg class="fhq-v8833-sign" viewBox="0 0 700 180"><path d="M45 120 C92 40,126 155,171 90 S245 58,265 118 C280 152,302 60,337 80 C369 98,359 140,390 118 C423 95,447 55,469 80 C489 101,480 137,520 110 C552 87,574 68,596 92 C615 114,610 134,657 100"/></svg>'+particles;
           return flash;
         }
         function startFx(rarity){
