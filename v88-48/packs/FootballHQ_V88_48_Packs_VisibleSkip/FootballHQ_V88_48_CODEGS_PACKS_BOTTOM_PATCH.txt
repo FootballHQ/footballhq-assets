@@ -1,0 +1,102 @@
+/* ============================================================
+   FOOTBALL HQ V88.48 — OFFICIAL 7-PACK ECONOMY + SLOT-SAFE ODDS
+   PASTE AT THE VERY BOTTOM OF Code.gs
+   ============================================================ */
+
+FHQ_PACK_CATALOG_={
+  rookie_cards:{id:'rookie_cards',name:'Rookie Pack',price:75,count:2,kind:'cards',set:'The Gridiron',art:'rookie',odds:'rookie',slotPlan:['rookie','rookie']},
+  scrimmage_pack:{id:'scrimmage_pack',name:'Scrimmage Pack',price:325,count:6,kind:'cards',set:'The Gridiron',art:'scrimmage',odds:'scrimmage',slotPlan:['scrimmage','scrimmage','scrimmage','scrimmage','scrimmage','scrimmage']},
+  gametime_pack:{id:'gametime_pack',name:'Gametime Pack',price:225,count:4,kind:'cards',set:'The Gridiron',art:'gametime',odds:'gametime',slotPlan:['gametime_base','gametime_base','uncommon_slot','uncommon_slot']},
+  redzone_pack:{id:'redzone_pack',name:'Red Zone Pack',price:300,count:3,kind:'cards',set:'The Gridiron',art:'redzone',odds:'redzone',slotPlan:['redzone_base','uncommon_slot','rare_slot']},
+  fourthquarter_pack:{id:'fourthquarter_pack',name:'Fourth Quarter Pack',price:525,count:4,kind:'cards',set:'The Gridiron',art:'fourthquarter',odds:'fourthquarter',slotPlan:['uncommon_slot','uncommon_slot','rare_slot','epic_slot']},
+  hailmary_pack:{id:'hailmary_pack',name:'Hail Mary Pack',price:700,count:3,kind:'cards',set:'The Gridiron',art:'hailmary',odds:'hailmary',slotPlan:['hailmary_slot','hailmary_slot','hailmary_slot']},
+  primetime_pack:{id:'primetime_pack',name:'Primetime Pack',price:850,count:5,kind:'cards',set:'The Gridiron',art:'primetime',odds:'primetime8848',slotPlan:['primetime_base','primetime_base','primetime_rare','primetime_rare','primetime_epic']},
+  avatar_pack:{id:'avatar_pack',name:'Avatar Pack',price:240,count:1,kind:'avatar',art:'avatar'}
+};
+
+function footballHQV8848SlotOdds_(slot){
+  var W={
+    rookie:{common:74,uncommon:20,rare:4.5,epic:1.2,legendary:.25,obsidian:.04,signature:.01},
+    scrimmage:{common:68,uncommon:24,rare:6,epic:1.6,legendary:.32,obsidian:.06,signature:.02},
+    gametime_base:{common:55,uncommon:31,rare:10,epic:3.2,legendary:.65,obsidian:.12,signature:.03},
+    redzone_base:{common:45,uncommon:32,rare:16,epic:5.7,legendary:1.05,obsidian:.2,signature:.05},
+    uncommon_slot:{common:0,uncommon:76,rare:18,epic:5,legendary:.82,obsidian:.15,signature:.03},
+    rare_slot:{common:0,uncommon:0,rare:79,epic:18,legendary:2.4,obsidian:.5,signature:.1},
+    epic_slot:{common:0,uncommon:0,rare:0,epic:96.8,legendary:2.7,obsidian:.4,signature:.1},
+    hailmary_slot:{common:0,uncommon:0,rare:73,epic:22,legendary:4.3,obsidian:.6,signature:.1},
+    primetime_base:{common:42,uncommon:30,rare:18,epic:8.4,legendary:1.3,obsidian:.25,signature:.05},
+    primetime_rare:{common:0,uncommon:0,rare:73,epic:22,legendary:4.3,obsidian:.6,signature:.1},
+    primetime_epic:{common:0,uncommon:0,rare:0,epic:92.85,legendary:6,obsidian:1,signature:.15}
+  };
+  return W[slot]||W.rookie;
+}
+
+function footballHQV8848PickSlotRarity_(slot){
+  var odds=footballHQV8848SlotOdds_(slot),order=['common','uncommon','rare','epic','legendary','obsidian','signature'],total=0;
+  order.forEach(function(r){total+=Number(odds[r]||0)});
+  var roll=Math.random()*total,acc=0;
+  for(var i=0;i<order.length;i++){acc+=Number(odds[order[i]]||0);if(roll<=acc)return order[i];}
+  return 'common';
+}
+
+function footballHQV8848RandomCard_(collection,setName,slot){
+  var base=FHQ_CARD_CATALOG_.slice();
+  if(setName)base=base.filter(function(x){return x.set===setName});
+  if(!base.length)base=FHQ_CARD_CATALOG_.slice();
+  var rarity=footballHQV8848PickSlotRarity_(slot),pool=base.filter(function(x){return x.rarity===rarity});
+  if(!pool.length){
+    var order=['common','uncommon','rare','epic','legendary','obsidian','signature'],target=order.indexOf(rarity),best=999;
+    order.forEach(function(r,idx){if(base.some(function(x){return x.rarity===r})&&Math.abs(idx-target)<best){best=Math.abs(idx-target);pool=base.filter(function(x){return x.rarity===r})}});
+  }
+  var unowned=pool.filter(function(x){return collection.indexOf(x.id)===-1}),src=unowned.length?unowned:pool;
+  return src[Math.floor(Math.random()*src.length)];
+}
+
+function footballHQPackOdds_(profile){
+  var map={
+    rookie:{common:74,uncommon:20,rare:4.5,epic:1.2,legendary:.25,obsidian:.04,signature:.01},
+    scrimmage:{common:68,uncommon:24,rare:6,epic:1.6,legendary:.32,obsidian:.06,signature:.02},
+    gametime:{common:55,uncommon:31,rare:10,epic:3.2,legendary:.65,obsidian:.12,signature:.03},
+    redzone:{common:45,uncommon:32,rare:16,epic:5.7,legendary:1.05,obsidian:.2,signature:.05},
+    fourthquarter:{common:36,uncommon:32,rare:20,epic:9.4,legendary:2.1,obsidian:.4,signature:.1},
+    hailmary:{common:0,uncommon:0,rare:73,epic:22,legendary:4.3,obsidian:.6,signature:.1},
+    primetime8848:{common:30,uncommon:27,rare:24,epic:15,legendary:3.3,obsidian:.6,signature:.1}
+  };
+  return map[profile]||map.rookie;
+}
+
+function openFootballHQPack(payload){
+  payload=payload||{};
+  var token=cleanFootballHQToken_(payload.token),packId=String(payload.packId||''),pack=FHQ_PACK_CATALOG_[packId];
+  if(!pack)throw new Error('Pack not found.');
+  var lock=LockService.getScriptLock();lock.waitLock(10000);
+  try{
+    var s=ensureFootballHQAccountSheets_(),a=s.accounts,rowNum=findFootballHQAccountRowByToken_(a,token);if(rowNum<0)throw new Error('Account not found.');
+    var row=a.getRange(rowNum,1,1,23).getValues()[0];row=footballHQMigrateCoins_(a,rowNum,row);
+    var coins=Number(row[14]||0),inv=footballHQInventoryParse_(row[15]),collection=footballHQInventoryParse_(row[21]);
+    if(coins<Number(pack.price))throw new Error('INSUFFICIENT_BALANCE');
+    coins-=Number(pack.price);var rewards=[];
+
+    if(pack.kind==='avatar'){
+      var pool=Object.keys(FHQ_SHOP_CATALOG_).map(function(k){return FHQ_SHOP_CATALOG_[k]}).filter(function(x){return x.type==='avatar'&&!footballHQOwnedValue_(inv,'avatar',x.value)});
+      if(!pool.length){coins+=150;rewards.push({type:'coins',value:150,name:'Duplicate Protection +150 Coins',rarity:'currency'});}
+      else{var av=pool[Math.floor(Math.random()*pool.length)],it={id:'pack|'+Date.now(),type:'avatar',value:av.value,name:av.name,source:'Pack',rarity:av.rarity};inv.push(it);rewards.push(it);}
+    }else{
+      var plan=Array.isArray(pack.slotPlan)&&pack.slotPlan.length?pack.slotPlan.slice():Array(Number(pack.count||1)).fill('rookie');
+      for(var i=0;i<plan.length;i++){
+        var c=footballHQV8848RandomCard_(collection,pack.set||'',plan[i]);
+        if(collection.indexOf(c.id)!==-1){
+          var dup=(c.rarity==='signature'?225:c.rarity==='obsidian'?120:c.rarity==='legendary'?75:c.rarity==='epic'?45:c.rarity==='rare'?28:c.rarity==='uncommon'?20:12);
+          coins+=dup;rewards.push({type:'card',value:c.id,name:c.name,set:c.set,rarity:c.rarity,duplicate:true,duplicateCoins:dup,source:'Duplicate Conversion'});
+        }else{
+          collection.push(c.id);rewards.push({type:'card',value:c.id,name:c.name,set:c.set,rarity:c.rarity,duplicate:false});
+        }
+      }
+    }
+
+    var setResult=footballHQSetCompletionRewards_(collection,inv,coins);coins=setResult.coins;inv=setResult.inventory;rewards=rewards.concat(setResult.bonus);
+    a.getRange(rowNum,15).setValue(coins);a.getRange(rowNum,16).setValue(JSON.stringify(inv));a.getRange(rowNum,22).setValue(JSON.stringify(collection));a.getRange(rowNum,8).setValue(new Date());
+    row=a.getRange(rowNum,1,1,23).getValues()[0];
+    return {profile:footballHQAccountObject_(row),rewards:rewards,pack:pack};
+  }finally{lock.releaseLock();}
+}

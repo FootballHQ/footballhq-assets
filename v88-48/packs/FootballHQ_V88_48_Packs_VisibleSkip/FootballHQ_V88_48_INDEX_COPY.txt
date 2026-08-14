@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<!-- FOOTBALL HQ V88.30 - INTERACTIVE MADDEN-STYLE PACKS + SHOP POLISH -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Football HQ</title>
+  <!-- DRAFT-TABS-BUILD-2026-08-07 -->
+  <link rel="stylesheet" href="https://footballhq.github.io/footballhq-assets/v88-36/footballhq-v88-36.css?v=8836fix58">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="rankings-page rankings-loading"><div id="fhqWalletBar" class="fhq-walletbar"><div class="fhq-wallet-chip"><span class="fhq-coin-icon"></span><div class="fhq-wallet-copy"><small>HQ COINS</small><strong id="fhqGlobalCoins">0</strong></div></div></div>
+
+<script id="fhq-v852-card-store-init" src="https://footballhq.github.io/footballhq-assets/v88-36/js/01-fhq-v852-card-store-init.js?v=8836fix54"></script>
+<script id="fhq-v88-rarity-variant-bootstrap" src="https://footballhq.github.io/footballhq-assets/v88-36/js/02-fhq-v88-rarity-variant-bootstrap.js?v=8836fix54"></script>
+<script id="fhq-cardassets-external"><?!= include('CardAssetsExternal'); ?></script>
+<script id="fhq-audioassets"><?!= include('AudioAssets'); ?></script>
+<script id="fhq-packrevealassets-inline" src="https://footballhq.github.io/footballhq-assets/v88-36/js/05-fhq-packrevealassets-inline.js?v=8836fix54"></script>
+<script id="fhq-v85-image-only-pipeline" src="https://footballhq.github.io/footballhq-assets/v88-36/js/06-fhq-v85-image-only-pipeline.js?v=8836fix54"></script>
+
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/07-script-07.js?v=8836fix54"></script>
+
+
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/08-script-08.js?v=8836fix54"></script>
+
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/09-script-09.js?v=8836fix54"></script>
+
+
+
+<div id="fhqMobileTopbar" class="fhq-mobile-topbar">
+  <button id="fhqMobileMenuBtn" class="fhq-mobile-menu-btn" type="button" aria-label="Open navigation" onclick="return toggleFootballHQMobileMenu(event)">
+    <span class="fhq-mobile-menu-lines"></span>
+  </button>
+  <div id="fhqMobileLogo" class="fhq-mobile-logo" role="button" tabindex="0" aria-label="Go home">
+    <svg viewBox="0 0 48 56" aria-hidden="true">
+      <path d="M24 2 43 9v15c0 13-8 23-19 30C13 47 5 37 5 24V9L24 2Z" fill="#111a21" stroke="#8fc8ef" stroke-width="2"/>
+      <text x="24" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="900" fill="#f6f8fa">HQ</text>
+      <path d="M15 34c5-6 13-7 18-3-2 6-9 10-15 9-2-1-3-3-3-6Z" fill="#e8edf1" transform="rotate(-18 24 35)"/>
+    </svg>
+    <span>FOOTBALL HQ</span>
+  </div>
+</div>
+<div id="fhqMobileScrim" class="fhq-mobile-scrim" onclick="closeFootballHQMobileMenu()"></div>
+
+<aside id="fhqSidebar" class="fhq-sidebar">
+  <div class="fhq-brand" id="fhqBrandHome" role="button" tabindex="0" aria-label="Go to Football HQ home">
+    <span class="fhq-brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 56" role="img">
+        <path d="M24 2 43 9v15c0 13-8 23-19 30C13 47 5 37 5 24V9L24 2Z" fill="#111a21" stroke="#8fc8ef" stroke-width="2"/>
+        <path d="M10 12 24 7l14 5v12c0 9-5.3 17.5-14 24-8.7-6.5-14-15-14-24V12Z" fill="none" stroke="#394d5b" stroke-width="1"/>
+        <text x="24" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="900" fill="#f6f8fa">HQ</text>
+        <path d="M15 34c5-6 13-7 18-3-2 6-9 10-15 9-2-1-3-3-3-6Z" fill="#e8edf1" transform="rotate(-18 24 35)"/>
+        <path d="M22 31.5v7M19.5 33.2l5 3M19.2 36l5-3" stroke="#111a21" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="fhq-brand-copy">FOOTBALL HQ<small>2026 FOOTBALL CENTER</small></span>
+  </div>
+
+  <button id="fhqProfileButton" class="fhq-profile-button fhq-sidebar-profile" type="button" aria-label="Open Football HQ profile">
+    <span id="fhqProfileButtonAvatar" class="fhq-profile-button-avatar">👤</span>
+    <span class="fhq-sidebar-profile-copy">
+      <span class="fhq-account-name" id="fhqAccountName">Guest</span>
+      <span class="fhq-account-meta" id="fhqAccountMeta">Choose a username to join the leaderboard</span>
+    </span>
+    <span class="fhq-sidebar-profile-arrow">›</span>
+  </button>
+
+  <div class="fhq-nav">
+    <button class="active" data-fhq-nav="home">⌂ Home</button>
+    <button data-fhq-nav="pass">▣ HQ Pass</button>
+    <button data-fhq-nav="shop">◉ Shop</button>
+    <button data-fhq-nav="locker">▤ Locker</button>
+    <button data-fhq-nav="album">▦ Collections</button>
+    <button data-fhq-nav="leaderboard">★ Leaderboard</button>
+    <button data-fhq-nav="games">◈ Games</button>
+    <button data-fhq-nav="rankings">▦ Rankings</button>
+    <button data-fhq-nav="draft">◫ Draft Sim</button>
+    <button class="coming" data-fhq-nav="coming">＋ Coming Soon</button>
+  </div>
+
+  <div class="fhq-side-spacer"></div>
+  <div class="fhq-side-foot">
+  <button type="button" class="side-nav-item admin-nav" data-fhq-nav="admin">⚙ Admin</button>
+  <span class="fhq-reset-copy">Daily games reset at<br><strong>12:00 AM Pacific.</strong><br>Build streaks, earn points, climb the board.</span>
+</div>
+</aside>
+
+<div id="fhqHome" class="fhq-home-overlay">
+  <div class="fhq-home-inner">
+    <div class="fhq-hero">
+      <div>
+        <div class="fhq-home-brandline">
+          <span class="fhq-home-shield" aria-hidden="true"><svg viewBox="0 0 64 74"><path d="M32 3 57 12v20c0 18-10 30-25 39C17 62 7 50 7 32V12L32 3Z" fill="#102b3b" stroke="#7ad1ff" stroke-width="3"/><path d="M20 22h24v22H20z" fill="none" stroke="#e7f7ff" stroke-width="2.5"/><text x="32" y="37" text-anchor="middle" fill="#e7f7ff" font-size="13" font-weight="900">HQ</text><path d="M26 51c4-6 13-7 17-2 3 4 0 8-4 10-5 2-12 0-13-4-.2-1 0-3 0-4Z" fill="none" stroke="#8edcff" stroke-width="2"/><path d="m31 50 7 7m-5-5 2-2m0 4 2-2" stroke="#8edcff" stroke-width="1.5"/></svg></span>
+          <h1>Football HQ</h1>
+        </div>
+        <p>Rankings, daily NFL games, draft simulation, streaks, and one place to compete with friends all season.</p>
+        <div class="fhq-hero-actions">
+          <button class="fhq-primary" data-home-open="games">PLAY DAILY GAMES</button>
+          <button class="fhq-secondary" data-home-open="rankings">VIEW RANKINGS</button>
+          <button class="fhq-secondary" data-home-open="draft">OPEN DRAFT SIM</button>
+        </div>
+      </div>
+      <div class="fhq-scorecard">
+        <span>YOUR POINTS TODAY</span>
+        <strong id="fhqPoints">0</strong>
+        <span id="fhqDailyCount">0 daily challenges completed today</span>
+        <span id="fhqDailyRank" class="fhq-daily-rank">Daily leaderboard rank loading…</span>
+      </div>
+    </div>
+
+    <div class="fhq-dashboard" id="fhqDashboard">
+      <div class="fhq-dashboard-card">
+        <small>TODAY'S CHALLENGES</small>
+        <strong id="fhqDashProgress">0 / 12</strong>
+        <span id="fhqDashProgressText">12 Daily games remaining</span>
+        <div class="fhq-dashboard-progress"><i id="fhqDashProgressBar"></i></div>
+      </div>
+      <div class="fhq-dashboard-card">
+        <small>LIFETIME POINTS</small>
+        <strong id="fhqDashLifetime">—</strong>
+        <span id="fhqDashRank">Loading Daily rank…</span>
+      </div>
+      <div class="fhq-dashboard-card">
+        <small>DAY STREAK</small>
+        <strong id="fhqDashStreak">0</strong>
+        <span>Keep your Daily run alive</span>
+      </div>
+      <div class="fhq-dashboard-card">
+        <small>CONTINUE TODAY</small>
+        <strong id="fhqDashNext">Active Players</strong>
+        <span id="fhqDashNextCopy">Your next unfinished Daily</span>
+      </div>
+    </div>
+
+    <div class="fhq-section-title">Daily Rewards</div>
+    <div class="fhq-daily-rewards" id="fhqDailyRewards">
+      <div class="fhq-daily-reward" id="fhqDailyGiftCard">
+        <div class="icon"><span class="fhq-coin-icon" style="width:34px;height:34px"></span></div>
+        <div><h3>Daily Gift <span id="fhqDailyGiftDot" class="fhq-reward-dot"></span></h3><p id="fhqDailyGiftCopy">50 HQ Coins • refreshes at 12:00 AM Pacific.</p></div>
+        <button id="fhqDailyGiftBtn" type="button">CLAIM</button>
+      </div>
+      <div class="fhq-daily-reward" id="fhqFreePackCard">
+        <div class="icon">▱</div>
+        <div><h3>Free Daily Pack <span id="fhqFreePackDot" class="fhq-reward-dot"></span></h3><p id="fhqFreePackCopy">One collectible card • refreshes at 12:00 AM Pacific.</p></div>
+        <button id="fhqFreePackBtn" type="button">OPEN</button>
+      </div>
+    </div>
+
+    <div class="fhq-section-title">Daily Games</div>
+    <div class="fhq-daily-scroll">
+      <div class="fhq-card-grid">
+        <div class="fhq-card" data-game-open="players"><h3>Active Players</h3><p>Current-NFL-only Weddle-style guessing.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="grid"><h3>Grid</h3><p>Fill a 3×3 NFL grid from Easy through Brutal.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="legends"><h3>Legends</h3><p>Guess a well-known retired NFL legend.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="whoami"><h3>Who Am I?</h3><p>Unlock clues and identify the NFL player.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="career"><h3>Career Path</h3><p>Identify a player from the teams he played for.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="connections"><h3>Connections</h3><p>Find four groups of four before four mistakes.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="statline"><h3>Stat Line</h3><p>Identify a player from his stat line and progressive hints.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="draftclass"><h3>Draft Class</h3><p>Guess the player’s NFL Draft year.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="moggle"><h3>Mogger</h3><p>Identify the football face challenge.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="timeline"><h3>Timeline</h3><p>Put four NFL moments in chronological order.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="guessteam"><h3>Franchise Finder</h3><p>Use progressive clues to identify the NFL franchise.</p><span class="tag">Daily</span></div>
+        <div class="fhq-card" data-game-open="depthchart"><h3>Depth Chart</h3><p>Put a position room in the correct depth-chart order.</p><span class="tag">Daily</span></div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<div id="fhqComingModal" class="fhq-coming-modal" aria-hidden="true">
+  <div class="fhq-coming-dialog">
+    <button id="fhqComingClose" class="fhq-coming-close" type="button" aria-label="Close">×</button>
+    <div class="fhq-profile-kicker">FOOTBALL HQ ROADMAP</div>
+    <h2>More is coming to Football HQ.</h2>
+    <p>New games, multiplayer features, rewards, draft tools, and more are already on the roadmap.</p>
+    <div class="fhq-coming-chips"><span>Multiplayer Drafts</span><span>New Games</span><span>More HQ Pass Rewards</span></div>
+  </div>
+</div>
+
+<div id="fhqPlacementOverlay" class="fhq-placement-overlay" aria-hidden="true">
+  <div class="fhq-placement-card">
+    <div id="fhqPlacementRank" class="rank">#1</div>
+    <h2 id="fhqPlacementTitle">Leaderboard Finish!</h2>
+    <p id="fhqPlacementCopy">You earned a competitive Football HQ reward.</p>
+    <div class="fhq-placement-prize">
+      <div id="fhqPlacementPrizeIcon" class="fhq-placement-prize-icon"></div>
+      <div><strong id="fhqPlacementPrizeName">Reward</strong><span id="fhqPlacementPrizeMeta">Added to your locker</span></div>
+    </div>
+    <div class="fhq-placement-actions">
+      <button id="fhqPlacementEquip" class="fhq-placement-equip" type="button">EQUIP</button>
+      <button id="fhqPlacementLater" class="fhq-placement-later" type="button">LATER</button>
+    </div>
+  </div>
+</div>
+
+<div id="fhqLeaderboardPage" class="fhq-leader-page hidden">
+  <div class="fhq-leader-inner">
+    <div class="fhq-leader-hero">
+      <div>
+        
+        <h1>Leaderboards</h1>
+        
+      </div>
+      <div class="fhq-point-total">
+        <strong id="fhqLeaderPoints">—</strong>
+        <span id="fhqLeaderPointLabel">ALL-TIME POINTS</span>
+      </div>
+    </div>
+
+    <div class="fhq-leader-tabs">
+      <button type="button" class="fhq-leader-tab" data-leader-period="daily" onclick="setFootballHQLeaderboardPeriod('daily')">TODAY</button>
+      <button type="button" class="fhq-leader-tab" data-leader-period="weekly" onclick="setFootballHQLeaderboardPeriod('weekly')">THIS WEEK</button>
+      <button type="button" class="fhq-leader-tab active" data-leader-period="alltime" onclick="setFootballHQLeaderboardPeriod('alltime')">ALL-TIME</button>
+    </div>
+    <div id="fhqLeaderboardPeriodCopy" class="fhq-period-copy">All-time points never reset.</div>
+    <div class="fhq-podium" id="fhqPodium"></div>
+
+    <div class="fhq-rank-table">
+      <div class="fhq-rank-row header"><span>RANK</span><span>PLAYER</span><span>POINTS</span><span>DAILIES</span></div>
+      <div id="fhqLeaderboardRows"></div>
+    </div>
+    <div class="fhq-leader-note">Create a username to sync Daily Challenge points to the shared Football HQ leaderboard. Points are permanent and only increase when you complete a new Daily Challenge.</div>
+  </div>
+</div>
+
+  
+
+<div id="fhqWorldModal" class="fhq-world-modal" aria-hidden="true">
+  <div class="fhq-world-dialog">
+    <div class="fhq-world-head">
+      <div><h2 id="fhqWorldTitle">World Rankings</h2><div id="fhqWorldCopy" class="fhq-world-copy"></div></div>
+      <button id="fhqWorldClose" class="fhq-world-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div id="fhqWorldList" class="fhq-world-list"></div>
+  </div>
+</div>
+
+<div id="fhqAccountModal" class="fhq-account-modal">
+  <div class="fhq-account-dialog">
+    <h2>Sign in to Football HQ</h2>
+    <p>Choose how you want to use Football HQ. Guest works immediately; a Football HQ username joins the shared leaderboard.</p>
+
+    <div class="fhq-signin-choices">
+      <button id="fhqGuestChoice" class="fhq-signin-choice" type="button">
+        <span><strong>Continue as Guest</strong><small>Play games without a shared leaderboard profile.</small></span>
+        <span class="state">READY</span>
+      </button>
+      <button id="fhqFootballAccountChoice" class="fhq-signin-choice" type="button">
+        <span><strong>Football HQ Account</strong><small>Choose a username and save Daily points.</small></span>
+        <span class="state">READY</span>
+      </button>
+      <button id="fhqGoogleChoice" class="fhq-signin-choice" type="button">
+        <span><strong>Google Account</strong><small>One-click Google sign-in.</small></span>
+        <span class="state">COMING SOON</span>
+      </button>
+    </div>
+
+    <div id="fhqFootballAccountForm" class="fhq-account-form">
+      <input id="fhqUsernameInput" maxlength="20" autocomplete="off" placeholder="Username (3–20 characters)">
+      <div id="fhqAccountError" class="fhq-account-error"></div>
+      <div class="fhq-account-actions">
+        <button id="fhqAccountCancel" type="button" class="fhq-secondary">CANCEL</button>
+        <button id="fhqAccountSave" type="button" class="fhq-primary">SAVE USERNAME</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="fhqProfileModal" class="fhq-profile-modal" aria-hidden="true">
+  <div class="fhq-profile-dialog">
+    <button id="fhqProfileClose" class="fhq-profile-close" type="button" aria-label="Close profile">×</button>
+    <div class="fhq-profile-head">
+      <div class="fhq-profile-avatar-wrap">
+        <div id="fhqProfileAvatarLarge" class="fhq-profile-avatar-large">🏈</div>
+        <button id="fhqAvatarChangeBtn" class="fhq-avatar-change-btn" type="button">Change</button>
+      </div>
+      <div>
+        <div class="fhq-profile-kicker">FOOTBALL HQ PROFILE</div>
+        <h2 id="fhqProfileName">Guest</h2>
+        <div id="fhqProfileSub">Your football identity, stats, and achievements.</div>
+        <button id="fhqChangeUsernameBtn" type="button" class="fhq-profile-secondary">Change username</button>
+        <div id="fhqChangeUsernameForm" class="fhq-change-username-form" style="display:none">
+          <input id="fhqChangeUsernameInput" type="text" maxlength="20" name="fhq_change_username" autocomplete="new-password" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="New username">
+          <div class="fhq-change-username-actions">
+            <button id="fhqChangeUsernameSave" type="button" class="fhq-primary">Save</button>
+            <button id="fhqChangeUsernameCancel" type="button" class="fhq-secondary">Cancel</button>
+          </div>
+          <div id="fhqChangeUsernameStatus" class="fhq-account-error"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fhq-profile-stats">
+      <div><strong id="fhqProfileLifetimePoints">0</strong><span>Lifetime points</span></div>
+      <div><strong id="fhqProfileDailyWins">0</strong><span>Daily wins</span></div>
+      <div><strong id="fhqProfileDailies">0</strong><span>Dailies played</span></div>
+      <div><strong id="fhqProfileStreak">0</strong><span>Day streak</span></div>
+    </div>
+
+    <div class="fhq-profile-menu">
+      <button type="button" data-profile-panel="achievements">Achievements</button>
+      <button type="button" data-profile-panel="recovery">Account Recovery</button>
+      <button type="button" data-profile-panel="career">Career</button>
+      <button type="button" data-profile-panel="records">Records</button>
+    </div>
+
+    <div id="fhqProfilePanelAvatar" class="fhq-profile-section fhq-profile-panel" data-profile-panel-body="avatar">
+      <button id="fhqAvatarPanelClose" class="fhq-avatar-panel-close" type="button" aria-label="Close profile picture chooser">×</button>
+      <h3>Profile Picture</h3>
+      <div id="fhqAvatarChoices" class="fhq-avatar-choices"></div>
+      <div class="fhq-avatar-lock-copy">Starter avatar is always available. HQ Pass avatars unlock as you level up.</div>
+    </div>
+
+    <div id="fhqProfilePanelRecovery" class="fhq-profile-section fhq-profile-panel" data-profile-panel-body="recovery">
+      <h3>Account & Recovery</h3>
+      <div class="fhq-account-recovery">
+        <h4>Keep this profile on future visits</h4>
+        <p>Football HQ now saves your selected account in several browser storage locations. Your recovery code is a backup if a browser update, deployment, or new device loses that saved identity.</p>
+        <div class="fhq-recovery-code"><span id="fhqRecoveryCode">Loading recovery code…</span><button id="fhqRecoveryCopy" type="button" class="fhq-profile-secondary">Copy</button></div>
+        <div class="fhq-recovery-form">
+          <input id="fhqRecoveryUsername" maxlength="20" name="fhq_recovery_username" autocomplete="new-password" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Username">
+          <input id="fhqRecoveryInput" maxlength="20" placeholder="Recovery code">
+          <button id="fhqRecoverySignIn" type="button" class="fhq-primary">SIGN BACK IN</button>
+        </div>
+        <div id="fhqRecoveryStatus" class="fhq-recovery-status"></div>
+      </div>
+    </div>
+
+    <div id="fhqProfilePanelCareer" class="fhq-profile-section fhq-profile-panel" data-profile-panel-body="career">
+      <h3>Football HQ Career</h3>
+      <div class="fhq-profile-reward-grid">
+        <div class="fhq-profile-reward"><strong id="fhqProfileGamesPlayed">0</strong><span>TOTAL GAMES OPENED</span></div>
+        <div class="fhq-profile-reward"><strong id="fhqProfileTop10">0</strong><span>TOP-10 FINISHES</span></div>
+        <div class="fhq-profile-reward"><strong id="fhqProfileWorldTop10">0</strong><span>GAME WORLD TOP 10s</span></div>
+        <div class="fhq-profile-reward"><strong id="fhqProfileWorldWins">0</strong><span>WORLD #1 RECORDS</span></div>
+      </div>
+      <div class="fhq-profile-bestgame">
+        <div><span>MOST PLAYED GAME</span><strong id="fhqProfileMostPlayed">None yet</strong></div>
+        <div style="text-align:right"><span>PLAYS</span><strong id="fhqProfileMostPlayedCount">0</strong></div>
+      </div>
+    </div>
+
+    <div id="fhqProfilePanelRecords" class="fhq-profile-section fhq-profile-panel" data-profile-panel-body="records">
+      <h3>Your Best Records</h3>
+      <div id="fhqProfileRecordGrid" class="fhq-profile-records"></div>
+    </div>
+
+    <div id="fhqProfilePanelAchievements" class="fhq-profile-section fhq-profile-panel" data-profile-panel-body="achievements">
+      <h3>Achievements</h3>
+      <div id="fhqAchievementGrid" class="fhq-achievement-grid"></div>
+    </div>
+  </div>
+</div>
+
+
+<div id="fhqAdminPage" class="fhq-admin-page">
+  <div class="fhq-admin-hero">
+    <div>
+      <div style="font-size:10px;font-weight:950;letter-spacing:2px;color:#7d8d98">FOOTBALL HQ ADMIN</div>
+      <h1>Database Health</h1>
+      <p>Audit rankings, photos, player identity, team mappings, game pools, and the Top 500 from one place. This screen is read-only; it does not change your public rankings.</p>
+    </div>
+    <div class="fhq-admin-badge"><strong id="fhqAdminHealthScore">—</strong><span>HEALTH SCORE</span></div>
+  </div>
+
+  <div class="fhq-admin-toolbar">
+    <button class="fhq-admin-btn primary" type="button" onclick="runFootballHQAdminAudit(true)">RUN FULL AUDIT</button>
+    <button class="fhq-admin-btn" type="button" onclick="exportFootballHQAdminAudit()">EXPORT REPORT</button>
+    <button class="fhq-admin-btn" type="button" onclick="openFootballHQAdminTab('unrated')">SHOW UNRATED</button>
+    <button class="fhq-admin-btn" type="button" onclick="openFootballHQAdminTab('photos')">SHOW PHOTO ISSUES</button>
+  </div>
+
+  <div class="fhq-health-grid">
+    <div id="fhqHealthCardRanked" class="fhq-health-card"><span>RANKED PLAYERS</span><strong id="fhqHealthRanked">—</strong></div>
+    <div id="fhqHealthCardUnrated" class="fhq-health-card"><span>UNRATED / TO REVIEW</span><strong id="fhqHealthUnrated">—</strong></div>
+    <div id="fhqHealthCardPhotos" class="fhq-health-card"><span>PHOTO ISSUES</span><strong id="fhqHealthPhotos">—</strong></div>
+    <div id="fhqHealthCardIntegrity" class="fhq-health-card"><span>DUPLICATES / TEAM ISSUES</span><strong id="fhqHealthIntegrity">—</strong></div>
+  </div>
+
+  <div class="fhq-admin-tabs">
+    <button class="fhq-admin-tab active" data-admin-tab="overview" onclick="openFootballHQAdminTab('overview')">Overview</button>
+    <button class="fhq-admin-tab" data-admin-tab="unrated" onclick="openFootballHQAdminTab('unrated')">Unrated</button>
+    <button class="fhq-admin-tab" data-admin-tab="photos" onclick="openFootballHQAdminTab('photos')">Photos</button>
+    <button class="fhq-admin-tab" data-admin-tab="duplicates" onclick="openFootballHQAdminTab('duplicates')">Duplicates</button>
+    <button class="fhq-admin-tab" data-admin-tab="teams" onclick="openFootballHQAdminTab('teams')">Team Issues</button>
+    <button class="fhq-admin-tab" data-admin-tab="games" onclick="openFootballHQAdminTab('games')">Game Pools</button>
+    <button class="fhq-admin-tab" data-admin-tab="top500" onclick="openFootballHQAdminTab('top500')">Top 500 Gaps</button>
+    <button class="fhq-admin-tab" data-admin-tab="accounts" onclick="openFootballHQAdminTab('accounts')">Accounts</button>
+  </div>
+
+  <div class="fhq-admin-note" id="fhqAdminNote">Run the audit after rankings and the full NFL database finish loading for the most complete result.</div>
+
+  <div id="fhqAdminOverview" class="fhq-admin-panel show"></div>
+  <div id="fhqAdminUnrated" class="fhq-admin-panel"></div>
+  <div id="fhqAdminPhotos" class="fhq-admin-panel"></div>
+  <div id="fhqAdminDuplicates" class="fhq-admin-panel"></div>
+  <div id="fhqAdminTeams" class="fhq-admin-panel"></div>
+  <div id="fhqAdminGames" class="fhq-admin-panel"></div>
+  <div id="fhqAdminTop500" class="fhq-admin-panel"></div>
+  <div id="fhqAdminAccounts" class="fhq-admin-panel">
+    <div class="fhq-admin-card">
+      <h3>Account Recovery</h3>
+      <p>Use this to attach this browser to an existing Football HQ account during testing or recovery.</p>
+      <button type="button" id="fhqAdminRefreshAccounts" class="fhq-admin-btn">REFRESH ACCOUNTS</button>
+      <div id="fhqAdminAccountsList" class="fhq-admin-accounts-list"></div>
+      <div id="fhqAdminAccountsStatus" class="fhq-account-error"></div>
+    </div>
+  </div>
+</div>
+
+
+<div id="fhqPassPage" class="fhq-pass-page hidden" style="display:none">
+  <div class="fhq-pass-inner">
+    <div class="fhq-pass-hero">
+      <div>
+        <div class="fhq-pass-kicker">FOOTBALL HQ PROGRESSION</div>
+        <h1>HQ Pass</h1>
+        <p>Daily Challenges are the main way to earn XP. Achievements add one-time bonus points and unlock new rewards.</p>
+      </div>
+      <div class="fhq-pass-level-badge"><small>LEVEL</small><strong id="fhqPassLevelBadge">1</strong></div>
+    </div>
+    <div class="fhq-pass-tabs">
+      <button class="active" type="button" data-pass-tab="pass">PASS</button>
+      <button type="button" data-pass-tab="rewards">REWARDS</button>
+    </div>
+    <div id="fhqPassTabPass" class="fhq-pass-tab active">
+      <div class="fhq-pass-progress-card">
+        <div class="fhq-pass-profile-line">
+          <div id="fhqPassAvatar" class="fhq-pass-avatar">🏈</div>
+          <div><small id="fhqPassUsername">PLAYER</small><strong id="fhqPassLevelTitle">Level 1</strong><span id="fhqPassEquippedTitle">No title equipped</span></div>
+          <div class="fhq-pass-points"><strong id="fhqPassPoints">0</strong><span>HQ POINTS / XP</span><div class="fhq-wallet-pill"><span class="fhq-coin-icon" style="width:18px;height:18px"></span><b id="fhqPassCoins">0</b> HQ COINS</div></div>
+        </div>
+        <div class="fhq-pass-progress-label"><span id="fhqPassProgressCopy">0 / 50 XP</span><b id="fhqPassNextLevel">LEVEL 2</b></div>
+        <div class="fhq-pass-progress"><i id="fhqPassProgressBar"></i></div>
+      </div>
+      <div class="fhq-pass-section-head"><div><small>SEASON PROGRESSION</small><h2>Reward Track</h2></div><span>Rewards unlock automatically</span></div>
+      <div id="fhqPassTrack" class="fhq-pass-track"></div>
+    </div>
+    <div id="fhqPassTabRewards" class="fhq-pass-tab">
+      <div class="fhq-pass-section-head"><div><small>YOUR LOCKER</small><h2>Locker</h2></div><span>Equip anything you have unlocked</span></div>
+      <div class="fhq-locker-filter"><button class="active" data-locker-filter="all">ALL</button><button data-locker-filter="avatar">AVATARS</button><button data-locker-filter="title">TITLES</button><button data-locker-filter="ring">RINGS</button><button data-locker-filter="banner">BANNERS</button></div>
+      <div class="fhq-locker-section" data-locker-section="avatar"><h3 class="fhq-reward-heading">Profile Pictures</h3><div id="fhqPassAvatarRewards" class="fhq-reward-grid"></div></div>
+      <div class="fhq-locker-section" data-locker-section="title"><h3 class="fhq-reward-heading">Leaderboard Titles</h3><div id="fhqPassTitleRewards" class="fhq-reward-grid titles"></div></div>
+      <div class="fhq-competitive-locker fhq-locker-section" data-locker-section="competitive">
+        <h3 class="fhq-reward-heading">Rings, Banners & Collected Cosmetics</h3>
+        <div id="fhqCompetitiveRewards" class="fhq-cosmetic-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="fhqLockerPage" class="fhq-locker-page hidden"><div class="fhq-locker-inner">
+<div class="fhq-locker-head"><div><h1>Locker</h1><p>Customize your Football HQ identity — equip your avatar, title, ring, and banner.</p></div><div class="fhq-shop-wallet"><span class="fhq-coin-icon"></span><span><small>HQ COINS</small><strong id="fhqLockerCoins">0</strong></span></div></div>
+<div class="fhq-locker-tabs"><button class="active" data-locker-page-filter="all">ALL</button><button data-locker-page-filter="avatar">AVATARS</button><button data-locker-page-filter="title">TITLES</button><button data-locker-page-filter="ring">RINGS</button><button data-locker-page-filter="banner">BANNERS</button></div>
+<div id="fhqLockerGrid" class="fhq-locker-grid"></div></div></div>
+<div id="fhqAlbumPage" class="fhq-album-page hidden"><div class="fhq-album-inner"><div class="fhq-album-head"><h1>HQ Collections</h1><p>Complete original Football HQ card sets for bonus Coins and exclusive cosmetics.</p></div><div id="fhqAlbumGrid" class="fhq-album-grid"></div></div></div>
+<div id="fhqDailyGiftOverlay" class="fhq-daily-gift-overlay"><div class="fhq-daily-gift-card"><div class="gift-icon"><span class="fhq-coin-icon" style="width:48px;height:48px"></span></div><h2>Daily Gift Claimed!</h2><p>Come back after 12:00 AM Pacific for another Football HQ reward.</p><div style="font-size:28px;font-weight:1000;color:#8ce3ff;margin:8px 0 18px">+50 HQ COINS</div><button id="fhqDailyGiftClose" type="button">CONTINUE</button></div></div>
+
+<div id="fhqDuplicateOverlay" aria-hidden="true">
+  <div class="fhq-dup-stage">
+    <div class="fhq-dup-kicker">FOOTBALL HQ DUPLICATE CONVERSION</div>
+    <div class="fhq-dup-card"></div>
+    <div class="fhq-dup-scan"></div>
+    <div class="fhq-dup-label">DUPLICATE</div>
+    <div class="fhq-dup-copy">ALREADY OWNED • CONVERTING TO HQ COINS</div>
+    <div class="fhq-dup-ring"></div>
+    <div class="fhq-dup-coin">HQ</div>
+    <div class="fhq-dup-value"></div>
+  </div>
+</div>
+
+<div id="fhqPackOverlay" class="fhq-pack-overlay"><div class="fhq-pack-modal">
+  <div id="fhqPackOpenStage" class="fhq-pack-open-stage"><span class="stadium-beam"></span><span class="stadium-beam b2"></span><div id="fhqOpeningPack" class="fhq-pack-opening"></div></div>
+  <h2 id="fhqPackTitle">Pack Opened!</h2><p id="fhqPackSubtitle">New Football HQ collectibles have been added to your account.</p>
+  <div id="fhqPackRewards" class="fhq-pack-rewards"></div><button id="fhqPackClose" class="fhq-pack-close">ADD TO LOCKER</button>
+</div></div>
+<div id="fhqOddsOverlay" class="fhq-odds-overlay"><div class="fhq-odds-card"><h2 id="fhqOddsTitle">Pack Odds</h2><p>Published Football HQ rarity odds for each standard card pull.</p><div id="fhqOddsRows"></div><button id="fhqOddsClose" class="fhq-odds-close" type="button">CLOSE</button></div></div>
+<div id="fhqWelcomeOverlay" class="fhq-welcome-overlay"><div class="fhq-welcome-card"><div id="fhqWelcomeShield" class="fhq-welcome-shield"></div><h2>WELCOME TO FOOTBALL HQ</h2><p>Your first Locker build is on us.</p><div class="fhq-welcome-coins"><span class="fhq-coin-icon" style="width:34px;height:34px"></span><span>+500 HQ COINS</span></div><button id="fhqWelcomeClaim" type="button">ENTER FOOTBALL HQ</button></div></div>
+<div id="fhqPurchaseOverlay" class="fhq-purchase-overlay" aria-hidden="true">
+  <div class="fhq-purchase-modal">
+    <h2 id="fhqPurchaseTitle">Confirm Purchase</h2>
+    <p id="fhqPurchaseCopy">Are you sure you want to purchase this item?</p>
+    <div class="fhq-purchase-balance">
+      <span><small>Current Balance</small><strong><i class="fhq-coin-icon" style="width:22px;height:22px"></i><em id="fhqPurchaseBefore" style="font-style:normal">0</em></strong></span>
+      <b class="fhq-purchase-arrow">→</b>
+      <span><small>Balance After</small><strong><i class="fhq-coin-icon" style="width:22px;height:22px"></i><em id="fhqPurchaseAfter" style="font-style:normal">0</em></strong></span>
+    </div>
+    <div class="fhq-purchase-actions">
+      <button id="fhqPurchaseYes" class="fhq-purchase-confirm" type="button">PURCHASE</button>
+      <button id="fhqPurchaseNo" class="fhq-purchase-cancel" type="button">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div id="fhqShopPage" class="fhq-shop-page hidden"><div class="fhq-shop-inner"><div class="fhq-shop-hero"><div style="width:145px"></div><h1>HQ Shop</h1><div class="fhq-shop-wallet"><span class="fhq-coin-icon"></span><span><small>HQ COINS</small><strong id="fhqShopCoins">0</strong></span></div></div><div class="fhq-shop-tabs"><button class="active" data-shop-filter="all">FEATURED</button><button data-shop-filter="pack">PACKS</button><button data-shop-filter="avatar">AVATARS</button><button data-shop-filter="ring">RINGS</button><button data-shop-filter="banner">BANNERS</button><button data-shop-filter="title">TITLES</button></div><div id="fhqShopGrid" class="fhq-shop-grid"></div></div></div>
+<div id="fhqGamesHub" class="fhq-games-hub hidden">
+  <div class="fhq-games-inner">
+    <div class="fhq-games-hero">
+      <div>
+        <div style="font-size:11px;font-weight:950;letter-spacing:2px;color:#778793">FOOTBALL HQ GAME CENTER</div>
+        <h1>Games</h1>
+        <div class="fhq-hero-detailbar"><span>12 DAILY CHALLENGES</span><span>WORLD RECORDS</span><span>UNLIMITED MODES</span></div>
+      </div>
+    </div>
+
+    <div class="fhq-games-section-title">
+      <span>All Games</span>
+      
+    </div>
+
+    <div class="fhq-game-library">
+      <button class="fhq-game-tile" data-game-open="players">
+        <span class="fhq-game-tag">PLAYER MATCH</span>
+        <div class="fhq-game-art fhq-art-players"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="s" d="M20 42c0-10 6-18 16-18s16 8 16 18"/><circle class="s" cx="36" cy="20" r="8"/><path class="a" d="M16 50h40M22 58h28"/><path class="gold" d="M29 39l7 5 7-5"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Active Players</strong><span>Weddle-style guessing using current NFL players only.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="players"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Guesses</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Guesses</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="legends">
+        <span class="fhq-game-tag">LEGEND MATCH</span>
+        <div class="fhq-game-art fhq-art-legends"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="gold" d="M24 14h24v12c0 10-5 17-12 20-7-3-12-10-12-20V14Z"/><path class="s" d="M24 20H15c0 10 5 15 12 16M48 20h9c0 10-5 15-12 16M36 46v9M27 59h18"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Legends</strong><span>Guess an iconic retired NFL player.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="legends"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Guesses</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Guesses</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="grid">
+        <span class="fhq-game-tag">GRID CHALLENGE</span>
+        <div class="fhq-game-art fhq-art-grid"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><rect class="s" x="12" y="12" width="48" height="48" rx="5"/><path class="s" d="M28 12v48M44 12v48M12 28h48M12 44h48"/><circle class="gold" cx="52" cy="20" r="4"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Grid</strong><span>Fill every square using players who match both clues.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="grid"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Misses</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Misses</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="whoami">
+        <span class="fhq-game-tag">CLUE LADDER</span>
+        <div class="fhq-game-art fhq-art-whoami"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><circle class="s" cx="30" cy="25" r="9"/><path class="s" d="M15 55c2-12 9-18 15-18s13 6 15 18"/><path class="gold" d="M49 22c1-6 11-6 12 0 1 5-5 6-5 10M56 39h.01"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Who Am I?</strong><span>Reveal progressively easier clues and name the player.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="whoami"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Clues</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Clues</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="career">
+        <span class="fhq-game-tag">CAREER PATH</span>
+        <div class="fhq-game-art fhq-art-career"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><circle class="f" cx="14" cy="52" r="4"/><circle class="f" cx="36" cy="32" r="4"/><circle class="f" cx="58" cy="16" r="4"/><path class="a" d="M18 49c8-2 9-11 14-14M40 29c7-3 7-9 14-11"/><path class="gold" d="M51 52h9V41M60 52c-13 0-19-7-19-15"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Career Path</strong><span>Identify the NFL player from the teams in his career.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="career"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Guesses</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Guesses</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="higherlower">
+        <span class="fhq-game-tag">STAT STREAK</span>
+        <div class="fhq-game-art fhq-art-hilo"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="a" d="M23 55V17m0 0-8 8m8-8 8 8"/><path class="gold" d="M49 17v38m0 0-8-8m8 8 8-8"/><path class="muted" d="M35 12v48"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Higher / Lower</strong><span>Compare players across age, stats, experience, and more.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="higherlower"><span><small>Current Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Longest Streak</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Longest Streak</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="imposter">
+        <span class="fhq-game-tag">FIND OUTLIER</span>
+        <div class="fhq-game-art fhq-art-imposter"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><circle class="s" cx="24" cy="25" r="7"/><circle class="s" cx="48" cy="25" r="7"/><circle class="s" cx="24" cy="49" r="7"/><circle class="gold" cx="48" cy="49" r="9"/><path class="gold" d="M45 46l6 6m0-6-6 6"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Imposter</strong><span>Find the one player who does not share the hidden connection.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="imposter"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Best Streak</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Best Streak</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="connections">
+        <span class="fhq-game-tag">GROUP PUZZLE</span>
+        <div class="fhq-game-art fhq-art-connections"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><rect class="s" x="13" y="13" width="18" height="18" rx="5"/><rect class="a" x="41" y="13" width="18" height="18" rx="5"/><rect class="gold" x="13" y="41" width="18" height="18" rx="5"/><rect class="muted" x="41" y="41" width="18" height="18" rx="5"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Connections</strong><span>Sort sixteen football names into four connected groups.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="connections"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Mistakes</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Mistakes</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="statline">
+        <span class="fhq-game-tag">STAT ID</span>
+        <div class="fhq-game-art fhq-art-statline"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="muted" d="M12 58h48"/><rect class="a" x="17" y="39" width="8" height="19" rx="2"/><rect class="s" x="32" y="28" width="8" height="30" rx="2"/><rect class="gold" x="47" y="16" width="8" height="42" rx="2"/><path class="s" d="M14 16h16"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Stat Line</strong><span>Identify the player from his season statistics and hints.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="statline"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fastest Solve</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fastest Solve</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="draftclass">
+        <span class="fhq-game-tag">DRAFT YEAR</span>
+        <div class="fhq-game-art fhq-art-draftclass"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="s" d="M13 22l23-10 23 10-23 10-23-10Z"/><path class="a" d="M22 28v15c7 6 21 6 28 0V28"/><path class="gold" d="M58 24v20"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Draft Class</strong><span>Guess which NFL Draft class a player belongs to.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="draftclass"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Guesses</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Guesses</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="moggle">
+        <span class="fhq-game-tag">FACE ID</span>
+        <div class="fhq-game-art fhq-art-moggle"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="a" d="M16 26V16h10M46 16h10v10M56 46v10H46M26 56H16V46"/><circle class="s" cx="36" cy="30" r="8"/><path class="s" d="M22 52c2-10 8-15 14-15s12 5 14 15"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Mogger</strong><span>Recognize football players from a face challenge.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="moggle"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Guesses</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Guesses</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="timeline">
+        <span class="fhq-game-tag">ORDER EVENTS</span>
+        <div class="fhq-game-art fhq-art-timeline"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="s" d="M12 36h48"/><circle class="gold" cx="18" cy="36" r="5"/><circle class="a" cx="36" cy="36" r="5"/><circle class="s" cx="54" cy="36" r="5"/><path class="muted" d="M18 24v-6M36 48v6M54 24v-6"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Timeline</strong><span>Put NFL moments in chronological order.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="timeline"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Attempts</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Attempts</small><strong data-stat="world">—</strong></span></div></button>
+      <button class="fhq-game-tile" data-game-open="guessteam">
+        <span class="fhq-game-tag">FRANCHISE CLUES</span>
+        <div class="fhq-game-art fhq-art-guessteam"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="a" d="M36 10 56 18v16c0 13-8 22-20 28-12-6-20-15-20-28V18l20-8Z"/><path class="gold" d="M30 28c1-7 12-8 13-1 1 6-6 7-6 12M37 47h.01"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Franchise Finder</strong><span>Reveal clues and identify the NFL franchise before you miss.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="guessteam"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Clues</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Clues</small><strong data-stat="world">—</strong></span></div></button>
+
+      <button class="fhq-game-tile" data-game-open="depthchart">
+        <span class="fhq-game-tag">ORDER DEPTH</span>
+        <div class="fhq-game-art fhq-art-depthchart"><span class="fhq-game-cover" aria-hidden="true"><svg viewBox="0 0 72 72"><path class="s" d="M16 18h40M16 36h32M16 54h24"/><circle class="gold" cx="11" cy="18" r="3"/><circle class="a" cx="11" cy="36" r="3"/><circle class="muted" cx="11" cy="54" r="3"/><path class="a" d="M54 32l6 4-6 4"/></svg></span></div>
+        <div class="fhq-game-copy"><strong>Depth Chart</strong><span>Arrange a current position room from starter to deeper backup.</span></div>
+      <div class="fhq-game-competitive" data-game-stats="depthchart"><span><small>Max Streak</small><strong data-stat="streak">0</strong></span><span><small>PERSONAL • Fewest Attempts</small><strong data-stat="personal">—</strong></span><span><small>WORLD • Fewest Attempts</small><strong data-stat="world">—</strong></span></div></button>
+
+    </div>
+  </div>
+</div>
+
+<div id="fhqCorePage" class="container">
+    <div class="site-topbar">
+      <div>
+        <h1 id="pageTitle">Fantasy Football Rankings</h1>
+        <div id="draftPageTitleNote" class="draft-page-title-note" style="display:none;"></div>
+      </div>
+      <button type="button" id="pageNavButton" class="page-nav-button" onclick="navigateSitePage()" style="display:none!important">DRAFT →</button>
+    </div>
+    <div class="fhq-rankings-detailbar" id="fhqRankingsDetailbar"><span>500 PLAYER BOARD</span><span>CONSENSUS COMPARISON</span><span>RISK METER</span></div>
+    <div class="instructions" id="instructionsBar"></div>
+    <div class="position-filter-wrap" id="rankingsPositionFilters">
+        <button type="button" class="filter-btn active-filter" data-position="all" onclick="filterPosition('all', this)">ALL</button>
+        <button type="button" class="filter-btn" data-position="qb" onclick="filterPosition('qb', this)">QB</button>
+        <button type="button" class="filter-btn" data-position="rb" onclick="filterPosition('rb', this)">RB</button>
+        <button type="button" class="filter-btn" data-position="wr" onclick="filterPosition('wr', this)">WR</button>
+        <button type="button" class="filter-btn" data-position="te" onclick="filterPosition('te', this)">TE</button>
+      </div>
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="Search by player, team, or position..." />
+      <span id="modeLabel" style="align-self:center;font-weight:700;"></span>
+      <button type="button" class="editor-only" onclick="addPlayer()">Add Player</button>
+      <button type="button" class="editor-only" onclick="saveRankings()">Save Rankings</button>
+      <button type="button" class="editor-only" onclick="resetRankings()">Reset to Original Top 250</button>
+    </div>
+
+    <!-- PERMANENT RANKINGS PAGE — V27 -->
+    <div id="rankingsStandalone">
+      
+      <div class="rankings-card">
+        <div id="rankingsStandaloneStatus" class="rankings-status"><span>Best available players</span><span id="fhqRankingsCount" class="fhq-rankings-count">Loading…</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th class="my-guys-col">My Guy</th>
+              <th>Pos. Rank</th>
+              <th class="team">Team</th>
+              <th class="consensus-only consensus-col"><button type="button" class="fhq-sort-head" data-rank-sort="consensus" onclick="fhqSetRankingsSort('consensus')">Consensus <span class="fhq-sort-arrow">↕</span></button></th>
+              <th class="consensus-only consensus-col"><button type="button" class="fhq-sort-head active" data-rank-sort="hq" onclick="fhqSetRankingsSort('hq')">Football HQ Rank <span class="fhq-sort-arrow">↑</span></button></th>
+              <th class="tier">Risk</th>
+              <th class="draft-column" style="display:none">Draft Action</th>
+            </tr>
+          </thead>
+          <tbody id="rankingsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DRAFT SIMULATOR SETUP -->
+    
+    <div id="draftLanding" class="draft-landing draft-flow-screen viewer-draft-only">
+      <div class="draft-flow-kicker">FOOTBALL HQ DRAFT ROOM</div>
+      <div class="draft-flow-title">How do you want to draft?</div>
+      <div class="draft-flow-sub">Choose a room type first. We’ll set up your league on the next screen.</div>
+      <div class="draft-choice-grid">
+        <button type="button" class="draft-choice-card" onclick="chooseDraftFlowMode('cpu')">
+          <span class="draft-choice-icon">🤖</span>
+          <strong>CPU Opponents</strong>
+          <p>Draft against the CPU.</p>
+          <span class="draft-choice-arrow">→</span>
+        </button>
+        <button type="button" class="draft-choice-card" onclick="chooseDraftFlowMode('friends')">
+          <span class="draft-choice-icon">👥</span>
+          <strong>Friends</strong>
+          <p>Draft against friends on this device.</p>
+          <span class="draft-choice-arrow">→</span>
+        </button>
+        <button type="button" class="draft-choice-card" onclick="chooseDraftFlowMode('online')">
+          <span class="draft-choice-icon">🌐</span>
+          <strong>Private Room</strong>
+          <p>Draft against friends online.</p>
+          <span class="draft-choice-arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+<div id="simSetup" class="sim-setup viewer-draft-only">
+      <div class="draft-settings-banner">
+        <div>
+          <strong>Draft Settings</strong>
+          <span>Customize the room before entering the lobby.</span>
+        </div>
+        <span id="draftSettingsModePill" class="draft-settings-mode-pill">CPU OPPONENTS</span>
+      </div>
+
+      <div class="sim-field sim-field-wide">
+        <label>Draft Against</label>
+        <input type="hidden" id="simOpponentMode" value="cpu">
+        <div class="opponent-mode-wrap">
+          <button type="button" id="cpuModeBtn" class="opponent-mode-btn active" onclick="setOpponentMode('cpu')">
+            <span class="mode-card-icon">🤖</span>
+            <span class="mode-card-copy"><strong>CPU Opponents</strong><small>Draft against the CPU.</small></span>
+          </button>
+          <button type="button" id="friendsModeBtn" class="opponent-mode-btn" onclick="setOpponentMode('friends')">
+            <span class="mode-card-icon">👥</span>
+            <span class="mode-card-copy"><strong>Friends</strong><small>Draft against friends on this device.</small></span>
+          </button>
+          <button type="button" id="onlineModeBtn" class="opponent-mode-btn" onclick="setOpponentMode('online')">
+            <span class="mode-card-icon">🌐</span>
+            <span class="mode-card-copy"><strong>Private Room</strong><small>Draft against friends online.</small></span>
+          </button>
+        </div>
+        <div id="opponentModeHelp" class="opponent-mode-help">Draft against the CPU.</div>
+      </div>
+      <div class="sim-field">
+        <label for="simTeams">Teams</label>
+        <select id="simTeams" onchange="refreshDraftSlotOptions(); refreshFriendSetup()">
+          <option value="8">8 teams</option>
+          <option value="10">10 teams</option>
+          <option value="12" selected>12 teams</option>
+          <option value="14">14 teams</option>
+        </select>
+      </div>
+      <div class="sim-field">
+        <label for="simSlot">Your Draft Slot</label>
+        <select id="simSlot" onchange="refreshFriendSetup()"></select>
+      </div>
+      <div class="sim-field">
+        <label for="simRounds">Rounds</label>
+        <select id="simRounds">
+          <option value="13" selected>13 rounds</option>
+          <option value="15">15 rounds</option>
+          <option value="16">16 rounds</option>
+        </select>
+      </div>
+      <div class="sim-field">
+        <label for="cpuDifficulty">CPU Difficulty</label>
+        <select id="cpuDifficulty" onchange="cpuDifficulty=this.value">
+          <option value="casual">Casual</option>
+          <option value="competitive" selected>Competitive</option>
+          <option value="expert">Expert</option>
+        </select>
+        <div class="cpu-difficulty-note">Controls CPU value discipline and randomness.</div>
+      </div>
+
+      <div class="advanced-settings-card">
+        <div class="advanced-settings-head">
+          <div class="advanced-settings-title">⚙ League Settings</div>
+          <div class="advanced-settings-note">These settings affect CPU strategy, roster construction, grading, and the pick clock.</div>
+        </div>
+        <div class="advanced-settings-grid">
+          <div class="sim-field">
+            <label for="scoringFormat">Scoring</label>
+            <select id="scoringFormat" onchange="syncAdvancedSettings()">
+              <option value="ppr" selected>PPR</option>
+              <option value="half">Half-PPR</option>
+              <option value="standard">Standard</option>
+            </select>
+          </div>
+          <div class="sim-field">
+            <label for="rosterFormat">Roster Format</label>
+            <select id="rosterFormat" onchange="applyRosterPreset(); syncAdvancedSettings()">
+              <option value="1qb" selected>1QB</option>
+              <option value="superflex">Superflex / 2QB</option>
+            </select>
+          </div>
+          <div class="sim-field">
+            <label for="pickTimer">Pick Timer</label>
+            <select id="pickTimer" onchange="syncAdvancedSettings()">
+              <option value="30">30 seconds</option>
+              <option value="60" selected>60 seconds</option>
+              <option value="90">90 seconds</option>
+              <option value="0">No timer</option>
+            </select>
+          </div>
+          <div class="sim-field">
+            <label for="benchSize">Bench Spots</label>
+            <select id="benchSize" onchange="syncAdvancedSettings()">
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6" selected>6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+        </div>
+        <div class="roster-custom-grid">
+          <div><label>QB</label><select id="startQB" onchange="syncAdvancedSettings()"><option>1</option><option>2</option></select></div>
+          <div><label>RB</label><select id="startRB" onchange="syncAdvancedSettings()"><option>1</option><option selected>2</option><option>3</option></select></div>
+          <div><label>WR</label><select id="startWR" onchange="syncAdvancedSettings()"><option>1</option><option selected>2</option><option>3</option></select></div>
+          <div><label>TE</label><select id="startTE" onchange="syncAdvancedSettings()"><option selected>1</option><option>2</option></select></div>
+          <div><label>FLEX</label><select id="startFlex" onchange="syncAdvancedSettings()"><option>0</option><option selected>1</option><option>2</option></select></div>
+          <div><label>SUPERFLEX</label><select id="startSuperflex" onchange="syncAdvancedSettings()"><option selected>0</option><option>1</option></select></div>
+        </div>
+        <div id="settingsSummary" class="settings-summary"></div>
+      </div>
+
+      <div id="draftHistoryShell" class="draft-history-shell">
+        <div class="draft-history-head">
+          <div class="draft-history-title">📚 Draft History</div>
+          <button type="button" class="history-toolbar-btn" onclick="clearDraftHistory()">Clear History</button>
+        </div>
+        <div id="draftHistoryList" class="draft-history-list"></div>
+      </div>
+
+      <div id="friendSetup" class="friend-setup">
+        <div class="friend-setup-head">
+          <span>Friend Draft Seats</span>
+          <span class="friend-setup-note">Any unfilled team is controlled by the CPU.</span>
+        </div>
+        <div class="sim-field" style="min-width:150px;max-width:180px;">
+          <label for="simFriendCount">Friends Joining</label>
+          <select id="simFriendCount" onchange="refreshFriendSetup()"></select>
+        </div>
+        <div id="friendManagerRows" style="display:flex;flex:1 1 520px;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+      <div id="onlineRoomSetup" class="online-room-setup">
+        <div style="width:100%;">
+          <div style="color:#fff;font-weight:1000;text-transform:uppercase;letter-spacing:.04em;">Private Multiplayer Room</div>
+          <div style="color:#9aa0a6;font-size:11px;font-weight:700;margin-top:3px;">Create a room on one device, then friends can join from their phones using the same 6-character code. Empty seats are CPU controlled.</div>
+        </div>
+        <div class="sim-field" style="min-width:180px;max-width:220px;">
+          <label for="onlineManagerName">Your Name</label>
+          <input id="onlineManagerName" type="text" maxlength="24" placeholder="Robin" style="width:100%;background:#20252a;color:#fff;border:1px solid #3a4148;border-radius:8px;padding:10px 11px;font-weight:800;box-sizing:border-box;">
+        </div>
+        <div class="online-room-actions">
+          <button type="button" class="online-action-btn primary" onclick="createOnlineDraftRoom()">CREATE ROOM</button>
+          <input id="onlineJoinCode" type="text" maxlength="6" placeholder="ROOM CODE" style="width:140px;text-transform:uppercase;letter-spacing:.12em;">
+          <button type="button" class="online-action-btn join" onclick="joinOnlineDraftRoom()">JOIN ROOM</button>
+        </div>
+        <div id="onlineRoomError" class="online-error"></div>
+        <div id="onlineRoomCard" class="online-room-card">
+          <div style="color:#9aa0a6;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;">Private Room Code</div>
+          <div id="onlineRoomCodeDisplay" class="online-room-code">------</div>
+          <div id="onlineRoomMeta" class="online-room-meta">Waiting for friends…</div>
+          <div id="onlineLobbyGrid" class="online-lobby-grid"></div>
+          <div id="onlineRoomStatus" class="online-room-status"></div>
+          <button type="button" id="onlineHostStartBtn" class="sim-start" style="display:none;margin-top:12px;" onclick="startOnlineDraftRoom()">🏈 START ROOM DRAFT</button>
+        </div>
+      </div>
+    
+      <div class="draft-settings-actions">
+        <button type="button" class="draft-flow-back" onclick="showDraftFlowStage('choice')">← BACK</button>
+        <button type="button" class="draft-flow-next" onclick="continueDraftToLobby()">CONTINUE →</button>
+      </div>
+</div>
+
+    <div id="draftWaitingRoom" class="draft-waiting-room draft-flow-screen viewer-draft-only">
+      <div class="draft-wait-top">
+        <div class="draft-wait-copy">
+          <div class="draft-flow-kicker" style="text-align:left">FOOTBALL HQ WAITING ROOM</div>
+          <h2 id="draftWaitingTitle">Draft starts soon</h2>
+          <p id="draftWaitingSubtitle">Managers are taking their seats.</p>
+        </div>
+        <div id="draftLobbyCountdown" class="draft-countdown">10</div>
+      </div>
+      <div id="draftLobbyMeta" class="draft-lobby-meta"></div>
+      <div id="draftManagerGrid" class="draft-manager-grid"></div>
+      <div class="draft-wait-actions">
+        <div class="draft-wait-note">The draft will start automatically when the countdown reaches zero.</div>
+        <button type="button" class="draft-skip" onclick="beginDraftFromLobby()">SKIP TO DRAFT →</button>
+      </div>
+    </div>
+
+
+    <!-- DRAFT MODE CONTROLS — V23 SETTINGS MENU -->
+    <div id="draftControls" class="draft-controls viewer-draft-only">
+      <button type="button" id="draftToolsToggle" class="draft-tools-toggle" onclick="toggleDraftToolsMenu()" aria-label="Draft settings">⚙</button>
+      <div id="draftToolsMenu" class="draft-tools-menu">
+        <button type="button" class="draft-tools-close" onclick="toggleDraftToolsMenu(false)">CLOSE ×</button>
+        <div class="draft-tools-menu-title">DRAFT OPTIONS</div>
+        <div class="draft-tool-row"><span>Auto Draft</span><button type="button" id="autoDraftBtn" class="auto-draft-button" onclick="toggleAutoDraft()">AUTO DRAFT: OFF</button></div>
+        <div class="draft-tool-row"><span>Draft Sounds</span><button type="button" id="soundToggleBtn" class="sound-toggle on" onclick="toggleDraftSounds()">🔊 ON</button></div>
+        <div class="draft-tool-row"><span>Live Draft Chat</span><button type="button" id="chatToggleBtn" onclick="toggleDraftChat()">OPEN CHAT</button></div><div class="draft-tool-row"><span>Pause Draft</span><button type="button" id="pauseDraftBtn" onclick="toggleDraftPause()">PAUSE</button></div>
+        <div class="draft-tool-row"><span>Restart Draft</span><button type="button" id="resetDraftBtn" class="reset-draft-button" onclick="resetDraft()">RESET</button></div>
+        <div id="draftStatus" class="draft-tool-status">0 drafted • 0 mine</div>
+      </div>
+    </div>
+
+    <!-- PERSISTENT DRAFT CLOCK / STATUS -->
+    <div id="simRoom" class="sim-room viewer-draft-only">
+      <div class="clock-panel">
+        <div class="clock-copy">
+          <div id="clockTitle" class="clock-title">Fantasy Football Draft Simulator</div>
+          <div id="clockSubtitle" class="clock-subtitle"></div>
+        </div>
+        <div id="draftClock" class="draft-clock waiting">--</div>
+      </div>
+      <div id="draftTurnRibbon" class="draft-turn-ribbon">
+        <div><strong id="draftTurnText">Draft preparing…</strong><span id="draftTurnSubtext">Your next pick will appear here.</span></div>
+        <div class="draft-turn-progress"><i id="draftTurnProgressFill" style="width:0%"></i></div>
+      </div>
+      <div id="draftPausedBanner" class="draft-paused-banner">⏸ Draft paused. Resume from ⚙ Settings when you are ready.</div>
+      <div id="simMessage" class="sim-message"></div>
+      <div id="draftAssistBar" class="draft-assist-bar">
+        <div class="draft-assist-card draft-needs-card">
+          <div class="draft-assist-label">ROSTER NEEDS</div>
+          <div id="quickRosterNeeds" class="quick-roster-needs"></div>
+        </div>
+        <div class="draft-assist-card draft-recommend-card">
+          <div class="draft-assist-label">BEST FIT AVAILABLE</div>
+          <div id="bestFitRecommendations" class="best-fit-recommendations"></div>
+        </div>
+        <div class="draft-assist-card recent-picks-card">
+          <div class="draft-assist-label">RECENT PICKS</div>
+          <div id="recentPicks" class="recent-picks-inline"></div>
+        </div>
+      </div>
+      <div class="draft-top-status">
+        <div>
+          <span class="draft-top-label">FORMAT</span>
+          <strong id="topDraftFormat">12-team snake</strong>
+        </div>
+        <div>
+          <span class="draft-top-label">ROUND</span>
+          <strong id="topDraftRound">1 / 13</strong>
+        </div>
+        <div>
+          <span class="draft-top-label">PICKS</span>
+          <strong id="topDraftPicks">0</strong>
+        </div>
+        <div>
+          <span class="draft-top-label">MY ROSTER</span>
+          <strong id="topDraftRoster">0</strong>
+        </div>
+      </div>
+    </div>
+
+    <div id="draftChatPanel" class="draft-chat-panel viewer-draft-only">
+      <div class="draft-chat-head"><strong>💬 Live Draft Chat</strong><span id="draftChatMode" class="draft-chat-mode">Draft room chat</span><button type="button" class="draft-chat-close" onclick="toggleDraftChat(false)" aria-label="Close draft chat">×</button></div>
+      <div id="draftChatMessages" class="draft-chat-messages"><div class="chat-empty">Create or join a private room to chat.</div></div>
+      <div class="draft-chat-compose">
+        <input id="draftChatInput" type="text" maxlength="220" placeholder="Message the room…">
+        <button id="draftChatSendBtn" type="button">SEND</button>
+      </div>
+      <div id="draftChatSaveStatus" class="draft-chat-save-status"></div>
+    </div>
+
+    <!-- DRAFT TABS -->
+    <div id="draftTabsShell" class="draft-tabs-shell viewer-draft-only">
+      <div class="draft-tab-nav" role="tablist">
+        <button type="button" class="draft-tab-button active" data-tab="players" onclick="switchDraftTab('players')">PLAYERS</button>
+        <button type="button" class="draft-tab-button" data-tab="board" onclick="switchDraftTab('board')">BOARD</button>
+        <button type="button" class="draft-tab-button" data-tab="roster" onclick="switchDraftTab('roster')">ROSTER</button>
+      </div>
+
+      <div id="draftTabPlayers" class="draft-tab-panel active">
+    <div id="draftBoardMain" class="draft-board-main">
+    <div class="draft-player-search">
+      <input id="draftPlayerSearchInput" type="search" autocomplete="off" placeholder="Search 500 players by name, team, or position…" oninput="scheduleDraftPlayerSearch(this.value)">
+      <button type="button" onclick="clearDraftPlayerSearch()">CLEAR</button>
+    </div>
+    <!-- POSITION FILTER BUTTONS -->
+    <div id="positionFilters" class="position-filter-wrap">
+      <button type="button" class="filter-btn active-filter" data-position="all" onclick="filterPosition('all', this)">ALL</button>
+      <button type="button" class="filter-btn" data-position="qb" onclick="filterPosition('qb', this)">QB</button>
+      <button type="button" class="filter-btn" data-position="rb" onclick="filterPosition('rb', this)">RB</button>
+      <button type="button" class="filter-btn" data-position="wr" onclick="filterPosition('wr', this)">WR</button>
+      <button type="button" class="filter-btn" data-position="te" onclick="filterPosition('te', this)">TE</button>
+    </div>
+      <div class="draft-utility-bar">
+        <div id="playerQueuePanel" class="player-queue-panel">
+          <div class="player-queue-head"><span class="player-queue-title">⭐ My Player Queue</span><span id="playerQueueCount" class="player-queue-count">0 queued</span></div>
+          <div id="playerQueueList" class="player-queue-list"><div class="queue-empty">Put a ☆ next to a player to add them to your queue.</div></div>
+        </div>
+      </div>
+      <div id="draftBoardStatus" style="position:sticky;top:55px;z-index:85;padding:7px 12px;font-size:12px;font-weight:800;color:#666;background:white;border-bottom:1px solid #eee;">Best available players</div>
+    <table>
+      <thead><tr><th>Rank</th><th>Player</th><th>Pos. Rank</th><th class="team">Team</th><th class="consensus-only consensus-col"><button type="button" class="fhq-sort-head" data-rank-sort="consensus" onclick="fhqSetRankingsSort('consensus')">Consensus <span class="fhq-sort-arrow">↕</span></button></th><th class="consensus-only consensus-col"><button type="button" class="fhq-sort-head active" data-rank-sort="hq" onclick="fhqSetRankingsSort('hq')">Football HQ Rank <span class="fhq-sort-arrow">↑</span></button></th><th class="tier">Risk</th><th id="draftHeader" class="draft-column draft-hidden">Draft Action</th></tr></thead>
+      <tbody id="draftRankingsBody"></tbody>
+    </table>
+    </div>
+      </div>
+
+      <div id="draftTabBoard" class="draft-tab-panel">
+        <div class="full-board-card">
+          <div class="full-board-heading">
+            <div>
+              <div class="full-board-title">Draft Board</div>
+              <div class="full-board-subtitle">Every pick by round and team</div>
+            </div>
+            <div id="boardPickCount" class="full-board-count">0 picks</div>
+          </div>
+          <div id="fullDraftBoard" class="full-draft-board"></div>
+        </div>
+      </div>
+
+      <div id="draftTabRoster" class="draft-tab-panel">
+    <!-- MY ROSTER -->
+    <div id="rosterPanel" class="roster-panel viewer-draft-only">
+      <div class="roster-heading espn-roster-heading">
+        <div>
+          <span>MY ROSTER</span>
+          <div class="espn-roster-subtitle">2026 Fantasy Team</div>
+        </div>
+        <span id="rosterCount">0 players</span>
+      </div>
+      <div id="espnRosterRoot" class="espn-roster-root"></div>
+    </div>
+      </div>
+    </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- DRAFT COMPLETE CELEBRATION -->
+  <canvas id="draftConfettiCanvas"></canvas>
+  <div id="draftCompleteOverlay" class="draft-complete-overlay" aria-hidden="true">
+    <div class="draft-complete-card" role="dialog" aria-modal="true" aria-labelledby="draftCompleteTitle">
+      <button type="button" id="draftCompleteClose" class="draft-complete-close" aria-label="Close">×</button>
+      <div class="draft-complete-kicker">🏆 Draft Complete</div>
+      <div id="draftCompleteTitle" class="draft-complete-title">Your Team Is Ready</div>
+      <div id="draftCompleteSubtitle" class="draft-complete-subtitle"></div>
+      <div id="draftGradePanel" class="draft-grade-panel"></div>
+      <div id="powerRankingsPanel" class="power-rankings-panel"></div>
+      <div id="finalRosterGrid" class="final-roster-grid"></div>
+      <div class="final-roster-actions">
+        <button type="button" class="share-card-button" onclick="shareDraftCard()">🖼 SHARE DRAFT CARD</button>
+        <button type="button" class="share-roster-button" onclick="shareFinalRoster()">↗ SHARE TEXT</button>
+        <button type="button" class="view-roster-button" onclick="closeDraftCompleteModal(true)">VIEW FULL ROSTER</button>
+      </div>
+      <div id="shareConfirmation" class="share-confirmation"></div>
+      <div id="shareCardPreview" class="share-card-preview"><canvas id="shareCardCanvas" width="1200" height="1500"></canvas></div>
+    </div>
+  </div>
+
+  <div id="playerModal" class="player-modal" aria-hidden="true">
+    <div class="player-card" role="dialog" aria-modal="true">
+      <button type="button" class="player-card-close" id="playerCardClose" aria-label="Close" onclick="closePlayerCard(); return false;">×</button>
+      <div class="player-card-top">
+        <div id="cardPhotoWrap"></div>
+        <div>
+          <h2 id="cardPlayerName"></h2>
+          <div id="cardSubtitle" class="player-subtitle"></div>
+          <div id="cardPlayerMeta" class="player-meta"></div>
+        </div>
+      </div>
+      <div class="rank-compare">
+        <div class="rank-box"><div class="rank-box-label">FOOTBALL HQ RANK</div><div id="cardMyRank" class="rank-box-value"></div></div>
+        <div class="rank-box"><div class="rank-box-label">EXPERT CONSENSUS</div><div id="cardConsensusRank" class="rank-box-value"></div></div>
+        <div class="rank-box"><div class="rank-box-label">FLOCK RANK</div><div id="cardFlockRank" class="rank-box-value"></div></div>
+      </div>
+      <div id="cardDifference" class="rank-difference"></div>
+      <div class="source-rankings-wrap">
+        <div class="source-rankings-title"><span>RANKING SOURCES</span><span class="source-rankings-subtitle">Rankings only</span></div>
+        <div id="sourceRankingsGrid" class="source-rankings-grid"></div>
+        <div id="comparisonCoverage" class="comparison-coverage"></div>
+      </div>
+      <div class="risk-meter-wrap">
+        <div class="risk-meter-title">RISK METER</div>
+        <div class="risk-meter-bar">
+          <div id="riskSegVH" class="risk-segment vh"></div>
+          <div id="riskSegH" class="risk-segment h"></div>
+          <div id="riskSegM" class="risk-segment m"></div>
+          <div id="riskSegL" class="risk-segment l"></div>
+          <div id="riskSegVL" class="risk-segment vl"></div>
+        </div>
+        <div id="cardRiskLabel" class="risk-meter-label risk-unset">Not rated</div>
+      </div>
+      <div class="player-stats-wrap">
+        <div class="player-stats-title">2025 STATS</div>
+        <div class="player-stats-grid">
+          <div class="player-stat"><div id="stat1Value" class="player-stat-value">—</div><div id="stat1Label" class="player-stat-label">Stat</div></div>
+          <div class="player-stat"><div id="stat2Value" class="player-stat-value">—</div><div id="stat2Label" class="player-stat-label">Stat</div></div>
+          <div class="player-stat"><div id="stat3Value" class="player-stat-value">—</div><div id="stat3Label" class="player-stat-label">Stat</div></div>
+          <div class="player-stat"><div id="stat4Value" class="player-stat-value">—</div><div id="stat4Label" class="player-stat-label">Stat</div></div>
+          <div class="player-stat"><div id="stat5Value" class="player-stat-value">—</div><div id="stat5Label" class="player-stat-label">Stat</div></div>
+          <div class="player-stat"><div id="stat6Value" class="player-stat-value">—</div><div id="stat6Label" class="player-stat-label">Stat</div></div>
+        </div>
+        <div id="playerStatsNote" class="player-stats-note">2025 regular season</div>
+      </div>
+    </div>
+  </div>
+
+<script>window.FHQ_EDITOR_KEY = <?!= JSON.stringify(editorKey) ?>;</script>
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/10-script-10.js?v=8836fix54"></script>
+
+
+
+
+  <button id="footballGameLaunch" class="football-game-launch" type="button">🏈 GAMES</button>
+  <canvas id="fgConfettiCanvas"></canvas>
+  <div id="fgDamageFlash" class="fg-damage-flash"></div>
+  <div id="fgFeedbackPop" class="fg-feedback-pop"></div>
+
+  <div id="footballGameOverlay" class="football-game-overlay" aria-hidden="true">
+    <div class="football-game-shell">
+      <div class="fg-head">
+        <button id="footballGameClose" class="fg-close" type="button" aria-label="Close">×</button>
+        <div class="fg-kicker">Football HQ game center</div>
+        <div class="fg-title">FOOTBALL DAILY</div>
+        <div class="fg-sub">Daily challenges + unlimited football games.</div>
+      </div>
+
+      <div class="fg-modes">
+        <button class="fg-mode active" data-fg-mode="players" type="button">CURRENT PLAYERS</button>
+        <button class="fg-mode" data-fg-mode="grid" type="button">GRID</button>
+        <button class="fg-mode" data-fg-mode="legends" type="button">LEGENDS</button>
+        <button class="fg-mode" data-fg-mode="whoami" type="button">WHO AM I?</button>
+        <button class="fg-mode" data-fg-mode="career" type="button">CAREER PATH</button>
+        <button class="fg-mode" data-fg-mode="higherlower" type="button">HIGHER / LOWER</button>
+        <button class="fg-mode" data-fg-mode="imposter" type="button">IMPOSTER</button>
+        <button class="fg-mode" data-fg-mode="connections" type="button">CONNECTIONS</button>
+        <button class="fg-mode" data-fg-mode="statline" type="button">STAT LINE</button>
+        <button class="fg-mode" data-fg-mode="draftclass" type="button">DRAFT CLASS</button>
+        <button class="fg-mode" data-fg-mode="moggle" type="button">MOGGER</button>
+        <button class="fg-mode" data-fg-mode="timeline" type="button">TIMELINE</button>
+        <button class="fg-mode" data-fg-mode="guessteam" type="button">FRANCHISE FINDER</button>
+        <button class="fg-mode" data-fg-mode="depthchart" type="button">DEPTH CHART</button>
+      </div>
+
+      <div class="fg-toolbar">
+        <button id="fgDailyBtn" class="fg-playtype active" type="button">DAILY CHALLENGE</button>
+        <button id="fgUnlimitedBtn" class="fg-playtype" type="button">UNLIMITED</button>
+      </div>
+
+      <div class="fg-body">
+        <div id="fgPrompt" class="fg-prompt"></div>
+
+        <div id="fgSearchArea">
+          <div class="fg-search-row">
+            <input id="fgInput" name="fhq_player_guess" autocomplete="new-password" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore="true" data-lpignore="true" placeholder="Type a guess..." />
+            <button id="fgGuessBtn" class="fg-guess-btn" type="button">GUESS</button>
+          </div>
+          <div id="fgSuggestions" class="fg-suggestions"></div>
+        </div>
+
+        <div id="fgMessage" class="fg-message"></div>
+        <div class="fg-grid-wrap" id="fgWeddleWrap"><div id="fgGrid" class="fg-grid"></div></div>
+        <div id="fgGridGame" class="fg-grid-game"></div>
+        <div id="fgSpecialGame" class="fg-special-wrap"></div>
+
+        <div class="fg-footer">
+          <button id="fgShareBtn" class="fg-share" type="button" style="display:none">SHARE RESULT</button>
+        </div>
+        <div id="fgHelp" class="fg-help">Green = exact match. Yellow = close. Gray = not a match.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="fgResultOverlay" class="fg-result-overlay" aria-hidden="true">
+    <div class="fg-result-card">
+      <button id="fgResultClose" class="fg-result-close" type="button" aria-label="Close results">×</button>
+      <div id="fgResultKicker" class="fg-result-kicker">Football Daily Results</div>
+      <div id="fgResultTitle" class="fg-result-title">TOUCHDOWN!</div>
+      <div id="fgResultSub" class="fg-result-sub"></div>
+      <div id="fgAnswerCard" class="fg-answer-card"></div>
+      <div id="fgResultSummary" class="fg-result-summary"></div>
+      <div id="fgMiniResult" class="fg-mini-result"></div>
+      <div class="fg-result-actions">
+        <button id="fgResultShare" class="fg-share" type="button">SHARE RESULT</button>
+        <button id="fgResultAgain" class="fg-secondary" type="button">PLAY AGAIN</button>
+      </div>
+      <div class="fg-result-note">Daily Challenge is shared by everyone and resets at 12:00 AM Pacific. Once completed, it stays view-only until the next day. Play Again starts an Unlimited game.</div>
+    </div>
+  </div>
+
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/11-script-11.js?v=8836fix572&v=8836fix54"></script>
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/21-v88-36-recovery-fix.js?v=8836fix54"></script>
+
+
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/12-script-12.js?v=8836fix54"></script>
+
+
+<div id="fhqLevelUpOverlay" class="fhq-levelup-overlay" aria-hidden="true"><div class="fhq-levelup-card"><small>FOOTBALL HQ</small><h2 id="fhqLevelUpTitle">LEVEL UP</h2><p id="fhqLevelUpCopy">You reached a new level.</p><strong id="fhqLevelUpReward"></strong><button id="fhqLevelUpClose" type="button">CONTINUE</button></div></div>
+
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/13-script-13.js?v=8836fix54"></script>
+
+
+
+<script src="https://footballhq.github.io/footballhq-assets/v88-36/js/14-script-14.js?v=8836fix54"></script>
+
+
+
+
+<!-- ================= FOOTBALL HQ V82.2 COLLECTION + PASS UI HOTFIX =================
+     Presentation/navigation only. Intentionally does NOT alter account identity,
+     persistence, recovery, coins, points, inventory, or server profile logic.
+=============================================================================== -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="fhqV8342BuildMarker" src="https://footballhq.github.io/footballhq-assets/v88-36/js/15-fhqv8342buildmarker.js?v=8836fix54"></script>
+
+<script id="fhqV822Script" src="https://footballhq.github.io/footballhq-assets/v88-36/js/16-fhqv822script.js?v=8836fix54"></script>
+
+
+
+
+
+
+<script id="fhq-v856-root-runtime-fix" src="https://footballhq.github.io/footballhq-assets/v88-36/js/17-fhq-v856-root-runtime-fix.js?v=8836fix54"></script>
+
+
+
+
+<script id="fhq-v87-rarity-helper-bridge" src="https://footballhq.github.io/footballhq-assets/v88-36/js/18-fhq-v87-rarity-helper-bridge.js?v=8836fix54"></script>
+
+
+<script id="fhq-v883-signature-exact-art-registration" src="https://footballhq.github.io/footballhq-assets/v88-36/js/19-fhq-v883-signature-exact-art-registration.js?v=8836fix54"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ================= FOOTBALL HQ V88.17 — EXACT CENTERED COLLECTION FIT =================
+     Asset layer and HTML now agree on one 720x1040 canvas.
+     The physical card is centered inside that canvas before it reaches the browser.
+     Browser does not crop, translate, scale beyond the slot, or guess offsets.
+========================================================================================= -->
+
+
+
+<!-- FOOTBALL HQ V88.48 — 7 PACK LINEUP + VISIBLE SAFE SKIP -->
+
+<script id="fhq-v8831-audio-and-tabs" src="https://footballhq.github.io/footballhq-assets/v88-36/js/20-fhq-v8831-audio-and-tabs.js?v=8836fix54"></script>
+
+
+
+
+<script id="fhq-fix5-card-engine" src="https://footballhq.github.io/footballhq-assets/v88-36/js/30-fhq-fix5-8-signatures-animation-foundation.js?v=8836fix58"></script>
+
+
+  <!-- V88.37 FINAL RARITY CINEMATICS + ROYAL OBSIDIAN -->
+  <script id="fhq-v8848-packs-visible-skip" src="https://footballhq.github.io/footballhq-assets/v88-36/js/32-fhq-packs-visible-skip-v8848.js?v=8848"></script>\n</body>
+</html>
