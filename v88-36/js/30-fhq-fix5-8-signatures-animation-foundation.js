@@ -15,104 +15,17 @@
     v=String(v||'common').toLowerCase();
     return ['common','uncommon','rare','epic','legendary','obsidian','signature'].includes(v)?v:'common';
   }
-/* FOOTBALL HQ FIX5 — COLLECTIBLE CARD ENGINE
-   V88.64 — SET-AWARE EXACT ART ENGINE
-   Backend catalog / odds / ownership remain untouched. */
-(function(){
-  'use strict';
-
-  const EXACT_FULL_CARD = {
-    tg021:'https://footballhq.github.io/footballhq-assets/v88-36/cards/021-pylonix-signature-exact.png?v=8836fix58',
-    tg022:'https://footballhq.github.io/footballhq-assets/v88-36/cards/022-visorcore-signature-exact.png?v=8836fix58',
-    tg023:'https://footballhq.github.io/footballhq-assets/v88-36/cards/023-stadion-signature-exact.png?v=8836fix58',
-    tg024:'https://footballhq.github.io/footballhq-assets/v88-36/cards/024-footsu-signature-exact.png?v=8836fix58'
-  };
-
-  /* KEEP YOUR EXISTING META OBJECT EXACTLY HERE */
-  const META = window.FHQ_FIX5_META || {};
-
-  function esc(v){
-    return String(v==null?'':v).replace(/[&<>"']/g,function(c){
-      return {
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#39;'
-      }[c];
-    });
-  }
-
-  function normRarity(v){
-    v=String(v||'common').toLowerCase();
-    return [
-      'common',
-      'uncommon',
-      'rare',
-      'epic',
-      'legendary',
-      'obsidian',
-      'signature'
-    ].includes(v) ? v : 'common';
-  }
-
   function setParts(id){
-    var m=String(id||'').match(/^ts(\d{3})-(\d{3})$/i);
-    if(!m) return null;
-
-    return {
-      setCode:m[1],
-      number:m[2]
-    };
+    const m=String(id||'').match(/^ts(\d{3})-(\d{3})$/i);
+    return m?{setCode:m[1],number:m[2]}:null;
   }
-
-  function exactSetArt(id){
-    var p=setParts(id);
-
-    if(!p) return '';
-
-    /*
-      New convention:
-      ts002-002 =>
-      /cards/002/ts002-002.png
-
-      Set 003+ automatically follows the same rule.
-    */
-    return 'https://footballhq.github.io/footballhq-assets/v88-36/cards/' +
-      p.setCode + '/' +
-      String(id).toLowerCase() +
-      '.png?v=8864';
+  function exactSetCardUrl(id){
+    const p=setParts(id);
+    if(!p || Number(p.setCode)<2) return '';
+    return 'https://footballhq.github.io/footballhq-assets/v88-36/cards/'+p.setCode+'/'+String(id).toLowerCase()+'.png?v=8865';
   }
-
-  function setInfo(id,card,m){
-    var p=setParts(id);
-
-    if(p){
-      if(p.setCode==='002'){
-        return {
-          name:'The Sideline',
-          code:'002',
-          total:40
-        };
-      }
-
-      return {
-        name:String(card.set || m.set || ('Set '+p.setCode)),
-        code:p.setCode,
-        total:Number(card.total || m.total || 40)
-      };
-    }
-
-    return {
-      name:String(card.set || m.set || 'The Gridiron'),
-      code:'001',
-      total:Number(card.total || m.total || 24)
-    };
-  }
-
   function normalize(card){
     card=card||{};
-
     const id=String(
       card.id ||
       card.cardId ||
@@ -121,396 +34,102 @@
       card.card_id ||
       ''
     ).trim();
-
     let m=META[id]||{};
-
     if(!m.id){
       const rawName=String(card.name||'').trim().toLowerCase();
       const rawRarity=normRarity(card.rarity||'common');
       const keys=Object.keys(META);
-
       for(let i=0;i<keys.length;i++){
         const candidate=META[keys[i]];
-
-        if(!candidate) continue;
-
-        const candidateFull=
-          (
-            candidate.name +
-            (candidate.subtitle ? ' — '+candidate.subtitle : '')
-          ).toLowerCase();
-
-        if(
-          (
-            String(candidate.name||'').toLowerCase()===rawName ||
-            candidateFull===rawName
-          ) &&
-          candidate.rarity===rawRarity
-        ){
+        const candidateFull=(candidate.name+(candidate.subtitle?' — '+candidate.subtitle:'')).toLowerCase();
+        if((candidate.name.toLowerCase()===rawName || candidateFull===rawName) &&
+           candidate.rarity===rawRarity){
           m=candidate;
           break;
         }
       }
     }
-
     const rarity=normRarity(card.rarity||m.rarity);
     const full=String(card.name||m.name||'Football HQ');
     const dash=full.split(/\s+[—-]\s+/);
-
-    const info=setInfo(id,card,m);
-
-    /*
-      CRITICAL FIX:
-      Set 002+ gets exact finished PNG from ID convention,
-      even when reward object contains no "art" field.
-    */
-    const autoArt=exactSetArt(id);
-
-    var indexNumber;
-
-    if(setParts(id)){
-      indexNumber=parseInt(setParts(id).number,10);
-    }else{
-      indexNumber=
-        Number(
-          card.index ||
-          m.index ||
-          parseInt(String(m.id||id).replace(/\D/g,''),10) ||
-          1
-        );
-    }
-
+    const sp=setParts(id);
+    const isNewSet=!!(sp && Number(sp.setCode)>=2);
     return {
       id:m.id||id,
-
-      name:
-        card.name ||
-        m.name ||
-        dash[0] ||
-        full,
-
-      subtitle:
-        card.subtitle ||
-        m.subtitle ||
-        dash[1] ||
-        'Original Character',
-
+      name:card.name||m.name||dash[0]||full,
+      subtitle:card.subtitle||m.subtitle||(dash[1]||'Original Character'),
       rarity:rarity,
-
-      flavor:
-        card.flavor ||
-        m.flavor ||
-        'Football HQ original collectible.',
-
-      set:info.name,
-      setCode:info.code,
-
-      index:indexNumber,
-
-      total:Number(
-        card.total ||
-        m.total ||
-        info.total
-      ),
-
-      stats:
-        card.stats ||
-        m.stats ||
-        {
-          SPD:60,
-          STR:60,
-          IQ:60,
-          CHA:60
-        },
-
-      /*
-        For Set 002+, exactSetArt wins intentionally.
-        Legacy tg### cards keep their established artwork.
-      */
-      art:
-        autoArt ||
-        card.art ||
-        m.art ||
-        ''
+      flavor:card.flavor||m.flavor||'Football HQ original collectible.',
+      set:isNewSet?(card.set||m.set||(sp.setCode==='002'?'The Sideline':'Set '+sp.setCode)):(card.set||m.set||'The Gridiron'),
+      index:Number(card.index||m.index||(sp?Number(sp.number):parseInt(String(m.id||id).replace(/\D/g,''),10))||1),
+      total:Number(card.total||m.total||(sp&&sp.setCode==='002'?40:24)),
+      stats:card.stats||m.stats||{SPD:60,STR:60,IQ:60,CHA:60},
+      art:isNewSet?exactSetCardUrl(id):(card.art||m.art||''),
+      exactSetCard:isNewSet
     };
   }
-
-
   function signatureName(c){
-    if(c.rarity!=='signature') return '';
+    if(c.rarity!=='signature')return '';
     return c.name;
   }
-
-
   function cornerDecor(r){
-    if(r==='common')
-      return '<i class="f5-corner c1"></i><i class="f5-corner c2"></i>';
-
-    if(r==='uncommon')
-      return '<i class="f5-corner c1"></i><i class="f5-corner c2"></i><i class="f5-notch n1"></i>';
-
-    if(r==='rare')
-      return '<i class="f5-corner c1"></i><i class="f5-corner c2"></i><i class="f5-notch n1"></i><i class="f5-notch n2"></i>';
-
-    if(r==='epic')
-      return '<i class="f5-corner c1"></i><i class="f5-corner c2"></i><i class="f5-crystal k1"></i><i class="f5-crystal k2"></i>';
-
-    if(r==='legendary')
-      return '<i class="f5-wing w1"></i><i class="f5-wing w2"></i><i class="f5-crownmark"></i>';
-
-    if(r==='obsidian')
-      return '<i class="f5-shard s1"></i><i class="f5-shard s2"></i><i class="f5-shard s3"></i><i class="f5-shard s4"></i><i class="f5-gem"></i><i class="f53-rail l"></i><i class="f53-rail r"></i>';
-
+    if(r==='common')return '<i class="f5-corner c1"></i><i class="f5-corner c2"></i>';
+    if(r==='uncommon')return '<i class="f5-corner c1"></i><i class="f5-corner c2"></i><i class="f5-notch n1"></i>';
+    if(r==='rare')return '<i class="f5-corner c1"></i><i class="f5-corner c2"></i><i class="f5-notch n1"></i><i class="f5-notch n2"></i>';
+    if(r==='epic')return '<i class="f5-corner c1"></i><i class="f5-corner c2"></i><i class="f5-crystal k1"></i><i class="f5-crystal k2"></i>';
+    if(r==='legendary')return '<i class="f5-wing w1"></i><i class="f5-wing w2"></i><i class="f5-crownmark"></i>';
+    if(r==='obsidian')return '<i class="f5-shard s1"></i><i class="f5-shard s2"></i><i class="f5-shard s3"></i><i class="f5-shard s4"></i><i class="f5-gem"></i><i class="f53-rail l"></i><i class="f53-rail r"></i>';
     return '<i class="f5-sig-gem"></i><i class="f5-sig-ray r1"></i><i class="f5-sig-ray r2"></i><i class="f5-sig-ray r3"></i><i class="f53-sig-crown"></i><i class="f53-sig-rail l"></i><i class="f53-sig-rail r"></i>';
   }
 
-
   function markup(card){
-    const c=normalize(card);
-    const r=c.rarity;
-    const s=c.stats;
-
-    /*
-      Existing original Set 001 signature exact cards remain untouched.
-    */
-    if(EXACT_FULL_CARD[c.id]){
-      return (
-        '<article class="fhq-fix5-card fhq-fix5-exact-card rarity-'+esc(r)+'" '+
-        'data-fix5-card="'+esc(c.id)+'" data-rarity="'+esc(r)+'">'+
-
-          '<img class="f5-exact-full-card" '+
-          'src="'+EXACT_FULL_CARD[c.id]+'" '+
-          'alt="'+esc(c.name)+' '+esc(r)+' card" '+
-          'draggable="false" loading="eager" decoding="async">'+
-
-        '</article>'
-      );
+    const c=normalize(card),r=c.rarity,s=c.stats;
+    if(EXACT_FULL_CARD[c.id] || c.exactSetCard){
+      const exactSrc=EXACT_FULL_CARD[c.id]||c.art;
+      return '<article class="fhq-fix5-card fhq-fix5-exact-card rarity-'+esc(r)+'" data-fix5-card="'+esc(c.id)+'" data-card-id="'+esc(c.id)+'" data-rarity="'+esc(r)+'">'+
+        '<img class="f5-exact-full-card" src="'+esc(exactSrc)+'" alt="'+esc(c.name)+' '+esc(r)+' card" draggable="false" loading="eager" decoding="async">'+
+      '</article>';
     }
-
-
-    /*
-      ============================================================
-      SET 002+ — FINISHED FULL-CARD PNG
-
-      This is the important change.
-
-      We DON'T put the PNG inside the old little .f5-art window.
-      The uploaded PNG IS the finished card.
-
-      That removes the old generic HQ card completely.
-      ============================================================
-    */
-
-    if(setParts(c.id) && parseInt(c.setCode,10)>=2){
-
-      return (
-        '<article class="fhq-fix5-card fhq-fix5-exact-card fhq-set-card rarity-'+esc(r)+'" '+
-        'data-fix5-card="'+esc(c.id)+'" '+
-        'data-card-id="'+esc(c.id)+'" '+
-        'data-rarity="'+esc(r)+'">'+
-
-          '<img class="f5-exact-full-card" '+
-          'src="'+esc(c.art)+'" '+
-          'alt="'+esc(c.name)+' '+esc(r)+' card" '+
-          'draggable="false" '+
-          'loading="eager" '+
-          'decoding="async" '+
-          'onerror="console.error(\'FootballHQ exact card art failed: '+esc(c.id)+'\',this.src)">'+
-
-        '</article>'
-      );
-    }
-
-
-    /*
-      Legacy Set 001 procedural renderer remains exactly
-      in place for old tg### cards.
-    */
-
-    return (
-      '<article class="fhq-fix5-card rarity-'+esc(r)+'" '+
-      'data-fix5-card="'+esc(c.id)+'" '+
-      'data-rarity="'+esc(r)+'">'+
-
-        '<div class="f5-frame">'+
-
-          cornerDecor(r)+
-
-          '<header class="f5-head">'+
-
-            '<div class="f5-title">'+
-              '<small>'+String(c.index).padStart(3,'0')+'</small>'+
-              '<strong>'+esc(c.name)+'</strong>'+
-              '<span>'+esc(c.subtitle)+'</span>'+
-            '</div>'+
-
-            '<div class="f5-rarity">'+
-              '<b>'+esc(r.toUpperCase())+'</b>'+
-              '<i>HQ</i>'+
-            '</div>'+
-
-          '</header>'+
-
-          '<div class="f5-art">'+
-
-            (
-              c.art
-                ?
-                '<img src="'+esc(c.art)+'" alt="" draggable="false" loading="eager" decoding="sync" '+
-                'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'">'+
-                '<div class="f5-art-missing" style="display:none">HQ</div>'
-                :
-                '<div class="f5-art-missing">HQ</div>'
-            )+
-
-            '<span class="f5-art-vignette"></span>'+
-            '<span class="f5-art-glint"></span>'+
-
-          '</div>'+
-
-          '<div class="f5-flavor">“'+esc(c.flavor)+'”</div>'+
-
-          (
-            r==='signature'
-              ?
-              '<div class="f5-signature"><span>'+
-              esc(signatureName(c))+
-              '</span></div>'
-              :
-              ''
-          )+
-
-          '<div class="f5-stats">'+
-            '<span><b>SPD</b><strong>'+s.SPD+'</strong></span>'+
-            '<span><b>STR</b><strong>'+s.STR+'</strong></span>'+
-            '<span><b>IQ</b><strong>'+s.IQ+'</strong></span>'+
-            '<span><b>CHA</b><strong>'+s.CHA+'</strong></span>'+
-          '</div>'+
-
-          '<footer class="f5-foot">'+
-            '<span>001 • THE GRIDIRON</span>'+
-            '<b>'+
-              String(c.index).padStart(2,'0')+
-              '/'+
-              String(c.total).padStart(2,'0')+
-            '</b>'+
-          '</footer>'+
-
+    return '<article class="fhq-fix5-card rarity-'+esc(r)+'" data-fix5-card="'+esc(c.id)+'" data-rarity="'+esc(r)+'">'+
+      '<div class="f5-frame">'+cornerDecor(r)+
+        '<header class="f5-head">'+
+          '<div class="f5-title"><small>'+String(c.index).padStart(3,'0')+'</small><strong>'+esc(c.name)+'</strong><span>'+esc(c.subtitle)+'</span></div>'+
+          '<div class="f5-rarity"><b>'+esc(r.toUpperCase())+'</b><i>HQ</i></div>'+
+        '</header>'+
+        '<div class="f5-art">'+
+          (c.art?'<img src="'+c.art+'" alt="" draggable="false" loading="eager" decoding="sync" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="f5-art-missing" style="display:none">HQ</div>':'<div class="f5-art-missing">HQ</div>')+
+          '<span class="f5-art-vignette"></span><span class="f5-art-glint"></span>'+
         '</div>'+
-
-      '</article>'
-    );
+        '<div class="f5-flavor">“'+esc(c.flavor)+'”</div>'+
+        (r==='signature'?'<div class="f5-signature"><span>'+esc(signatureName(c))+'</span></div>':'')+
+        '<div class="f5-stats">'+
+          '<span><b>SPD</b><strong>'+s.SPD+'</strong></span>'+
+          '<span><b>STR</b><strong>'+s.STR+'</strong></span>'+
+          '<span><b>IQ</b><strong>'+s.IQ+'</strong></span>'+
+          '<span><b>CHA</b><strong>'+s.CHA+'</strong></span>'+
+        '</div>'+
+        '<footer class="f5-foot"><span>001 • THE GRIDIRON</span><b>'+String(c.index).padStart(2,'0')+'/'+String(c.total).padStart(2,'0')+'</b></footer>'+
+      '</div>'+
+    '</article>';
   }
-
 
   function backMarkup(){
-    return (
-      '<div class="fhq-fix5-back">'+
-        '<div class="f5-back-core">'+
-          '<span>★</span>'+
-          '<strong>HQ</strong>'+
-          '<small>FOOTBALL HQ</small>'+
-        '</div>'+
-      '</div>'
-    );
+    return '<div class="fhq-fix5-back"><div class="f5-back-core"><span>★</span><strong>HQ</strong><small>FOOTBALL HQ</small></div></div>';
   }
 
-
   window.FHQFix5NormalizeCard=normalize;
-
   window.FHQFix5VerifyReward=function(reward){
     const c=normalize(reward||{});
-
-    return {
-      input:reward||{},
-      id:c.id,
-      name:c.name,
-      rarity:c.rarity,
-      hasArt:!!c.art,
-      art:c.art,
-      set:c.set,
-      index:c.index
-    };
+    return {input:reward||{},id:c.id,name:c.name,rarity:c.rarity,hasArt:!!c.art,art:c.art,exactSetCard:!!c.exactSetCard,index:c.index};
   };
-
 
   window.FHQFix5CardMarkup=markup;
   window.FHQFix5CardBackMarkup=backMarkup;
-
   window.FHQ_FIX5_META=META;
   window.FHQ_FIX5_CARD_RENDERER=true;
-
-
-  /*
-    These are the functions the reveal/carousel engines actually use.
-  */
+  // Make later/global render paths use the same renderer.
   window.fhqCardArtHTML=markup;
   window.fhqV85CardMarkup=markup;
-
-
-  /*
-    Reassert because some older scripts load after this engine.
-  */
-  [0,250,750,1500,3000].forEach(function(ms){
-
-    setTimeout(function(){
-
-      window.FHQFix5CardMarkup=markup;
-      window.fhqCardArtHTML=markup;
-      window.fhqV85CardMarkup=markup;
-
-    },ms);
-
-  });
-
-
-  /*
-    Finished-card PNG sizing.
-  */
-  if(!document.getElementById('fhqV8864ExactCardCss')){
-
-    var style=document.createElement('style');
-
-    style.id='fhqV8864ExactCardCss';
-
-    style.textContent=`
-
-      .fhq-fix5-exact-card.fhq-set-card{
-        position:relative!important;
-        display:block!important;
-
-        width:100%!important;
-        height:auto!important;
-
-        aspect-ratio:720/1040!important;
-
-        background:transparent!important;
-        overflow:hidden!important;
-      }
-
-      .fhq-fix5-exact-card.fhq-set-card > .f5-exact-full-card{
-        display:block!important;
-
-        width:100%!important;
-        height:100%!important;
-
-        object-fit:contain!important;
-        object-position:center center!important;
-
-        max-width:none!important;
-        max-height:none!important;
-      }
-
-    `;
-
-    document.head.appendChild(style);
-  }
-
-
-  console.log(
-    '[FootballHQ] FIX5 V88.64 set-aware exact-card renderer active'
-  );
-
 })();
 
 /* ================================================================
