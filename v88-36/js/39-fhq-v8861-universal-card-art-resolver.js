@@ -1,5 +1,5 @@
 /* ============================================================
-   FOOTBALL HQ V88.67 — UNIVERSAL CARD ART RESOLVER
+   FOOTBALL HQ V88.68 — UNIVERSAL CARD ART RESOLVER
    GitHub path: v88-36/js/39-fhq-v8861-universal-card-art-resolver.js
 
    LOCKED ASSET CONTRACT
@@ -13,8 +13,8 @@
    ============================================================ */
 (function(){
   'use strict';
-  if(window.__FHQ_V8867_UNIVERSAL_CARD_ART__) return;
-  window.__FHQ_V8867_UNIVERSAL_CARD_ART__ = true;
+  if(window.__FHQ_V8868_UNIVERSAL_CARD_ART__) return;
+  window.__FHQ_V8868_UNIVERSAL_CARD_ART__ = true;
 
   var RAW_ROOT='https://raw.githubusercontent.com/FootballHQ/footballhq-assets/main/v88-36/cards/';
 
@@ -39,16 +39,12 @@
   function conventionUrl(id){
     var p=setParts(id);
     if(!p || p.setNumber<2) return '';
-    return RAW_ROOT+p.setCode+'/'+String(id).toLowerCase()+'.png?v=8867';
+    return RAW_ROOT+p.setCode+'/'+String(id).toLowerCase()+'.png?v=8868';
   }
 
   function resolve(card){
     var id=cardId(card);
     var p=setParts(id);
-
-    /* Critical rule: Set 001 is legacy and must NEVER be routed through
-       the Set 002+ convention. This prevents working Gridiron art from
-       being replaced by guessed URLs. */
     if(p && p.setNumber>=2) return conventionUrl(id);
     return registeredExact(id);
   }
@@ -103,9 +99,9 @@
   reassert();
   [0,300,900,1800,3500].forEach(function(ms){setTimeout(reassert,ms)});
 
-  if(!document.getElementById('fhqV8867UniversalArtCss')){
+  if(!document.getElementById('fhqV8868UniversalArtCss')){
     var style=document.createElement('style');
-    style.id='fhqV8867UniversalArtCss';
+    style.id='fhqV8868UniversalArtCss';
     style.textContent=`
       .fhq-universal-card-art,.fhq-v85-card-img-wrap{
         width:100%!important;
@@ -134,5 +130,5 @@
   window.FHQ_CARD_ART_RESOLVE=resolve;
   window.FHQ_CARD_ASSET_SPEC={width:720,height:1040,aspect:'9:13',format:'png',setConvention:'v88-36/cards/{setCode}/ts{setCode}-{number}.png'};
 
-  console.log('[FootballHQ] V88.67 universal card-art resolver active');
+  console.log('[FootballHQ] V88.68 universal card-art resolver active');
 })();
