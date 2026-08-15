@@ -1,4 +1,5 @@
 /* FOOTBALL HQ FIX5 — COLLECTIBLE CARD ENGINE
+   V88.66 — exact Set 001 restore + centered, sharp Set 002 full-card fit.
    Visual-only card overhaul. Backend catalog / odds / ownership remain untouched. */
 (function(){
   'use strict';
@@ -22,8 +23,18 @@
   function exactSetCardUrl(id){
     const p=setParts(id);
     if(!p || Number(p.setCode)<2) return '';
-    return 'https://footballhq.github.io/footballhq-assets/v88-36/cards/'+p.setCode+'/'+String(id).toLowerCase()+'.png?v=8865';
+    return 'https://footballhq.github.io/footballhq-assets/v88-36/cards/'+p.setCode+'/'+String(id).toLowerCase()+'.png?v=8866';
   }
+  /* V88.66: prefer the existing exact Set 001 full-card registry when available. */
+  function legacyExactCardUrl(id){
+    try{
+      const map=window.FHQ_V85_CARD_IMAGES;
+      const hit=map && map[id];
+      if(hit && !/^data:image\/svg\+xml/i.test(String(hit))) return String(hit);
+    }catch(e){}
+    return EXACT_FULL_CARD[id] || '';
+  }
+
   function normalize(card){
     card=card||{};
     const id=String(
@@ -84,12 +95,20 @@
 
   function markup(card){
     const c=normalize(card),r=c.rarity,s=c.stats;
-    if(EXACT_FULL_CARD[c.id] || c.exactSetCard){
-      const exactSrc=EXACT_FULL_CARD[c.id]||c.art;
-      return '<article class="fhq-fix5-card fhq-fix5-exact-card rarity-'+esc(r)+'" data-fix5-card="'+esc(c.id)+'" data-card-id="'+esc(c.id)+'" data-rarity="'+esc(r)+'">'+
-        '<img class="f5-exact-full-card" src="'+esc(exactSrc)+'" alt="'+esc(c.name)+' '+esc(r)+' card" draggable="false" loading="eager" decoding="async">'+
+
+    /* V88.66: exact full-card image inside the ORIGINAL frame structure. */
+    const legacyExact=legacyExactCardUrl(c.id);
+    const fullCardSrc=(c.exactSetCard ? c.art : legacyExact);
+
+    if(fullCardSrc){
+      return '<article class="fhq-fix5-card rarity-'+esc(r)+' fhq-v8866-full-card" data-fix5-card="'+esc(c.id)+'" data-card-id="'+esc(c.id)+'" data-rarity="'+esc(r)+'">'+
+        '<div class="f5-frame fhq-v8866-full-frame">'+
+          '<img class="fhq-v8866-full-img" src="'+esc(fullCardSrc)+'" alt="'+esc(c.name)+' '+esc(r)+' card" draggable="false" loading="eager" decoding="async" '+
+          'onerror="this.style.display=\'none\';this.parentNode.classList.add(\'fhq-v8866-image-failed\')">'+
+        '</div>'+
       '</article>';
     }
+
     return '<article class="fhq-fix5-card rarity-'+esc(r)+'" data-fix5-card="'+esc(c.id)+'" data-rarity="'+esc(r)+'">'+
       '<div class="f5-frame">'+cornerDecor(r)+
         '<header class="f5-head">'+
@@ -97,7 +116,7 @@
           '<div class="f5-rarity"><b>'+esc(r.toUpperCase())+'</b><i>HQ</i></div>'+
         '</header>'+
         '<div class="f5-art">'+
-          (c.art?'<img src="'+c.art+'" alt="" draggable="false" loading="eager" decoding="sync" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="f5-art-missing" style="display:none">HQ</div>':'<div class="f5-art-missing">HQ</div>')+
+          (c.art?'<img src="'+c.art+'" alt="" draggable="false" loading="eager" decoding="async" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="f5-art-missing" style="display:none">HQ</div>':'<div class="f5-art-missing">HQ</div>')+
           '<span class="f5-art-vignette"></span><span class="f5-art-glint"></span>'+
         '</div>'+
         '<div class="f5-flavor">“'+esc(c.flavor)+'”</div>'+
@@ -130,6 +149,31 @@
   // Make later/global render paths use the same renderer.
   window.fhqCardArtHTML=markup;
   window.fhqV85CardMarkup=markup;
+
+  if(!document.getElementById('fhqV8866FullCardCss')){
+    const style=document.createElement('style');
+    style.id='fhqV8866FullCardCss';
+    style.textContent=`
+      .fhq-v8866-full-card{box-sizing:border-box!important;}
+      .fhq-v8866-full-card>.fhq-v8866-full-frame{
+        position:relative!important;width:100%!important;height:100%!important;
+        min-width:0!important;min-height:0!important;padding:0!important;margin:0!important;
+        overflow:hidden!important;display:flex!important;align-items:center!important;justify-content:center!important;
+        background:transparent!important;
+      }
+      .fhq-v8866-full-frame>.fhq-v8866-full-img{
+        position:relative!important;inset:auto!important;display:block!important;
+        width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+        max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:50% 50%!important;
+        margin:0!important;padding:0!important;filter:none!important;image-rendering:auto!important;transform:none!important;opacity:1!important;
+      }
+      .fhq-v8866-image-failed:after{
+        content:'ARTWORK NOT FOUND';position:absolute;inset:0;display:grid;place-items:center;
+        font:900 11px/1 Arial,sans-serif;letter-spacing:1.5px;color:#708895;background:#071017;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 })();
 
 /* ================================================================
