@@ -1,0 +1,251 @@
+{
+  "set": "The Sideline",
+  "setCode": "002",
+  "dimensions": {
+    "width": 720,
+    "height": 1040,
+    "aspectRatio": "9:13"
+  },
+  "cards": [
+    {
+      "id": "ts002-001",
+      "name": "Conehead Cal",
+      "rarity": "common",
+      "file": "ts002-001.png"
+    },
+    {
+      "id": "ts002-002",
+      "name": "Whistle Wit",
+      "rarity": "common",
+      "file": "ts002-002.png"
+    },
+    {
+      "id": "ts002-003",
+      "name": "Towel Snap",
+      "rarity": "common",
+      "file": "ts002-003.png"
+    },
+    {
+      "id": "ts002-004",
+      "name": "Clip Kip",
+      "rarity": "common",
+      "file": "ts002-004.png"
+    },
+    {
+      "id": "ts002-005",
+      "name": "Bench Bro",
+      "rarity": "common",
+      "file": "ts002-005.png"
+    },
+    {
+      "id": "ts002-006",
+      "name": "Cup Stack Jack",
+      "rarity": "common",
+      "file": "ts002-006.png"
+    },
+    {
+      "id": "ts002-007",
+      "name": "Tape Roll Tony",
+      "rarity": "common",
+      "file": "ts002-007.png"
+    },
+    {
+      "id": "ts002-008",
+      "name": "Lace Ace",
+      "rarity": "common",
+      "file": "ts002-008.png"
+    },
+    {
+      "id": "ts002-009",
+      "name": "Ball Pump Paul",
+      "rarity": "common",
+      "file": "ts002-009.png"
+    },
+    {
+      "id": "ts002-010",
+      "name": "Waterboy Wally",
+      "rarity": "common",
+      "file": "ts002-010.png"
+    },
+    {
+      "id": "ts002-011",
+      "name": "Glove Guy",
+      "rarity": "common",
+      "file": "ts002-011.png"
+    },
+    {
+      "id": "ts002-012",
+      "name": "Gator Gulp",
+      "rarity": "common",
+      "file": "ts002-012.png"
+    },
+    {
+      "id": "ts002-013",
+      "name": "Chalk Chuck",
+      "rarity": "common",
+      "file": "ts002-013.png"
+    },
+    {
+      "id": "ts002-014",
+      "name": "Sticky Stan",
+      "rarity": "common",
+      "file": "ts002-014.png"
+    },
+    {
+      "id": "ts002-015",
+      "name": "Headset Hank",
+      "rarity": "uncommon",
+      "file": "ts002-015.png"
+    },
+    {
+      "id": "ts002-016",
+      "name": "Net Ripper",
+      "rarity": "uncommon",
+      "file": "ts002-016.png"
+    },
+    {
+      "id": "ts002-017",
+      "name": "Strapzap",
+      "rarity": "uncommon",
+      "file": "ts002-017.png"
+    },
+    {
+      "id": "ts002-018",
+      "name": "Chilly Willy",
+      "rarity": "uncommon",
+      "file": "ts002-018.png"
+    },
+    {
+      "id": "ts002-019",
+      "name": "Megaphone Moe",
+      "rarity": "uncommon",
+      "file": "ts002-019.png"
+    },
+    {
+      "id": "ts002-020",
+      "name": "Marker Mike",
+      "rarity": "uncommon",
+      "file": "ts002-020.png"
+    },
+    {
+      "id": "ts002-021",
+      "name": "Downs Dash",
+      "rarity": "uncommon",
+      "file": "ts002-021.png"
+    },
+    {
+      "id": "ts002-022",
+      "name": "Cable Carl",
+      "rarity": "uncommon",
+      "file": "ts002-022.png"
+    },
+    {
+      "id": "ts002-023",
+      "name": "Playcard Pete",
+      "rarity": "uncommon",
+      "file": "ts002-023.png"
+    },
+    {
+      "id": "ts002-024",
+      "name": "Chain Gang Chief",
+      "rarity": "rare",
+      "file": "ts002-024.png"
+    },
+    {
+      "id": "ts002-025",
+      "name": "Flagger Flash",
+      "rarity": "rare",
+      "file": "ts002-025.png"
+    },
+    {
+      "id": "ts002-026",
+      "name": "Cooler Crusher",
+      "rarity": "rare",
+      "file": "ts002-026.png"
+    },
+    {
+      "id": "ts002-027",
+      "name": "Tablet Titan",
+      "rarity": "rare",
+      "file": "ts002-027.png"
+    },
+    {
+      "id": "ts002-028",
+      "name": "Equip Master",
+      "rarity": "rare",
+      "file": "ts002-028.png"
+    },
+    {
+      "id": "ts002-029",
+      "name": "Clock Commander",
+      "rarity": "rare",
+      "file": "ts002-029.png"
+    },
+    {
+      "id": "ts002-030",
+      "name": "Coach Circuit",
+      "rarity": "epic",
+      "file": "ts002-030.png"
+    },
+    {
+      "id": "ts002-031",
+      "name": "Cartwheel",
+      "rarity": "epic",
+      "file": "ts002-031.png"
+    },
+    {
+      "id": "ts002-032",
+      "name": "Playcall Phantom",
+      "rarity": "epic",
+      "file": "ts002-032.png"
+    },
+    {
+      "id": "ts002-033",
+      "name": "Signal Boost",
+      "rarity": "epic",
+      "file": "ts002-033.png"
+    },
+    {
+      "id": "ts002-034",
+      "name": "Hydration Hero",
+      "rarity": "epic",
+      "file": "ts002-034.png"
+    },
+    {
+      "id": "ts002-035",
+      "name": "Signal Storm",
+      "rarity": "legendary",
+      "file": "ts002-035.png"
+    },
+    {
+      "id": "ts002-036",
+      "name": "First Down King",
+      "rarity": "legendary",
+      "file": "ts002-036.png"
+    },
+    {
+      "id": "ts002-037",
+      "name": "Sideline Supreme",
+      "rarity": "legendary",
+      "file": "ts002-037.png"
+    },
+    {
+      "id": "ts002-038",
+      "name": "Momentum Meter",
+      "rarity": "legendary",
+      "file": "ts002-038.png"
+    },
+    {
+      "id": "ts002-039",
+      "name": "The Command Center",
+      "rarity": "obsidian",
+      "file": "ts002-039.png"
+    },
+    {
+      "id": "ts002-040",
+      "name": "Coach Circuit \u2014 Signature Edition",
+      "rarity": "signature",
+      "file": "ts002-040.png"
+    }
+  ]
+}
