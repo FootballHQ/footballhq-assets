@@ -1,39 +1,45 @@
 /* ============================================================
-   FOOTBALL HQ V88.71 — FINAL OVERTIME TEST PACK INJECTOR
-   Runs after legacy shop renderers and re-adds Overtime Pack.
+   FOOTBALL HQ V88.72 — TEMP OVERTIME FORCE SLOT
+   Converts the already-visible Primetime shop card into Overtime.
+   No extra shop card required; avoids legacy renderer conflicts.
    TEMPORARY: remove after Signature 040 QA.
    ============================================================ */
 (function(){
 'use strict';
-if(window.__FHQ_V8871_OVERTIME_FINAL__)return;
-window.__FHQ_V8871_OVERTIME_FINAL__=true;
+if(window.__FHQ_V8872_OVERTIME_FORCE__)return;
+window.__FHQ_V8872_OVERTIME_FORCE__=true;
 
-var ART='https://footballhq.github.io/footballhq-assets/v88-48/packs/pack-primetime-v8848.png?v=8871';
-
-function inject(){
+function findPrime(){
   var g=document.getElementById('fhqShopGrid');
-  if(!g)return;
-  if(g.querySelector('[data-shop-pack-card="overtime_pack"],[data-fhq-v8871-overtime]'))return;
+  if(!g)return null;
+  var cards=g.querySelectorAll('article,.fhq-shop-item');
+  for(var i=0;i<cards.length;i++){
+    if(/Primetime Pack|Overtime Pack/i.test(cards[i].textContent||'')) return cards[i];
+  }
+  return null;
+}
 
-  var prime=g.querySelector('[data-shop-pack-card="primetime_pack"],article[data-fhq-v8853-pack="primetime_pack"]');
-  if(!prime){
-    var arts=g.querySelectorAll('article');
-    for(var i=0;i<arts.length;i++){
-      if(/Primetime Pack/i.test(arts[i].textContent||'')){prime=arts[i];break;}
+function forceOvertime(){
+  var card=findPrime();
+  if(!card)return;
+
+  card.setAttribute('data-fhq-overtime-forced','1');
+
+  var h=card.querySelector('h3');
+  if(h)h.textContent='Overtime Pack';
+
+  var meta=card.querySelector('.fhq-v8831-pack-meta');
+  if(meta)meta.textContent='2 RARE+ • 3 EPIC+';
+
+  var ps=card.querySelectorAll('p');
+  for(var i=0;i<ps.length;i++){
+    if(/marquee|card|Rare|Epic|chase/i.test(ps[i].textContent||'')){
+      ps[i].textContent='TEMP TEST PACK • 5 cards with 2 Rare+ and 3 Epic+ guaranteed. Built for Signature testing.';
+      break;
     }
   }
-  if(!prime)return;
 
-  var card=prime.cloneNode(true);
-  card.setAttribute('data-shop-pack-card','overtime_pack');
-  card.setAttribute('data-fhq-v8871-overtime','1');
-
-  var h=card.querySelector('h3'); if(h)h.textContent='Overtime Pack';
-  var meta=card.querySelector('.fhq-v8831-pack-meta'); if(meta)meta.textContent='2 RARE+ • 3 EPIC+';
-  var p=card.querySelector('p'); if(p)p.textContent='TEMP TEST PACK • 5 cards with 2 Rare+ and 3 Epic+ guaranteed. Built for high-end card testing.';
-  var img=card.querySelector('img'); if(img){img.src=ART;img.alt='Overtime Pack';}
-
-  var buy=card.querySelector('[data-pack-buy],button[data-pack-buy]');
+  var buy=card.querySelector('[data-pack-buy]');
   if(buy){
     buy.setAttribute('data-pack-buy','overtime_pack');
     buy.onclick=function(e){
@@ -46,38 +52,46 @@ function inject(){
   var odds=card.querySelector('[data-pack-odds]');
   if(odds){
     odds.setAttribute('data-pack-odds','overtime_pack');
-    odds.onclick=function(e){if(e)e.stopPropagation();if(typeof fhqOpenPackOdds==='function')fhqOpenPackOdds('primetime_pack');};
+    odds.onclick=function(e){
+      if(e)e.stopPropagation();
+      if(typeof fhqOpenPackOdds==='function')fhqOpenPackOdds('primetime_pack');
+    };
   }
 
-  var spans=card.querySelectorAll('span');
-  for(var j=0;j<spans.length;j++){
-    if(/^\s*850\s*$/.test(spans[j].textContent||'')){spans[j].textContent='1000';break;}
+  /* Change only visible Primetime price text from 850 to 1000. */
+  var all=card.querySelectorAll('*');
+  for(var j=0;j<all.length;j++){
+    if(all[j].children.length===0 && /^\s*850\s*$/.test(all[j].textContent||'')){
+      all[j].textContent='1000';
+    }
   }
-  // Fallback if price is embedded with the coin icon in a larger span.
-  var html=card.innerHTML;
-  html=html.replace(/>\s*850\s*</g,'>1000<');
-  card.innerHTML=html;
-  // Rebind purchase after innerHTML normalization.
-  buy=card.querySelector('[data-pack-buy]');
-  if(buy){
-    buy.setAttribute('data-pack-buy','overtime_pack');
-    buy.onclick=function(e){if(e){e.preventDefault();e.stopPropagation();}try{if(typeof fhqV8831UnlockAudio==='function')fhqV8831UnlockAudio();}catch(_e){}if(typeof fhqBuyPack==='function')fhqBuyPack('overtime_pack');};
-  }
-  odds=card.querySelector('[data-pack-odds]');
-  if(odds){odds.setAttribute('data-pack-odds','overtime_pack');odds.onclick=function(e){if(e)e.stopPropagation();if(typeof fhqOpenPackOdds==='function')fhqOpenPackOdds('primetime_pack');};}
 
-  prime.insertAdjacentElement('afterend',card);
-  console.log('[FootballHQ] V88.71 Overtime Pack injected');
+  /* Fallback for text nodes where 850 is beside the coin icon. */
+  var walker=document.createTreeWalker(card,NodeFilter.SHOW_TEXT,null);
+  var n;
+  while((n=walker.nextNode())){
+    if(/\b850\b/.test(n.nodeValue||'')) n.nodeValue=n.nodeValue.replace(/\b850\b/g,'1000');
+  }
+
+  console.log('[FootballHQ] V88.72 Primetime slot forced to Overtime test pack');
 }
 
-var queued=false;
-function queue(){if(queued)return;queued=true;setTimeout(function(){queued=false;inject();},40);}
+var timer=null;
+function schedule(){
+  clearTimeout(timer);
+  timer=setTimeout(forceOvertime,60);
+}
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){inject();});
-else inject();
+function boot(){
+  forceOvertime();
+  var g=document.getElementById('fhqShopGrid');
+  if(g && window.MutationObserver){
+    new MutationObserver(schedule).observe(g,{childList:true,subtree:true,characterData:true});
+  }
+  document.addEventListener('click',function(){setTimeout(forceOvertime,100);},true);
+  [200,500,1000,2000,4000,7000].forEach(function(ms){setTimeout(forceOvertime,ms);});
+}
 
-var obs=new MutationObserver(queue);
-obs.observe(document.documentElement,{childList:true,subtree:true});
-document.addEventListener('click',function(){setTimeout(inject,80);},true);
-[200,600,1200,2500,5000].forEach(function(ms){setTimeout(inject,ms);});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
 })();
