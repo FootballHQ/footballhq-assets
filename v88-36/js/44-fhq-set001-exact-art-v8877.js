@@ -1,16 +1,17 @@
 /* ============================================================
-   TURF TRIALS / FOOTBALLHQ V88.80 — SET 001 EXACT PNG GUARD
-   PERFORMANCE FIX
-   - Keeps the V88.79 per-card number resolver.
-   - Removes repeated pack scans on every click.
-   - Debounces DOM changes so animations do not trigger dozens of scans.
-   - Scans only the actual pack / collection / locker card surfaces.
-   - Never replaces an already-correct overlay.
+   TURF TRIALS / FOOTBALLHQ V88.81 — SET 001 EXACT PNG GUARD
+   PERFORMANCE FIX 2
+   - Keeps the V88.79 per-card resolver (prevents tg020 takeover).
+   - REMOVES subtree MutationObservers from pack cards.
+   - Never rescans during card animation frames.
+   - Pack repair runs only when the pack's direct slide list changes
+     or after a pack navigation/open click.
+   - Existing correct overlays are never rebuilt.
    ============================================================ */
 (function(){
   'use strict';
 
-  window.__FHQ_V8880_SET001_EXACT_ART__ = true;
+  window.__FHQ_V8881_SET001_EXACT_ART__ = true;
 
   var PAGES = 'https://footballhq.github.io/footballhq-assets/v88-36/cards/001/';
   var RAW   = 'https://raw.githubusercontent.com/FootballHQ/footballhq-assets/main/v88-36/cards/001/';
@@ -54,7 +55,6 @@
     }catch(e){}
 
     var rawText = String(host.textContent || '');
-
     var num = rawText.match(/\b(00[1-9]|01\d|020)\s*\/\s*24\b/);
     if(num){
       var byNum = 'tg' + num[1];
@@ -74,12 +74,11 @@
     if(hay.indexOf('midnight field') !== -1){
       return {id:'tg020',name:'Midnight Field'};
     }
-
     return null;
   }
 
-  function pagesUrl(id){ return PAGES + id + '.png?v=8880'; }
-  function rawUrl(id){ return RAW + id + '.png?v=8880'; }
+  function pagesUrl(id){ return PAGES + id + '.png?v=8881'; }
+  function rawUrl(id){ return RAW + id + '.png?v=8881'; }
 
   function isCardShape(el){
     if(!el || el.nodeType !== 1) return false;
@@ -92,8 +91,6 @@
 
   function findFace(host){
     if(!host) return null;
-
-    /* Fast path for the current pack renderer. */
     try{
       var front = host.matches && host.matches('.fhq-v8832-front') ? host : host.querySelector('.fhq-v8832-front');
       if(front && isCardShape(front)) return front;
@@ -102,13 +99,11 @@
     var selectors = '.fhq-card-front,.fhq-card-face,.fhq-card-art,.fhq-v85-card-img-wrap,[data-card-id],[data-card]';
     var candidates=[];
     if(isCardShape(host)) candidates.push(host);
-
     try{
       host.querySelectorAll(selectors).forEach(function(el){
         if(isCardShape(el) && candidates.indexOf(el)===-1) candidates.push(el);
       });
     }catch(e){}
-
     candidates.sort(function(a,b){
       var ar=a.getBoundingClientRect(), br=b.getBoundingClientRect();
       return (ar.width*ar.height)-(br.width*br.height);
@@ -119,34 +114,23 @@
   function install(face,card){
     if(!face || !card) return false;
 
-    /* Fastest path: correct art already installed. Do nothing. */
     var existing = null;
-    try{ existing = face.querySelector(':scope > .fhq-v8880-set001-overlay'); }catch(e){}
-    if(face.dataset && face.dataset.fhqSet001ExactId === card.id && existing && existing.dataset.cardId === card.id){
-      return true;
-    }
-
-    /* Remove only an old/wrong Set 001 overlay. */
-    try{
-      face.querySelectorAll(':scope > .fhq-v8877-set001-overlay,:scope > .fhq-v8878-set001-overlay,:scope > .fhq-v8879-set001-overlay,:scope > .fhq-v8880-set001-overlay').forEach(function(el){
-        if(el.dataset.cardId !== card.id) el.remove();
-      });
-    }catch(e){}
-
-    try{
-      existing = face.querySelector(':scope > .fhq-v8880-set001-overlay[data-card-id="'+card.id+'"]');
-    }catch(e){ existing = null; }
+    try{ existing = face.querySelector(':scope > .fhq-v8881-set001-overlay[data-card-id="'+card.id+'"]'); }catch(e){}
     if(existing){
       face.dataset.fhqSet001ExactId = card.id;
       return true;
     }
 
     try{
+      face.querySelectorAll(':scope > .fhq-v8877-set001-overlay,:scope > .fhq-v8878-set001-overlay,:scope > .fhq-v8879-set001-overlay,:scope > .fhq-v8880-set001-overlay,:scope > .fhq-v8881-set001-overlay').forEach(function(el){ el.remove(); });
+    }catch(e){}
+
+    try{
       if(getComputedStyle(face).position === 'static') face.style.position='relative';
     }catch(e){ face.style.position='relative'; }
 
     var overlay=document.createElement('div');
-    overlay.className='fhq-v8880-set001-overlay';
+    overlay.className='fhq-v8881-set001-overlay';
     overlay.dataset.cardId=card.id;
     overlay.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:30;pointer-events:none;';
 
@@ -189,16 +173,10 @@
 
   function repairContainer(container){
     if(!container || container.nodeType!==1) return;
-
     var hosts=[];
-    var selector;
-
-    if(container.id === 'fhqPackRewards'){
-      /* Pack only: five-ish slide/shell hosts, not every descendant. */
-      selector = ':scope > .fhq-v8832-slide,:scope > .fhq-v8832-card-shell,.fhq-v8832-slide';
-    }else{
-      selector = '.fhq-collection-card,.fhq-collectible-card,[data-card-id],[data-card]';
-    }
+    var selector = container.id === 'fhqPackRewards'
+      ? ':scope > .fhq-v8832-slide,:scope > .fhq-v8832-card-shell,.fhq-v8832-slide'
+      : '.fhq-collection-card,.fhq-collectible-card,[data-card-id],[data-card]';
 
     try{
       container.querySelectorAll(selector).forEach(function(el){
@@ -206,7 +184,6 @@
       });
     }catch(e){}
 
-    /* Fallback for pack structures whose slides are direct children with changing classes. */
     if(container.id === 'fhqPackRewards' && hosts.length===0){
       Array.prototype.forEach.call(container.children,function(el){
         if(el && el.nodeType===1) hosts.push(el);
@@ -216,64 +193,62 @@
     hosts.forEach(repairHost);
   }
 
-  var timers = new WeakMap();
-  function scheduleRepair(container,delay){
-    if(!container) return;
-    var old = timers.get(container);
-    if(old) clearTimeout(old);
-    var t = setTimeout(function(){
-      timers.delete(container);
-      repairContainer(container);
-    }, delay || 120);
-    timers.set(container,t);
+  var timer = 0;
+  function schedulePackRepair(delay){
+    clearTimeout(timer);
+    timer=setTimeout(function(){
+      var pack=document.getElementById('fhqPackRewards');
+      if(pack) repairContainer(pack);
+    },delay||100);
   }
 
-  function knownContainers(){
-    return [
-      document.getElementById('fhqPackRewards'),
-      document.getElementById('fhqAlbumGrid'),
-      document.getElementById('fhqLockerGrid')
-    ].filter(Boolean);
+  function repairStaticSurfaces(){
+    var album=document.getElementById('fhqAlbumGrid');
+    var locker=document.getElementById('fhqLockerGrid');
+    if(album) repairContainer(album);
+    if(locker) repairContainer(locker);
   }
 
-  function attachObserver(container){
-    if(!container || container.dataset.fhqSet001Observer8880==='1') return;
-    container.dataset.fhqSet001Observer8880='1';
+  function attachPackObserver(){
+    var pack=document.getElementById('fhqPackRewards');
+    if(!pack || pack.dataset.fhqSet001Observer8881==='1') return;
+    pack.dataset.fhqSet001Observer8881='1';
 
     try{
-      var obs = new MutationObserver(function(mutations){
-        var added=false;
+      /* IMPORTANT: direct children ONLY. Internal animation DOM changes are ignored. */
+      new MutationObserver(function(mutations){
         for(var i=0;i<mutations.length;i++){
-          if(mutations[i].addedNodes && mutations[i].addedNodes.length){ added=true; break; }
+          if(mutations[i].type==='childList'){
+            schedulePackRepair(90);
+            break;
+          }
         }
-        if(added) scheduleRepair(container,160);
-      });
-
-      /* subtree is needed for late card content, but the callback is heavily debounced. */
-      obs.observe(container,{childList:true,subtree:true});
+      }).observe(pack,{childList:true,subtree:false});
     }catch(e){}
   }
 
   function start(){
-    knownContainers().forEach(function(container){
-      repairContainer(container);
-      attachObserver(container);
-    });
+    var pack=document.getElementById('fhqPackRewards');
+    if(pack) repairContainer(pack);
+    repairStaticSurfaces();
+    attachPackObserver();
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
 
-  /*
-     Tiny navigation hook only when a known surface may have just been opened.
-     No repeated 80ms/300ms scans on every pack arrow click.
-  */
+  /* Event-driven refresh only. No animation-time rescanning. */
   document.addEventListener('click',function(e){
     var t=e.target;
     if(!t || !t.closest) return;
 
-    if(t.closest('[data-view="collections"],#fhqCollectionsBtn,#fhqLockerBtn,[href*="collection"],[href*="locker"],[href*="shop"]')){
-      setTimeout(start,220);
+    if(t.closest('#fhqPackRewards')){
+      schedulePackRepair(90);
+      return;
+    }
+
+    if(t.closest('[data-view="collections"],#fhqCollectionsBtn,#fhqLockerBtn,[href*="collection"],[href*="locker"],[href*="shop"],button')){
+      setTimeout(start,180);
     }
   },true);
 })();
