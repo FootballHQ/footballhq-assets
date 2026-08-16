@@ -1,12 +1,16 @@
 /* ============================================================
-   TURF TRIALS / FOOTBALLHQ V88.79 — SET 001 EXACT PNG GUARD
-   FIX: each Set 001 card now resolves by its own card number/data.
-   Prevents tg020 (Midnight Field) from taking over every card.
+   TURF TRIALS / FOOTBALLHQ V88.80 — SET 001 EXACT PNG GUARD
+   PERFORMANCE FIX
+   - Keeps the V88.79 per-card number resolver.
+   - Removes repeated pack scans on every click.
+   - Debounces DOM changes so animations do not trigger dozens of scans.
+   - Scans only the actual pack / collection / locker card surfaces.
+   - Never replaces an already-correct overlay.
    ============================================================ */
 (function(){
   'use strict';
 
-  window.__FHQ_V8879_SET001_EXACT_ART__ = true;
+  window.__FHQ_V8880_SET001_EXACT_ART__ = true;
 
   var PAGES = 'https://footballhq.github.io/footballhq-assets/v88-36/cards/001/';
   var RAW   = 'https://raw.githubusercontent.com/FootballHQ/footballhq-assets/main/v88-36/cards/001/';
@@ -33,7 +37,6 @@
   function cardFromHost(host){
     if(!host || host.nodeType !== 1) return null;
 
-    /* 1) Prefer explicit card IDs from DOM attributes. */
     var attrs = ['data-card-id','data-card','data-cardid','data-id'];
     for(var a=0;a<attrs.length;a++){
       var id = validId(host.getAttribute && host.getAttribute(attrs[a]));
@@ -52,7 +55,6 @@
 
     var rawText = String(host.textContent || '');
 
-    /* 2) Best visible fallback: the printed card number, e.g. 014/24. */
     var num = rawText.match(/\b(00[1-9]|01\d|020)\s*\/\s*24\b/);
     if(num){
       var byNum = 'tg' + num[1];
@@ -62,8 +64,6 @@
     var hay = norm(rawText);
     if(!hay) return null;
 
-    /* 3) Unique character-name fallback. Never match "The Gridiron",
-          because that set name appears on EVERY Set 001 card. */
     var ids = Object.keys(SET001).filter(function(id){ return id !== 'tg020'; });
     ids.sort(function(a,b){ return norm(SET001[b]).length - norm(SET001[a]).length; });
     for(var i=0;i<ids.length;i++){
@@ -71,7 +71,6 @@
       if(n && hay.indexOf(n) !== -1) return {id:ids[i],name:SET001[ids[i]]};
     }
 
-    /* tg020 only gets selected by its unique subtitle. */
     if(hay.indexOf('midnight field') !== -1){
       return {id:'tg020',name:'Midnight Field'};
     }
@@ -79,8 +78,8 @@
     return null;
   }
 
-  function pagesUrl(id){ return PAGES + id + '.png?v=8879'; }
-  function rawUrl(id){ return RAW + id + '.png?v=8879'; }
+  function pagesUrl(id){ return PAGES + id + '.png?v=8880'; }
+  function rawUrl(id){ return RAW + id + '.png?v=8880'; }
 
   function isCardShape(el){
     if(!el || el.nodeType !== 1) return false;
@@ -93,17 +92,23 @@
 
   function findFace(host){
     if(!host) return null;
-    var selectors = [
-      '.fhq-v8832-front','.fhq-card-front','.fhq-card-face',
-      '.fhq-card-art','.fhq-v85-card-img-wrap','[data-card-id]','[data-card]'
-    ];
+
+    /* Fast path for the current pack renderer. */
+    try{
+      var front = host.matches && host.matches('.fhq-v8832-front') ? host : host.querySelector('.fhq-v8832-front');
+      if(front && isCardShape(front)) return front;
+    }catch(e){}
+
+    var selectors = '.fhq-card-front,.fhq-card-face,.fhq-card-art,.fhq-v85-card-img-wrap,[data-card-id],[data-card]';
     var candidates=[];
     if(isCardShape(host)) candidates.push(host);
+
     try{
-      host.querySelectorAll(selectors.join(',')).forEach(function(el){
+      host.querySelectorAll(selectors).forEach(function(el){
         if(isCardShape(el) && candidates.indexOf(el)===-1) candidates.push(el);
       });
     }catch(e){}
+
     candidates.sort(function(a,b){
       var ar=a.getBoundingClientRect(), br=b.getBoundingClientRect();
       return (ar.width*ar.height)-(br.width*br.height);
@@ -114,25 +119,34 @@
   function install(face,card){
     if(!face || !card) return false;
 
-    /* If this face had the WRONG Set 001 overlay, remove it first. */
+    /* Fastest path: correct art already installed. Do nothing. */
+    var existing = null;
+    try{ existing = face.querySelector(':scope > .fhq-v8880-set001-overlay'); }catch(e){}
+    if(face.dataset && face.dataset.fhqSet001ExactId === card.id && existing && existing.dataset.cardId === card.id){
+      return true;
+    }
+
+    /* Remove only an old/wrong Set 001 overlay. */
     try{
-      face.querySelectorAll(':scope > .fhq-v8877-set001-overlay,:scope > .fhq-v8878-set001-overlay,:scope > .fhq-v8879-set001-overlay').forEach(function(el){
+      face.querySelectorAll(':scope > .fhq-v8877-set001-overlay,:scope > .fhq-v8878-set001-overlay,:scope > .fhq-v8879-set001-overlay,:scope > .fhq-v8880-set001-overlay').forEach(function(el){
         if(el.dataset.cardId !== card.id) el.remove();
       });
     }catch(e){}
 
-    if(face.dataset && face.dataset.fhqSet001ExactId === card.id && face.querySelector(':scope > .fhq-v8879-set001-overlay')) return true;
+    try{
+      existing = face.querySelector(':scope > .fhq-v8880-set001-overlay[data-card-id="'+card.id+'"]');
+    }catch(e){ existing = null; }
+    if(existing){
+      face.dataset.fhqSet001ExactId = card.id;
+      return true;
+    }
 
     try{
       if(getComputedStyle(face).position === 'static') face.style.position='relative';
     }catch(e){ face.style.position='relative'; }
 
-    try{
-      face.querySelectorAll(':scope > .fhq-v8877-set001-overlay,:scope > .fhq-v8878-set001-overlay,:scope > .fhq-v8879-set001-overlay').forEach(function(el){ el.remove(); });
-    }catch(e){}
-
     var overlay=document.createElement('div');
-    overlay.className='fhq-v8879-set001-overlay';
+    overlay.className='fhq-v8880-set001-overlay';
     overlay.dataset.cardId=card.id;
     overlay.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:30;pointer-events:none;';
 
@@ -165,19 +179,26 @@
     return true;
   }
 
+  function repairHost(host){
+    if(!host || host.nodeType!==1) return;
+    var card=cardFromHost(host);
+    if(!card) return;
+    var face=findFace(host);
+    if(face) install(face,card);
+  }
+
   function repairContainer(container){
     if(!container || container.nodeType!==1) return;
 
     var hosts=[];
-    var selector=[
-      '.fhq-v8832-slide',
-      '.fhq-v8832-card-shell',
-      '.fhq-pack-reward',
-      '.fhq-collection-card',
-      '.fhq-collectible-card',
-      '[data-card-id]',
-      '[data-card]'
-    ].join(',');
+    var selector;
+
+    if(container.id === 'fhqPackRewards'){
+      /* Pack only: five-ish slide/shell hosts, not every descendant. */
+      selector = ':scope > .fhq-v8832-slide,:scope > .fhq-v8832-card-shell,.fhq-v8832-slide';
+    }else{
+      selector = '.fhq-collection-card,.fhq-collectible-card,[data-card-id],[data-card]';
+    }
 
     try{
       container.querySelectorAll(selector).forEach(function(el){
@@ -185,15 +206,26 @@
       });
     }catch(e){}
 
-    /* If the container itself is one card, allow it. */
-    if(isCardShape(container)) hosts.push(container);
+    /* Fallback for pack structures whose slides are direct children with changing classes. */
+    if(container.id === 'fhqPackRewards' && hosts.length===0){
+      Array.prototype.forEach.call(container.children,function(el){
+        if(el && el.nodeType===1) hosts.push(el);
+      });
+    }
 
-    hosts.forEach(function(host){
-      var card=cardFromHost(host);
-      if(!card) return;
-      var face=findFace(host);
-      if(face) install(face,card);
-    });
+    hosts.forEach(repairHost);
+  }
+
+  var timers = new WeakMap();
+  function scheduleRepair(container,delay){
+    if(!container) return;
+    var old = timers.get(container);
+    if(old) clearTimeout(old);
+    var t = setTimeout(function(){
+      timers.delete(container);
+      repairContainer(container);
+    }, delay || 120);
+    timers.set(container,t);
   }
 
   function knownContainers(){
@@ -204,32 +236,44 @@
     ].filter(Boolean);
   }
 
-  function run(){ knownContainers().forEach(repairContainer); }
+  function attachObserver(container){
+    if(!container || container.dataset.fhqSet001Observer8880==='1') return;
+    container.dataset.fhqSet001Observer8880='1';
 
-  function attachObservers(){
+    try{
+      var obs = new MutationObserver(function(mutations){
+        var added=false;
+        for(var i=0;i<mutations.length;i++){
+          if(mutations[i].addedNodes && mutations[i].addedNodes.length){ added=true; break; }
+        }
+        if(added) scheduleRepair(container,160);
+      });
+
+      /* subtree is needed for late card content, but the callback is heavily debounced. */
+      obs.observe(container,{childList:true,subtree:true});
+    }catch(e){}
+  }
+
+  function start(){
     knownContainers().forEach(function(container){
-      if(container.dataset.fhqSet001Observer8879==='1') return;
-      container.dataset.fhqSet001Observer8879='1';
-      try{
-        new MutationObserver(function(mutations){
-          for(var i=0;i<mutations.length;i++){
-            if(mutations[i].addedNodes && mutations[i].addedNodes.length){
-              requestAnimationFrame(function(){ repairContainer(container); });
-              break;
-            }
-          }
-        }).observe(container,{childList:true,subtree:true});
-      }catch(e){}
+      repairContainer(container);
+      attachObserver(container);
     });
   }
 
-  function start(){ run(); attachObservers(); }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
 
-  document.addEventListener('click',function(){
-    setTimeout(start,80);
-    setTimeout(start,300);
+  /*
+     Tiny navigation hook only when a known surface may have just been opened.
+     No repeated 80ms/300ms scans on every pack arrow click.
+  */
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(!t || !t.closest) return;
+
+    if(t.closest('[data-view="collections"],#fhqCollectionsBtn,#fhqLockerBtn,[href*="collection"],[href*="locker"],[href*="shop"]')){
+      setTimeout(start,220);
+    }
   },true);
 })();
