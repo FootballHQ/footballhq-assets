@@ -5,140 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TURF — Trials: 40-Yard Dash</title>
   <meta name="theme-color" content="#0a1320" />
-  <link rel="stylesheet" href="./styles.css?v=8867" />
+  <link rel="stylesheet" href="./styles.css?v=8868" />
 </head>
 <body>
   <main class="game-shell" aria-live="polite">
     <header class="topbar">
       <button id="exit-btn" class="icon-btn exit-btn" type="button" aria-label="Back to Trials" title="Back to Trials">×</button>
-      <div class="brand" aria-label="TURF">
-        <span class="brand-mark">T</span>
-        <div><div class="brand-name">TURF</div><div class="brand-mode">TRIALS</div></div>
-      </div>
-      <div class="topbar-actions">
-        <button id="records-btn" class="records-btn" type="button">WORLD RECORDS</button>
-        <div class="trial-chip">TRIAL 01</div>
-      </div>
+      <div class="brand"><span class="brand-mark">T</span><div><div class="brand-name">TURF</div><div class="brand-mode">TRIALS</div></div></div>
+      <div class="topbar-actions"><button id="records-btn" class="records-btn" type="button">WORLD RECORDS</button><div class="trial-chip">TRIAL 01</div></div>
     </header>
 
     <section id="screen-intro" class="screen active">
-      <div class="hero-card card-matchup-hero">
+      <div class="hero-card">
         <div class="eyebrow">TRIAL 01</div>
         <h1>40-YARD DASH</h1>
-        <p>Two cards enter. Their character speed decides the race.</p>
+        <p>Top card is you. Alternate <b>R</b> and <b>G</b> as fast as you can to sprint.</p>
 
-        <div class="matchup-preview card-matchup">
-          <article id="intro-card-a" class="trial-card rarity-common">
+        <div class="matchup-preview">
+          <article id="intro-card-a" class="trial-card rarity-common player-card">
+            <div class="you-chip">YOU</div>
             <div class="trial-card-top"><span id="intro-rarity-a">COMMON</span><span id="intro-number-a">001/024</span></div>
             <div class="trial-card-art"><img id="intro-art-a" alt="" /></div>
-            <div class="trial-card-copy">
-              <strong id="intro-name-a">Conjuke</strong>
-              <small id="intro-subtitle-a">Training Cone</small>
-              <div class="trial-stats"><span>SPD <b id="intro-speed-a">52</b></span><span>BURST <b id="intro-burst-a">63</b></span></div>
-            </div>
+            <div class="trial-card-copy"><strong id="intro-name-a">Conjuke</strong><small id="intro-subtitle-a">Training Cone</small><div class="trial-stats"><span>SPD <b id="intro-speed-a">52</b></span><span>BURST <b id="intro-burst-a">63</b></span></div></div>
           </article>
-
           <div class="vs">VS</div>
-
           <article id="intro-card-b" class="trial-card rarity-uncommon">
+            <div class="cpu-chip">CPU</div>
             <div class="trial-card-top"><span id="intro-rarity-b">UNCOMMON</span><span id="intro-number-b">006/024</span></div>
             <div class="trial-card-art"><img id="intro-art-b" alt="" /></div>
-            <div class="trial-card-copy">
-              <strong id="intro-name-b">Cleatle</strong>
-              <small id="intro-subtitle-b">Game Cleat</small>
-              <div class="trial-stats"><span>SPD <b id="intro-speed-b">70</b></span><span>BURST <b id="intro-burst-b">72</b></span></div>
-            </div>
+            <div class="trial-card-copy"><strong id="intro-name-b">Cleatle</strong><small id="intro-subtitle-b">Game Cleat</small><div class="trial-stats"><span>SPD <b id="intro-speed-b">62</b></span><span>BURST <b id="intro-burst-b">65</b></span></div></div>
           </article>
         </div>
 
-        <div class="matchup-actions">
-          <button id="shuffle-btn" class="secondary-btn" type="button">NEW MATCHUP</button>
-          <button id="start-btn" class="primary-btn">START TRIAL</button>
-        </div>
+        <div class="control-demo"><span class="keycap">R</span><span class="swap-arrow">↔</span><span class="keycap">G</span><strong>ALTERNATE TO RUN</strong></div>
+        <div class="matchup-actions"><button id="shuffle-btn" class="secondary-btn" type="button">NEW MATCHUP</button><button id="start-btn" class="primary-btn">START TRIAL</button></div>
       </div>
     </section>
 
-    <section id="screen-reveal" class="screen">
-      <div class="reveal-stage">
-        <div class="eyebrow">NEXT TRIAL</div>
-        <div id="reveal-count" class="reveal-count">3</div>
-        <div id="reveal-title" class="reveal-title hidden"><span>TRIAL 01</span><h2>40-YARD DASH</h2></div>
-      </div>
-    </section>
+    <section id="screen-reveal" class="screen"><div class="reveal-stage"><div class="eyebrow">NEXT TRIAL</div><div id="reveal-count" class="reveal-count">3</div><div id="reveal-title" class="reveal-title hidden"><span>TRIAL 01</span><h2>40-YARD DASH</h2></div></div></section>
 
     <section id="screen-race" class="screen race-screen">
       <div class="race-head">
         <div><div class="eyebrow">TRIAL 01</div><h2>40-YARD DASH</h2></div>
-        <div id="race-status" class="race-status">GET READY</div>
+        <div class="race-ui"><div id="tap-meter" class="tap-meter"><span>R</span><span>G</span><b id="tap-count">0</b></div><div id="race-status" class="race-status">GET READY</div></div>
       </div>
 
       <div class="track-wrap">
-        <div class="yard-labels" aria-hidden="true"><span>0</span><span>10</span><span>20</span><span>30</span><span>40</span></div>
-        <div class="track">
-          <div class="yard-lines" aria-hidden="true"></div>
-          <div class="finish-line" aria-hidden="true"><span>FINISH</span></div>
+        <div class="distance-hud"><span id="distance-text">0 YDS</span><div class="distance-bar"><i id="distance-fill"></i></div><span>40 YDS</span></div>
+        <div id="track-viewport" class="track-viewport">
+          <div id="track-world" class="track-world">
+            <div class="yard-grid" aria-hidden="true"></div>
+            <div class="yard-number n0">0</div><div class="yard-number n10">10</div><div class="yard-number n20">20</div><div class="yard-number n30">30</div><div class="yard-number n40">40</div>
+            <div class="finish-line"><span>FINISH</span></div>
 
-          <div class="lane lane-a">
-            <div class="lane-name"><img id="lane-thumb-a" alt=""/><span id="lane-name-a">Conjuke</span></div>
-            <div id="runner-a" class="runner runner-a" style="--progress:0">
-              <div class="runner-shadow"></div>
-              <div class="character-avatar"><img id="runner-art-a" alt="" /></div>
-              <span class="runner-leg leg-left"></span><span class="runner-leg leg-right"></span>
+            <div class="lane lane-a">
+              <div class="lane-name"><img id="lane-thumb-a" alt=""/><span id="lane-name-a">Conjuke</span><em>YOU</em></div>
+              <div id="runner-a" class="runner runner-a"><div class="runner-shadow"></div><div class="character-avatar"><img id="runner-art-a" alt="" /></div><span class="runner-leg leg-left"></span><span class="runner-leg leg-right"></span></div>
             </div>
-          </div>
-
-          <div class="lane lane-b">
-            <div class="lane-name"><img id="lane-thumb-b" alt=""/><span id="lane-name-b">Cleatle</span></div>
-            <div id="runner-b" class="runner runner-b" style="--progress:0">
-              <div class="runner-shadow"></div>
-              <div class="character-avatar"><img id="runner-art-b" alt="" /></div>
-              <span class="runner-leg leg-left"></span><span class="runner-leg leg-right"></span>
+            <div class="lane lane-b">
+              <div class="lane-name"><img id="lane-thumb-b" alt=""/><span id="lane-name-b">Cleatle</span><em>CPU</em></div>
+              <div id="runner-b" class="runner runner-b"><div class="runner-shadow"></div><div class="character-avatar"><img id="runner-art-b" alt="" /></div><span class="runner-leg leg-left"></span><span class="runner-leg leg-right"></span></div>
             </div>
           </div>
         </div>
+        <div class="race-controls"><span class="keycap active-key" id="key-r">R</span><span class="keycap" id="key-g">G</span><strong>ALTERNATE!</strong></div>
       </div>
       <div id="countdown" class="countdown-overlay hidden">3</div>
     </section>
 
     <section id="screen-results" class="screen">
       <div class="results-card">
-        <div class="eyebrow">TRIAL COMPLETE</div>
-        <div class="winner-badge">WINNER</div>
-        <div id="winner-avatar" class="winner-avatar"><img id="winner-art" alt="" /></div>
-        <h2 id="winner-name">CONJUKE</h2>
-        <div id="winner-time" class="winner-time">4.42s</div>
-
-        <div class="winner-card-mini">
-          <span id="winner-card-rarity">COMMON</span><strong id="winner-card-subtitle">Training Cone</strong>
-        </div>
-
-        <div class="result-table">
-          <div class="result-row winner-row"><span id="result-name-a">Conjuke</span><strong id="result-time-a">4.42s</strong></div>
-          <div class="result-row"><span id="result-name-b">Cleatle</span><strong id="result-time-b">4.57s</strong></div>
-        </div>
-
+        <div class="eyebrow">TRIAL COMPLETE</div><div class="winner-badge">WINNER</div>
+        <div id="winner-avatar" class="winner-avatar"><img id="winner-art" alt="" /></div><h2 id="winner-name">CONJUKE</h2><div id="winner-time" class="winner-time">4.42s</div>
+        <div class="winner-card-mini"><span id="winner-card-rarity">COMMON</span><strong id="winner-card-subtitle">Training Cone</strong></div>
+        <div class="result-table"><div class="result-row winner-row"><span id="result-name-a">Conjuke</span><strong id="result-time-a">4.42s</strong></div><div class="result-row"><span id="result-name-b">Cleatle</span><strong id="result-time-b">4.57s</strong></div></div>
         <div class="record-strip"><span>YOUR BEST</span><strong id="personal-best">—</strong><button id="results-records-btn" type="button">VIEW WORLD RECORDS</button></div>
         <div class="result-actions"><button id="rematch-btn" class="primary-btn">RUN IT AGAIN</button><button id="back-btn" class="secondary-btn">BACK TO TRIALS</button></div>
       </div>
     </section>
   </main>
 
-  <div id="records-modal" class="records-modal hidden" role="dialog" aria-modal="true" aria-labelledby="records-title">
-    <div class="records-panel">
-      <button id="records-close" class="records-close" type="button" aria-label="Close records">×</button>
-      <div class="eyebrow">TRIAL 01</div><h2 id="records-title">40-YARD DASH RECORDS</h2>
-      <div class="record-tabs" role="tablist"><button class="record-tab active" data-record-tab="world" type="button">WORLD</button><button class="record-tab" data-record-tab="personal" type="button">YOUR BEST</button></div>
-      <div id="record-world" class="record-pane active"><div class="records-empty"><strong>GLOBAL RECORD BOARD</strong><p>Global records will populate when Trials is connected to the TURF leaderboard backend.</p></div></div>
-      <div id="record-personal" class="record-pane"><div class="personal-record-card"><span>FASTEST TIME ON THIS DEVICE</span><strong id="modal-personal-best">—</strong></div></div>
-    </div>
-  </div>
+  <div id="records-modal" class="records-modal hidden" role="dialog" aria-modal="true"><div class="records-panel"><button id="records-close" class="records-close" type="button">×</button><div class="eyebrow">TRIAL 01</div><h2>40-YARD DASH RECORDS</h2><div class="record-tabs"><button class="record-tab active" data-record-tab="world">WORLD</button><button class="record-tab" data-record-tab="personal">YOUR BEST</button></div><div id="record-world" class="record-pane active"><div class="records-empty"><strong>GLOBAL RECORD BOARD</strong><p>Global records will populate when Trials is connected to the TURF leaderboard backend.</p></div></div><div id="record-personal" class="record-pane"><div class="personal-record-card"><span>FASTEST TIME ON THIS DEVICE</span><strong id="modal-personal-best">—</strong></div></div></div></div>
 
-  <script src="./game.js?v=8867"></script>
-  <script>
-    (function(){function backToTrials(e){if(e){e.preventDefault();e.stopImmediatePropagation();}location.href='/trials/';}
-      var x=document.getElementById('exit-btn'),back=document.getElementById('back-btn');
-      if(x)x.addEventListener('click',backToTrials,true);if(back)back.addEventListener('click',backToTrials,true);
-    })();
-  </script>
+  <script src="./game.js?v=8868"></script>
+  <script>(function(){function back(e){if(e){e.preventDefault();e.stopImmediatePropagation();}location.href='/trials/';}var x=document.getElementById('exit-btn'),b=document.getElementById('back-btn');if(x)x.addEventListener('click',back,true);if(b)b.addEventListener('click',back,true);})();</script>
 </body>
 </html>
