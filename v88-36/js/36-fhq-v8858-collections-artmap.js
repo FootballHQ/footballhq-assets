@@ -1,14 +1,13 @@
 /* ============================================================
-   FOOTBALL HQ V88.58 — COLLECTION STABILITY + ART MAP READY
-   GitHub path:
-   v88-36/js/36-fhq-v8858-collections-artmap.js
+   FOOTBALL HQ / TURF V88.82 — COLLECTION STABILITY + SET 001 ART
 
-   This patch intentionally DOES NOT add substitute art.
-   It prepares the exact Set 002 asset URLs for the final approved PNGs:
-     /v88-36/cards/002/ts002-001.png ... ts002-040.png
-
-   It also makes 001 and 002 collection covers open without depending on
-   the older V82/V83 lexical click handlers.
+   FIXES
+   - Set 001 collection now uses the exact approved tg001-tg020 PNGs.
+   - Set 001 signatures tg021-tg024 stay on the existing signature resolver.
+   - Set 002 art path and rendering are intentionally unchanged.
+   - Collection covers open immediately from the cached collection state.
+   - BACK TO COLLECTIONS restores the already-rendered collection home
+     instead of reloading the whole app / causing a white screen.
    ============================================================ */
 (function(){
   'use strict';
@@ -17,38 +16,52 @@
 
   var SET001='The Gridiron';
   var SET002='The Sideline';
-  var ASSET_ROOT='https://footballhq.github.io/footballhq-assets/v88-36/cards/002/';
+  var SET001_ROOT='https://footballhq.github.io/footballhq-assets/v88-36/cards/001/';
+  var SET002_ROOT='https://footballhq.github.io/footballhq-assets/v88-36/cards/002/';
 
   function esc(v){
     return String(v==null?'':v)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
       .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
+
   function sidelineUrl(id){
     id=String(id||'');
-    return /^ts002-\d{3}$/.test(id) ? ASSET_ROOT+id+'.png' : '';
+    return /^ts002-\d{3}$/.test(id) ? SET002_ROOT+id+'.png' : '';
   }
 
-  /* Public lookup table ready for the final approved PNGs. */
+  function gridironExactUrl(id){
+    id=String(id||'').toLowerCase();
+    return /^tg0(?:0[1-9]|1\d|20)$/.test(id) ? SET001_ROOT+id+'.png?v=8882' : '';
+  }
+
+  /* Set 002 art registry: intentionally unchanged. */
   window.FHQ_SET002_ART_URLS=window.FHQ_SET002_ART_URLS||{};
   for(var i=1;i<=40;i++){
     var id='ts002-'+String(i).padStart(3,'0');
     window.FHQ_SET002_ART_URLS[id]=sidelineUrl(id);
   }
 
-  /* Do not override working Set 001 art. Only add Set 002 when the file exists.
-     Browser image fallback hides a missing file instead of showing a broken icon. */
   var previousImageForCard = typeof window.fhqV85ImageForCard==='function'
     ? window.fhqV85ImageForCard : null;
 
   function imageForCard(card){
     var id=String(card && (card.value||card.id||card.cardId) || '');
+
+    /* Never change Set 002 behavior. */
     if(/^ts002-\d{3}$/.test(id)) return sidelineUrl(id);
+
+    /* Exact approved Set 001 art for cards 001-020 only. */
+    var exact001=gridironExactUrl(id);
+    if(exact001) return exact001;
+
+    /* tg021-tg024 signatures continue through the existing resolver. */
     if(previousImageForCard){
       try{return previousImageForCard.apply(this,arguments)||'';}catch(e){}
     }
     return '';
   }
+
   window.fhqV85ImageForCard=imageForCard;
   try{fhqV85ImageForCard=imageForCard}catch(e){}
 
@@ -98,11 +111,33 @@
     document.head.appendChild(s);
   }
 
+  function rememberCollectionsHome(){
+    var root=document.getElementById('fhqAlbumGrid');
+    if(!root) return;
+    if(!root.querySelector('.v8858-set') && root.innerHTML.trim()){
+      window.__fhqV8858CollectionsHomeHTML=root.innerHTML;
+      window.__fhqV8858CollectionsHomeScroll=window.scrollY||0;
+    }
+  }
+
+  function restoreCollectionsHome(){
+    var root=document.getElementById('fhqAlbumGrid');
+    if(!root) return false;
+    var html=window.__fhqV8858CollectionsHomeHTML;
+    if(!html) return false;
+    root.innerHTML=html;
+    window.__fhqOpenCollectionSet='';
+    var y=Number(window.__fhqV8858CollectionsHomeScroll)||0;
+    requestAnimationFrame(function(){window.scrollTo(0,y)});
+    return true;
+  }
+
   function renderSet(state,setName){
     injectCss();
     var root=document.getElementById('fhqAlbumGrid');
     if(!root || !state) return;
 
+    rememberCollectionsHome();
     window.__fhqV8858State=state;
     var cards=sortCards((state.sets||{})[setName]||[]);
     var owned=(state.owned||[]).map(String);
@@ -121,16 +156,25 @@
     cards.forEach(function(c){
       var got=owned.indexOf(String(c.id))>=0;
       var src='';
-      if(setName===SET002) src=sidelineUrl(c.id);
-      else {
-        try{src=imageForCard({type:'card',value:c.id,id:c.id,name:c.name,set:c.set,rarity:c.rarity})||''}catch(e){}
+
+      if(setName===SET002){
+        /* LOCKED: do not modify Set 002 card art. */
+        src=sidelineUrl(c.id);
+      }else{
+        var exact001=gridironExactUrl(c.id);
+        if(exact001){
+          src=exact001;
+        }else{
+          /* Keep the existing signature artwork for tg021-tg024. */
+          try{src=imageForCard({type:'card',value:c.id,id:c.id,name:c.name,set:c.set,rarity:c.rarity})||''}catch(e){}
+        }
       }
 
-      html+='<article class="v8858-card '+(got?'':'v8858-locked')+'">'+
+      html+='<article class="v8858-card '+(got?'':'v8858-locked')+'" data-card-id="'+esc(c.id||'')+'">'+
         '<span class="v8858-rarity">'+esc(c.rarity||'common')+'</span>';
 
       if(src){
-        html+='<img src="'+esc(src)+'" alt="'+esc(c.name||'Football HQ card')+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'+
+        html+='<img src="'+esc(src)+'" alt="'+esc(c.name||'Football HQ card')+'" loading="eager" decoding="async" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'+
           '<div class="fallback" style="display:none"><b>'+esc(c.name||'Football HQ card')+'</b><span>'+esc(c.subtitle||c.set||'Football HQ')+'</span></div>';
       }else{
         html+='<div class="fallback"><b>'+esc(c.name||'Football HQ card')+'</b><span>'+esc(c.subtitle||c.set||'Football HQ')+'</span></div>';
@@ -141,32 +185,51 @@
     root.innerHTML=html;
 
     var back=document.getElementById('v8858Back');
-    if(back) back.onclick=function(){
+    if(back) back.onclick=function(e){
+      if(e){e.preventDefault();e.stopPropagation()}
+      if(restoreCollectionsHome()) return;
+
+      /* Fallback without reloading the app. */
       window.__fhqOpenCollectionSet='';
       try{
-        if(typeof window.fhqLoadCollections==='function'){window.fhqLoadCollections();return}
-        if(typeof fhqLoadCollections==='function'){fhqLoadCollections();return}
-      }catch(e){}
-      location.reload();
+        if(typeof window.fhqLoadCollections==='function'){
+          window.fhqLoadCollections();
+          return;
+        }
+        if(typeof fhqLoadCollections==='function'){
+          fhqLoadCollections();
+          return;
+        }
+      }catch(err){console.warn('[TURF] collection back fallback failed',err)}
     };
-    window.scrollTo({top:0,behavior:'smooth'});
+
+    window.scrollTo({top:0,behavior:'auto'});
   }
 
   function fetchAndOpen(setName){
     var cached=window.__fhqLastCollectionsState||window.__fhqV8858State||null;
+
+    /* Fast path: the Collections home already has the state, so open instantly. */
+    if(cached){
+      renderSet(cached,setName);
+      return;
+    }
+
+    /* First-ever load only: fetch from Apps Script. */
     try{
       if(typeof google!=='undefined' && google.script && google.script.run){
         google.script.run
           .withSuccessHandler(function(x){
-            var state=x||cached;
-            if(state){window.__fhqLastCollectionsState=state;renderSet(state,setName)}
+            if(x){
+              window.__fhqLastCollectionsState=x;
+              renderSet(x,setName);
+            }
           })
-          .withFailureHandler(function(){if(cached)renderSet(cached,setName)})
+          .withFailureHandler(function(){})
           .getFootballHQCollections(getToken());
         return;
       }
     }catch(e){}
-    if(cached) renderSet(cached,setName);
   }
 
   function identifyCover(target){
@@ -194,13 +257,13 @@
     e.preventDefault();
     e.stopPropagation();
     if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    rememberCollectionsHome();
     fetchAndOpen(hit.setName);
   },true);
 
-  /* Expose manual functions for QA/debugging. */
-  window.FHQ_OPEN_GRIDIRON_COLLECTION=function(){fetchAndOpen(SET001)};
-  window.FHQ_OPEN_SIDELINE_COLLECTION=function(){fetchAndOpen(SET002)};
+  window.FHQ_OPEN_GRIDIRON_COLLECTION=function(){rememberCollectionsHome();fetchAndOpen(SET001)};
+  window.FHQ_OPEN_SIDELINE_COLLECTION=function(){rememberCollectionsHome();fetchAndOpen(SET002)};
 
   injectCss();
-  console.log('[FootballHQ] V88.58 collections + Set 002 art map ready');
+  console.log('[TURF] V88.82 collections fixed; Set 002 art untouched');
 })();
