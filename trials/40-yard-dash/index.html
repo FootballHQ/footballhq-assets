@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TURF — Trials: 40-Yard Dash</title>
+  <meta name="theme-color" content="#07120c" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="game-shell" aria-live="polite">
+    <header class="topbar">
+      <div class="brand" aria-label="TURF">
+        <span class="brand-mark">T</span>
+        <div>
+          <div class="brand-name">TURF</div>
+          <div class="brand-mode">TRIALS</div>
+        </div>
+      </div>
+      <div class="trial-chip">TRIAL 01</div>
+    </header>
+
+    <section id="screen-intro" class="screen active">
+      <div class="hero-card">
+        <div class="eyebrow">WELCOME TO TRIALS</div>
+        <h1>40-YARD DASH</h1>
+        <p>Two Turf competitors. Forty yards. One winner.</p>
+        <div class="matchup-preview">
+          <div class="mini-card left-card">
+            <div class="mini-avatar avatar-a"><span></span></div>
+            <strong id="intro-name-a">Bolt</strong>
+          </div>
+          <div class="vs">VS</div>
+          <div class="mini-card right-card">
+            <div class="mini-avatar avatar-b"><span></span></div>
+            <strong id="intro-name-b">Rush</strong>
+          </div>
+        </div>
+        <button id="start-btn" class="primary-btn">START TRIAL</button>
+      </div>
+    </section>
+
+    <section id="screen-reveal" class="screen">
+      <div class="reveal-stage">
+        <div class="eyebrow">NEXT TRIAL</div>
+        <div id="reveal-count" class="reveal-count">3</div>
+        <div id="reveal-title" class="reveal-title hidden">
+          <span>TRIAL 01</span>
+          <h2>40-YARD DASH</h2>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-race" class="screen race-screen">
+      <div class="race-head">
+        <div>
+          <div class="eyebrow">TRIAL 01</div>
+          <h2>40-YARD DASH</h2>
+        </div>
+        <div id="race-status" class="race-status">GET READY</div>
+      </div>
+
+      <div class="track-wrap">
+        <div class="yard-labels" aria-hidden="true">
+          <span>0</span><span>10</span><span>20</span><span>30</span><span>40</span>
+        </div>
+        <div class="track">
+          <div class="yard-lines" aria-hidden="true"></div>
+          <div class="finish-line" aria-hidden="true"><span>FINISH</span></div>
+
+          <div class="lane lane-a">
+            <div class="lane-name"><span id="lane-name-a">Bolt</span></div>
+            <div id="runner-a" class="runner runner-a" style="--progress: 0">
+              <div class="runner-shadow"></div>
+              <div class="sprite sprite-a"><span class="face"></span><span class="arm arm-1"></span><span class="arm arm-2"></span><span class="leg leg-1"></span><span class="leg leg-2"></span></div>
+            </div>
+          </div>
+
+          <div class="lane lane-b">
+            <div class="lane-name"><span id="lane-name-b">Rush</span></div>
+            <div id="runner-b" class="runner runner-b" style="--progress: 0">
+              <div class="runner-shadow"></div>
+              <div class="sprite sprite-b"><span class="face"></span><span class="arm arm-1"></span><span class="arm arm-2"></span><span class="leg leg-1"></span><span class="leg leg-2"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="countdown" class="countdown-overlay hidden">3</div>
+    </section>
+
+    <section id="screen-results" class="screen">
+      <div class="results-card">
+        <div class="eyebrow">TRIAL COMPLETE</div>
+        <div id="winner-badge" class="winner-badge">WINNER</div>
+        <div id="winner-avatar" class="winner-avatar avatar-a"><span></span></div>
+        <h2 id="winner-name">BOLT</h2>
+        <div id="winner-time" class="winner-time">4.42s</div>
+
+        <div class="result-table">
+          <div class="result-row winner-row">
+            <span id="result-name-a">Bolt</span>
+            <strong id="result-time-a">4.42s</strong>
+          </div>
+          <div class="result-row">
+            <span id="result-name-b">Rush</span>
+            <strong id="result-time-b">4.57s</strong>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button id="rematch-btn" class="primary-btn">RUN IT AGAIN</button>
+          <button id="back-btn" class="secondary-btn">BACK TO TRIALS</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./game.js"></script>
+</body>
+</html>
