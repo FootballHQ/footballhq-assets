@@ -22,28 +22,29 @@
 <body>
   <header class="top">
     <div class="brand"><span class="mark">T</span><div>TURF<small>TRIALS</small></div></div>
-    <button class="home" onclick="location.href='/'">← BACK TO TURF</button>
+    <button class="home" id="backToTurf">← BACK TO TURF</button>
   </header>
   <main>
     <div class="hero">
-      <div>
-        <div class="eyebrow">COMPETE • REVEAL • WIN</div>
-        <h1>TRIALS</h1>
-        <p>Head-to-head TURF events where competitors reveal one challenge at a time. Every new event plugs into the same Trials engine.</p>
-      </div>
+      <div><div class="eyebrow">COMPETE • REVEAL • WIN</div><h1>TRIALS</h1><p>Head-to-head TURF events where competitors reveal one challenge at a time. Every new event plugs into the same Trials engine.</p></div>
       <div class="record-link">WORLD RECORDS</div>
     </div>
-
     <div class="section-title"><h2>Available Trials</h2><span>1 LIVE EVENT</span></div>
     <div class="grid">
-      <article class="trial" onclick="location.href='/trials/40-yard-dash/'">
-        <span class="badge">LIVE</span><div class="num">TRIAL 01</div><h3>40-YARD<br>DASH</h3><p>Two competitors. Forty yards. One winner. Speed, burst and consistency decide the race.</p><button class="play">ENTER TRIAL →</button>
-      </article>
+      <article class="trial" onclick="location.href='/trials/40-yard-dash/'"><span class="badge">LIVE</span><div class="num">TRIAL 01</div><h3>40-YARD<br>DASH</h3><p>Two competitors. Forty yards. One winner. Speed, burst and consistency decide the race.</p><button class="play">ENTER TRIAL →</button></article>
       <article class="trial coming"><span class="badge">COMING</span><div class="num">TRIAL 02</div><h3>LOCKED<br>EVENT</h3><p>The next event stays hidden until we build and reveal it.</p><button class="play" disabled>LOCKED</button></article>
       <article class="trial coming"><span class="badge">COMING</span><div class="num">TRIAL 03</div><h3>LOCKED<br>EVENT</h3><p>Trials will expand one polished event at a time.</p><button class="play" disabled>LOCKED</button></article>
     </div>
-
-    <div class="records"><div><strong>World Record System</strong><p>Each Trial will have its own World and Your Best record board. The 40-Yard Dash record UI is already live.</p></div><button onclick="location.href='/trials/40-yard-dash/'">VIEW 40-YARD RECORDS</button></div>
+    <div class="records"><div><strong>World Record System</strong><p>Each Trial will have its own World and Your Best record board. The 40-Yard Dash record UI is already live.</p></div><button onclick="location.href='/trials/40-yard-dash/?records=1'">VIEW 40-YARD RECORDS</button></div>
   </main>
+  <script>
+    document.getElementById('backToTurf').addEventListener('click',function(){
+      /* The TURF sidebar puts the app on Home before opening Trials.
+         Going back therefore restores that live Home page without forcing
+         a new Apps Script boot/account-recovery cycle. */
+      if(history.length>1){ history.back(); return; }
+      location.href='/';
+    });
+  </script>
 </body>
 </html>
