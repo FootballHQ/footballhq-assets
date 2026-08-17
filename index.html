@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TURF</title>
   <meta name="theme-color" content="#07111c" />
-  <link id="turfFavicon" rel="icon" type="image/svg+xml" href="/v88-36/brand/turf-mark.svg?v=8901" />
+  <link id="turfFavicon" rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAV0lEQVR4nO2WsQkAMQwD9f9P+g6ZQRGSLiR7QDDxFTQ0ePZFJXkBUAjHIJR9wAGf1QXg1S8gywJw9QHgei8gq8B+H0CWB+DqA3D1Abj6AFx9AK4+AFc/gD8zvAo1kTs8gQAAAABJRU5ErkJggg==" />
   <style>
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
     body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -24,7 +24,7 @@
     var layer=document.getElementById('turfTrialsLayer'),frame=document.getElementById('turfTrialsFrame'),app=document.getElementById('turfApp');
     function norm(p){p=String(p||'/trials/');return p.indexOf('/trials/')===0?p:'/trials/'}
     function openTrials(p){var t=norm(p);if(frame.getAttribute('src')!==t)frame.setAttribute('src',t);layer.classList.add('open');layer.setAttribute('aria-hidden','false');document.title='TURF — Trials'}
-    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'8901'},'*')}catch(e){}}
+    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'8903'},'*')}catch(e){}}
     function setFavicon(href){if(!href)return;var f=document.getElementById('turfFavicon');if(!f){f=document.createElement('link');f.id='turfFavicon';f.rel='icon';document.head.appendChild(f)}f.type='image/png';f.href=href}
     window.addEventListener('message',function(e){var d=e&&e.data;if(typeof d==='string'){if(d==='turf-open-trials')openTrials('/trials/');if(d==='turf-close-trials')closeTrials();return}if(!d||typeof d!=='object')return;if(d.type==='turf-open-trials')openTrials(d.path||'/trials/');if(d.type==='turf-close-trials')closeTrials();if(d.type==='turf-page-title'&&!layer.classList.contains('open'))document.title=String(d.title||'TURF').slice(0,80);if(d.type==='turf-favicon'){setFavicon(d.href);if(d.title&&!layer.classList.contains('open'))document.title=String(d.title).slice(0,80)}});
     try{var p=new URLSearchParams(location.search);if(p.get('trials')==='1')openTrials('/trials/')}catch(e){}
