@@ -37,6 +37,7 @@
     (function(){
       var layer=document.getElementById('turfTrialsLayer');
       var frame=document.getElementById('turfTrialsFrame');
+      var app=document.getElementById('turfApp');
 
       function openTrials(path){
         var target=String(path||'/trials/');
@@ -47,22 +48,28 @@
         document.title='TURF — Trials';
       }
 
-      function closeTrials(){
+      function closeTrialsToHome(){
+        /* Keep the already-loaded Apps Script/account session alive. */
         layer.classList.remove('open');
         layer.setAttribute('aria-hidden','true');
         document.title='TURF';
-        /* Do NOT clear/reload the main Apps Script iframe. Its account session
-           and current Home state stay alive underneath the Trials layer. */
+
+        /* Tell the existing app iframe to switch to Home. This is a normal
+           in-app navigation, not a reload, so account recovery does not run. */
+        try{
+          if(app && app.contentWindow){
+            app.contentWindow.postMessage({type:'turf-go-home'},'*');
+          }
+        }catch(e){}
       }
 
       window.addEventListener('message',function(e){
         var d=e&&e.data;
         if(!d||typeof d!=='object') return;
         if(d.type==='turf-open-trials') openTrials(d.path||'/trials/');
-        if(d.type==='turf-close-trials') closeTrials();
+        if(d.type==='turf-close-trials') closeTrialsToHome();
       });
 
-      /* Optional direct links such as turftrials.com/?trials=1. */
       try{
         var p=new URLSearchParams(location.search);
         if(p.get('trials')==='1') openTrials('/trials/');
