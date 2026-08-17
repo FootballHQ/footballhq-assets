@@ -39,11 +39,10 @@
   </main>
   <script>
     document.getElementById('backToTurf').addEventListener('click',function(){
-      /* The TURF sidebar puts the app on Home before opening Trials.
-         Going back therefore restores that live Home page without forcing
-         a new Apps Script boot/account-recovery cycle. */
-      if(history.length>1){ history.back(); return; }
-      location.href='/';
+      /* Never use history.back() here. That caused a loop between the
+         TURF shell and Trials. Replace the current history entry with the
+         TURF root so one click always returns to the main site. */
+      window.location.replace('https://turftrials.com/');
     });
   </script>
 </body>
