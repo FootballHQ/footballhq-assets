@@ -1,24 +1,25 @@
 /* ============================================================
-   TURF V88.91 — SAFE TRIALS ENTRY + HOME RETURN
+   TURF V88.92 — SAFE TRIALS ENTRY
 
    - Leaves every native sidebar button untouched.
    - Adds Trials as one extra button only.
-   - Opens Trials in the parent overlay when TURF is wrapped by turftrials.com.
-   - Listens for turf-go-home and clicks the native Home button in-place.
+   - Opens Trials through the top-level turftrials.com wrapper.
+   - Does NOT send the app Home before opening Trials.
+   - Back to TURF can still return the live app to Home in-place.
    ============================================================ */
 (function(){
   'use strict';
-  if(window.__TURF_V8891_SAFE_TRIALS__) return;
-  window.__TURF_V8891_SAFE_TRIALS__=true;
+  if(window.__TURF_V8892_SAFE_TRIALS__) return;
+  window.__TURF_V8892_SAFE_TRIALS__=true;
 
   var TRIALS_URL='https://turftrials.com/trials/';
 
   function qs(s,r){return (r||document).querySelector(s)}
 
   function style(){
-    if(document.getElementById('turfV8891TrialsCss')) return;
+    if(document.getElementById('turfV8892TrialsCss')) return;
     var s=document.createElement('style');
-    s.id='turfV8891TrialsCss';
+    s.id='turfV8892TrialsCss';
     s.textContent=`
       #fhqSidebar.fhq-sidebar{overflow-y:auto!important;overflow-x:hidden!important;scrollbar-width:thin!important}
       #turfTrialsNav{position:relative!important}
@@ -40,15 +41,22 @@
   }
 
   function openTrials(e){
-    if(e){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation()}
-    /* Put the underlying app on Home before covering it. */
-    goHome();
+    if(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+    }
+
+    /* Apps Script can be nested inside Google's own frame, so post to TOP,
+       not merely parent. The turftrials.com wrapper listens there. */
     try{
-      if(window.parent && window.parent!==window){
-        window.parent.postMessage({type:'turf-open-trials',path:'/trials/'},'*');
+      if(window.top && window.top!==window){
+        window.top.postMessage({type:'turf-open-trials',path:'/trials/'},'*');
         return false;
       }
     }catch(err){}
+
+    /* Standalone Apps Script fallback. */
     window.location.href=TRIALS_URL;
     return false;
   }
@@ -71,11 +79,10 @@
     return true;
   }
 
+  /* The top wrapper sends this only AFTER Back to TURF is clicked. */
   window.addEventListener('message',function(e){
     var d=e&&e.data;
-    if(d&&typeof d==='object'&&d.type==='turf-go-home'){
-      goHome();
-    }
+    if(d&&typeof d==='object'&&d.type==='turf-go-home') goHome();
   });
 
   function boot(){
