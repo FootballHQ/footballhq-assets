@@ -1,9 +1,11 @@
 /* ============================================================
-   FOOTBALL HQ / TURF V88.85 — CURRENT SHOP CATALOG + HARD NO-FLASH
+   FOOTBALL HQ / TURF V88.86 — SHOP NO-FLASH + SIDEBAR SCROLL
 
-   The current pack renderer is unchanged.
-   This version hides the shop grid BEFORE legacy Shop click handlers run,
-   then reveals it only after the current catalog has been written.
+   FIXES
+   - Prevents legacy pack flash without leaving Shop blank.
+   - Forces current shop data/render immediately after Shop navigation.
+   - Includes a safety reveal if a legacy async path does not re-render.
+   - Makes the expanded categorized sidebar vertically scrollable.
    ============================================================ */
 (function(){
 'use strict';
@@ -30,19 +32,8 @@ const ART={
 function esc2(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]})}
 function packPreview8849(pk){const url=ART[pk.id];if(url)return '<div class="fhq-v8849-pack-art"><img src="'+url+'" alt="'+esc2(pk.name)+'" draggable="false"></div>';if(typeof window.__fhq8848OldPackPreview==='function')return window.__fhq8848OldPackPreview(pk);if(typeof fhqPackPreview==='function')try{return fhqPackPreview(pk)}catch(e){}return '<div class="fhq-v8849-pack-art fallback"><strong>'+esc2(pk.name)+'</strong></div>'}
 
-function hideGridNow(){
-  const g=document.getElementById('fhqShopGrid');
-  if(!g)return;
-  g.removeAttribute('data-turf-shop-ready');
-  g.style.visibility='hidden';
-  g.style.opacity='0';
-}
-
-function revealCurrentGrid(g){
-  if(!g)return;
-  g.setAttribute('data-turf-shop-ready','1');
-  requestAnimationFrame(function(){g.style.visibility='visible';g.style.opacity='1'});
-}
+function hideGridNow(){const g=document.getElementById('fhqShopGrid');if(!g)return;g.removeAttribute('data-turf-shop-ready');g.style.visibility='hidden';g.style.opacity='0'}
+function revealCurrentGrid(g){if(!g)return;g.setAttribute('data-turf-shop-ready','1');requestAnimationFrame(function(){g.style.visibility='visible';g.style.opacity='1'})}
 
 function install(){
   if(typeof window.fhqRenderShop!=='function' && typeof fhqRenderShop!=='function')return false;
@@ -70,17 +61,20 @@ function install(){
       g.querySelectorAll('[data-pack-buy]').forEach(b=>b.onclick=function(){if(typeof fhqV8831UnlockAudio==='function')fhqV8831UnlockAudio();if(typeof fhqBuyPack==='function')fhqBuyPack(this.dataset.packBuy)});
       g.querySelectorAll('[data-pack-odds]').forEach(b=>b.onclick=function(e){e.stopPropagation();if(typeof fhqOpenPackOdds==='function')fhqOpenPackOdds(this.dataset.packOdds)});
       revealCurrentGrid(g);
-    }catch(e){console.warn('[FHQ V88.85] render failed',e);return oldRender(x)}
+    }catch(e){console.warn('[TURF V88.86] render failed',e);try{return oldRender(x)}finally{setTimeout(function(){revealCurrentGrid(document.getElementById('fhqShopGrid'))},30)}}
   };
   try{window.fhqRenderShop=render}catch(e){}try{fhqRenderShop=render}catch(e){}
+  window.__turfCurrentShopRender=render;
   return true;
 }
 
 function injectStyle(){
   if(document.getElementById('fhqV8849ShopStyle'))return;
   const s=document.createElement('style');s.id='fhqV8849ShopStyle';s.textContent='\
+  .fhq-sidebar{overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;scrollbar-width:thin!important}\
+  .fhq-nav{padding-bottom:28px!important}\
   #fhqShopGrid:not([data-turf-shop-ready="1"]){visibility:hidden!important;opacity:0!important}\
-  #fhqShopGrid[data-turf-shop-ready="1"]{visibility:visible;opacity:1;transition:opacity .10s ease}\
+  #fhqShopGrid[data-turf-shop-ready="1"]{visibility:visible!important;opacity:1!important;transition:opacity .08s ease}\
   .fhq-v8849-pack-art{width:100%;height:100%;min-height:235px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 38%,#173040 0,#091218 60%,#05090c 100%);border-radius:14px}\
   .fhq-v8849-pack-art img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}\
   #fhqShopGrid{grid-template-columns:repeat(auto-fit,minmax(285px,1fr))!important}\
@@ -88,21 +82,23 @@ function injectStyle(){
   ';document.head.appendChild(s)
 }
 
-/*
-  HARD NO-FLASH FIX:
-  Capture Shop navigation before legacy handlers fire. Removing the ready
-  flag happens in the same click event, before the browser can paint the
-  legacy pack markup. Our renderer reveals the grid again when finished.
-*/
+function forceCurrentShop(){
+  hideGridNow();
+  /* Trigger the normal data loader after the legacy nav has switched views. */
+  setTimeout(function(){try{if(typeof window.fhqLoadShop==='function')window.fhqLoadShop();else if(typeof fhqLoadShop==='function')fhqLoadShop()}catch(e){}},0);
+  setTimeout(function(){try{if(typeof window.fhqLoadShop==='function')window.fhqLoadShop();else if(typeof fhqLoadShop==='function')fhqLoadShop()}catch(e){}},140);
+  /* Never allow a permanent blank Shop even if an old callback stalls. */
+  setTimeout(function(){const g=document.getElementById('fhqShopGrid');if(g&&!g.hasAttribute('data-turf-shop-ready')){try{if(typeof window.fhqLoadShop==='function')window.fhqLoadShop()}catch(e){}setTimeout(function(){revealCurrentGrid(g)},220)}},700);
+}
+
 document.addEventListener('click',function(e){
-  const t=e.target&&e.target.closest?e.target.closest('button,a,[data-fhq-nav],[data-view]'):null;
-  if(!t)return;
+  const t=e.target&&e.target.closest?e.target.closest('button,a,[data-fhq-nav],[data-view]'):null;if(!t)return;
   const nav=String(t.getAttribute('data-fhq-nav')||t.getAttribute('data-view')||'').toLowerCase();
   const txt=String(t.textContent||'').trim().toLowerCase();
-  if(nav==='shop'||txt==='shop'||txt.endsWith(' shop')) hideGridNow();
+  if(nav==='shop'||txt==='shop'||txt.endsWith(' shop'))forceCurrentShop();
 },true);
 
 injectStyle();
-let tries=0;const t=setInterval(function(){tries++;if(install()||tries>30){clearInterval(t);setTimeout(function(){try{if(typeof fhqLoadShop==='function')fhqLoadShop()}catch(e){}},120)}},100);
-console.log('[TURF] V88.85 hard no-flash shop renderer active');
+let tries=0;const timer=setInterval(function(){tries++;if(install()||tries>50){clearInterval(timer);setTimeout(function(){try{if(typeof fhqLoadShop==='function')fhqLoadShop()}catch(e){}},120)}},100);
+console.log('[TURF] V88.86 shop + sidebar stability active');
 })();
