@@ -1,269 +1,36 @@
 (() => {
-  const screens = {
-    intro: document.getElementById('screen-intro'),
-    reveal: document.getElementById('screen-reveal'),
-    race: document.getElementById('screen-race'),
-    results: document.getElementById('screen-results')
-  };
+  const screens={intro:document.getElementById('screen-intro'),reveal:document.getElementById('screen-reveal'),race:document.getElementById('screen-race'),results:document.getElementById('screen-results')};
+  const $=id=>document.getElementById(id);
+  const els={start:$('start-btn'),shuffle:$('shuffle-btn'),rematch:$('rematch-btn'),back:$('back-btn'),exit:$('exit-btn'),records:$('records-btn'),resultsRecords:$('results-records-btn'),recordsModal:$('records-modal'),recordsClose:$('records-close'),personalBest:$('personal-best'),modalPersonalBest:$('modal-personal-best'),revealCount:$('reveal-count'),revealTitle:$('reveal-title'),countdown:$('countdown'),status:$('race-status'),runnerA:$('runner-a'),runnerB:$('runner-b'),laneNameA:$('lane-name-a'),laneNameB:$('lane-name-b'),laneThumbA:$('lane-thumb-a'),laneThumbB:$('lane-thumb-b'),runnerArtA:$('runner-art-a'),runnerArtB:$('runner-art-b'),winnerName:$('winner-name'),winnerTime:$('winner-time'),winnerArt:$('winner-art'),winnerCardRarity:$('winner-card-rarity'),winnerCardSubtitle:$('winner-card-subtitle'),resultNameA:$('result-name-a'),resultNameB:$('result-name-b'),resultTimeA:$('result-time-a'),resultTimeB:$('result-time-b')};
 
-  const els = {
-    start: document.getElementById('start-btn'),
-    rematch: document.getElementById('rematch-btn'),
-    back: document.getElementById('back-btn'),
-    exit: document.getElementById('exit-btn'),
-    records: document.getElementById('records-btn'),
-    resultsRecords: document.getElementById('results-records-btn'),
-    recordsModal: document.getElementById('records-modal'),
-    recordsClose: document.getElementById('records-close'),
-    personalBest: document.getElementById('personal-best'),
-    modalPersonalBest: document.getElementById('modal-personal-best'),
-    revealCount: document.getElementById('reveal-count'),
-    revealTitle: document.getElementById('reveal-title'),
-    countdown: document.getElementById('countdown'),
-    status: document.getElementById('race-status'),
-    runnerA: document.getElementById('runner-a'),
-    runnerB: document.getElementById('runner-b'),
-    laneNameA: document.getElementById('lane-name-a'),
-    laneNameB: document.getElementById('lane-name-b'),
-    introNameA: document.getElementById('intro-name-a'),
-    introNameB: document.getElementById('intro-name-b'),
-    winnerName: document.getElementById('winner-name'),
-    winnerTime: document.getElementById('winner-time'),
-    winnerAvatar: document.getElementById('winner-avatar'),
-    resultNameA: document.getElementById('result-name-a'),
-    resultNameB: document.getElementById('result-name-b'),
-    resultTimeA: document.getElementById('result-time-a'),
-    resultTimeB: document.getElementById('result-time-b')
-  };
-
-  const roster = [
-    { id: 'bolt', name: 'Bolt', speed: 92, burst: 95, consistency: 86, avatar: 'a' },
-    { id: 'rush', name: 'Rush', speed: 90, burst: 88, consistency: 93, avatar: 'b' },
-    { id: 'dash', name: 'Dash', speed: 94, burst: 91, consistency: 82, avatar: 'a' },
-    { id: 'jet', name: 'Jet', speed: 89, burst: 96, consistency: 84, avatar: 'b' },
-    { id: 'zip', name: 'Zip', speed: 91, burst: 89, consistency: 90, avatar: 'a' },
-    { id: 'flash', name: 'Flash', speed: 93, burst: 90, consistency: 85, avatar: 'b' }
+  const A='https://footballhq.github.io/footballhq-assets/v88-36/cards/art/';
+  const roster=[
+    {id:'tg001',name:'Conjuke',subtitle:'Training Cone',rarity:'common',index:1,speed:52,burst:63,consistency:61,art:A+'tg001.webp?v=8836fix58'},
+    {id:'tg002',name:'Turfling',subtitle:'Field Turf',rarity:'common',index:2,speed:55,burst:54,consistency:53,art:A+'tg002.webp?v=8836fix58'},
+    {id:'tg003',name:'Teezy',subtitle:'Kicking Tee',rarity:'common',index:3,speed:58,burst:58,consistency:58,art:A+'tg003.webp?v=8836fix58'},
+    {id:'tg004',name:'Towelow',subtitle:'Sideline Towel',rarity:'common',index:4,speed:61,burst:62,consistency:63,art:A+'tg004.webp?v=8836fix58'},
+    {id:'tg005',name:'Hashling',subtitle:'Hash Mark',rarity:'common',index:5,speed:64,burst:53,consistency:55,art:A+'tg005.webp?v=8836fix58'},
+    {id:'tg006',name:'Cleatle',subtitle:'Game Cleat',rarity:'uncommon',index:6,speed:62,burst:65,consistency:68,art:A+'tg006.webp?v=8836fix58'},
+    {id:'tg007',name:'Flagoon',subtitle:'Penalty Flag',rarity:'uncommon',index:7,speed:65,burst:69,consistency:60,art:A+'tg007.webp?v=8836fix58'},
+    {id:'tg008',name:'Downster',subtitle:'Down Marker',rarity:'uncommon',index:8,speed:68,burst:60,consistency:65,art:A+'tg008.webp?v=8836fix58'},
+    {id:'tg009',name:'Chaynk',subtitle:'Chain Crew',rarity:'uncommon',index:9,speed:71,burst:64,consistency:70,art:A+'tg009.webp?v=8836fix58'},
+    {id:'tg010',name:'Glovolt',subtitle:'Receiver Glove',rarity:'uncommon',index:10,speed:60,burst:71,consistency:69,art:A+'tg010.webp?v=8836fix58'}
   ];
 
-  const BEST_KEY = 'turf.trials.40yard.best';
-  let matchup = [roster[0], roster[1]];
-  let raceToken = 0;
+  const BEST_KEY='turf.trials.40yard.best';let matchup=[roster[0],roster[5]],raceToken=0;const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  function showScreen(n){Object.values(screens).forEach(s=>s.classList.remove('active'));screens[n].classList.add('active')}
+  function randomMatchup(){const first=roster[Math.floor(Math.random()*roster.length)];let second=roster[Math.floor(Math.random()*roster.length)];while(second.id===first.id)second=roster[Math.floor(Math.random()*roster.length)];matchup=[first,second];syncMatchup()}
+  function fillCard(side,c){$('intro-card-'+side).className='trial-card rarity-'+c.rarity;$('intro-rarity-'+side).textContent=c.rarity.toUpperCase();$('intro-number-'+side).textContent=String(c.index).padStart(3,'0')+'/024';$('intro-art-'+side).src=c.art;$('intro-art-'+side).alt=c.name;$('intro-name-'+side).textContent=c.name;$('intro-subtitle-'+side).textContent=c.subtitle;$('intro-speed-'+side).textContent=c.speed;$('intro-burst-'+side).textContent=c.burst}
+  function syncMatchup(){const[a,b]=matchup;fillCard('a',a);fillCard('b',b);els.laneNameA.textContent=a.name;els.laneNameB.textContent=b.name;els.resultNameA.textContent=a.name;els.resultNameB.textContent=b.name;[els.laneThumbA,els.runnerArtA].forEach(i=>{i.src=a.art;i.alt=a.name});[els.laneThumbB,els.runnerArtB].forEach(i=>{i.src=b.art;i.alt=b.name})}
+  function getPersonalBest(){const n=Number(localStorage.getItem(BEST_KEY));return Number.isFinite(n)&&n>0?n:null}function updateBestDisplay(){const b=getPersonalBest(),t=b?b.toFixed(2)+'s':'—';els.personalBest.textContent=t;els.modalPersonalBest.textContent=t}function saveBest(t){const b=getPersonalBest();if(!b||t<b)localStorage.setItem(BEST_KEY,String(t));updateBestDisplay()}
+  function openRecords(){updateBestDisplay();els.recordsModal.classList.remove('hidden')}function closeRecords(){els.recordsModal.classList.add('hidden')}function goBackToTrials(){raceToken++;location.href='/trials/'}
+  function resetRaceVisuals(){raceToken++;[els.runnerA,els.runnerB].forEach(r=>{r.classList.remove('running','winner','loser');r.style.setProperty('--progress','0');r.style.transition='none'});els.status.textContent='GET READY';els.countdown.classList.add('hidden');els.revealTitle.classList.add('hidden');els.revealCount.classList.remove('hidden');els.revealCount.textContent='3'}
+  async function revealSequence(token){showScreen('reveal');els.revealTitle.classList.add('hidden');els.revealCount.classList.remove('hidden');for(const v of['3','2','1']){if(token!==raceToken)return false;els.revealCount.textContent=v;await wait(650)}if(token!==raceToken)return false;els.revealCount.textContent='REVEAL';await wait(700);els.revealCount.classList.add('hidden');els.revealTitle.classList.remove('hidden');await wait(1100);return token===raceToken}
+  function calculateTime(c){const skill=c.speed*.58+c.burst*.27+c.consistency*.15;const baseline=5.35-((skill-50)*.0215);const variance=(Math.random()-.5)*.15;return Math.max(4.28,Math.min(5.35,baseline+variance))}
+  async function raceCountdown(token){els.countdown.classList.remove('hidden');for(const v of['3','2','1']){if(token!==raceToken)return false;els.countdown.textContent=v;await wait(650)}if(token!==raceToken)return false;els.countdown.textContent='GO!';els.status.textContent='RUNNING';await wait(300);els.countdown.classList.add('hidden');return true}
+  async function animateRace(token,timeA,timeB){const slow=Math.max(timeA,timeB),dA=timeA*1000,dB=timeB*1000;els.runnerA.classList.add('running');els.runnerB.classList.add('running');requestAnimationFrame(()=>{els.runnerA.style.transition=`transform ${dA}ms cubic-bezier(.12,.65,.22,1)`;els.runnerB.style.transition=`transform ${dB}ms cubic-bezier(.12,.65,.22,1)`;els.runnerA.style.setProperty('--progress','1');els.runnerB.style.setProperty('--progress','1')});await wait(slow*1000+150);if(token!==raceToken)return false;els.runnerA.classList.remove('running');els.runnerB.classList.remove('running');els.status.textContent='FINISHED';const aw=timeA<=timeB;(aw?els.runnerA:els.runnerB).classList.add('winner');(aw?els.runnerB:els.runnerA).classList.add('loser');await wait(1150);return token===raceToken}
+  function showResults(timeA,timeB){const aw=timeA<=timeB,w=aw?matchup[0]:matchup[1],wt=aw?timeA:timeB;els.winnerName.textContent=w.name.toUpperCase();els.winnerTime.textContent=wt.toFixed(2)+'s';els.winnerArt.src=w.art;els.winnerArt.alt=w.name;els.winnerCardRarity.textContent=w.rarity.toUpperCase();els.winnerCardSubtitle.textContent=w.subtitle;els.resultTimeA.textContent=timeA.toFixed(2)+'s';els.resultTimeB.textContent=timeB.toFixed(2)+'s';document.querySelectorAll('.result-row').forEach(r=>r.classList.remove('winner-row'));document.querySelectorAll('.result-row')[aw?0:1].classList.add('winner-row');saveBest(wt);showScreen('results')}
+  async function runTrial({newMatchup=false}={}){resetRaceVisuals();if(newMatchup)randomMatchup();const token=raceToken;if(!await revealSequence(token))return;showScreen('race');await wait(300);if(!await raceCountdown(token))return;let a=calculateTime(matchup[0]),b=calculateTime(matchup[1]);if(Math.abs(a-b)<.025)b+=.035;if(!await animateRace(token,a,b))return;showResults(a,b)}
 
-  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-  function showScreen(name) {
-    Object.values(screens).forEach(screen => screen.classList.remove('active'));
-    screens[name].classList.add('active');
-  }
-
-  function randomMatchup() {
-    const first = roster[Math.floor(Math.random() * roster.length)];
-    let second = roster[Math.floor(Math.random() * roster.length)];
-    while (second.id === first.id) second = roster[Math.floor(Math.random() * roster.length)];
-    matchup = [first, second];
-    syncNames();
-  }
-
-  function syncNames() {
-    const [a, b] = matchup;
-    els.introNameA.textContent = a.name;
-    els.introNameB.textContent = b.name;
-    els.laneNameA.textContent = a.name;
-    els.laneNameB.textContent = b.name;
-    els.resultNameA.textContent = a.name;
-    els.resultNameB.textContent = b.name;
-  }
-
-  function getPersonalBest() {
-    const raw = Number(localStorage.getItem(BEST_KEY));
-    return Number.isFinite(raw) && raw > 0 ? raw : null;
-  }
-
-  function updateBestDisplay() {
-    const best = getPersonalBest();
-    const text = best ? `${best.toFixed(2)}s` : '—';
-    els.personalBest.textContent = text;
-    els.modalPersonalBest.textContent = text;
-  }
-
-  function saveBest(time) {
-    const best = getPersonalBest();
-    if (!best || time < best) localStorage.setItem(BEST_KEY, String(time));
-    updateBestDisplay();
-  }
-
-  function openRecords() {
-    updateBestDisplay();
-    els.recordsModal.classList.remove('hidden');
-  }
-
-  function closeRecords() {
-    els.recordsModal.classList.add('hidden');
-  }
-
-  function goBackToTrials() {
-    raceToken += 1;
-    if (document.referrer && document.referrer.includes(location.host)) {
-      history.back();
-      setTimeout(() => { location.href = '/'; }, 350);
-    } else {
-      location.href = '/';
-    }
-  }
-
-  function resetRaceVisuals() {
-    raceToken += 1;
-    [els.runnerA, els.runnerB].forEach(runner => {
-      runner.classList.remove('running', 'winner', 'loser');
-      runner.style.setProperty('--progress', '0');
-      runner.style.transition = 'none';
-    });
-    els.status.textContent = 'GET READY';
-    els.countdown.classList.add('hidden');
-    els.revealTitle.classList.add('hidden');
-    els.revealCount.classList.remove('hidden');
-    els.revealCount.textContent = '3';
-  }
-
-  async function revealSequence(token) {
-    showScreen('reveal');
-    els.revealTitle.classList.add('hidden');
-    els.revealCount.classList.remove('hidden');
-
-    for (const value of ['3', '2', '1']) {
-      if (token !== raceToken) return false;
-      els.revealCount.textContent = value;
-      els.revealCount.style.animation = 'none';
-      void els.revealCount.offsetWidth;
-      els.revealCount.style.animation = '';
-      await wait(650);
-    }
-
-    if (token !== raceToken) return false;
-    els.revealCount.textContent = 'REVEAL';
-    await wait(700);
-    els.revealCount.classList.add('hidden');
-    els.revealTitle.classList.remove('hidden');
-    await wait(1250);
-    return token === raceToken;
-  }
-
-  function calculateTime(character) {
-    const skill = character.speed * 0.55 + character.burst * 0.3 + character.consistency * 0.15;
-    const baseline = 5.38 - ((skill - 80) * 0.047);
-    const variance = (Math.random() - 0.5) * 0.16;
-    return Math.max(4.18, Math.min(5.25, baseline + variance));
-  }
-
-  async function raceCountdown(token) {
-    els.countdown.classList.remove('hidden');
-    for (const value of ['3', '2', '1']) {
-      if (token !== raceToken) return false;
-      els.countdown.textContent = value;
-      await wait(650);
-    }
-    if (token !== raceToken) return false;
-    els.countdown.textContent = 'GO!';
-    els.status.textContent = 'RUNNING';
-    await wait(300);
-    els.countdown.classList.add('hidden');
-    return token === raceToken;
-  }
-
-  async function animateRace(token, timeA, timeB) {
-    const slowest = Math.max(timeA, timeB);
-    const durationA = timeA * 1000;
-    const durationB = timeB * 1000;
-
-    els.runnerA.classList.add('running');
-    els.runnerB.classList.add('running');
-
-    requestAnimationFrame(() => {
-      els.runnerA.style.transition = `transform ${durationA}ms cubic-bezier(.12,.65,.22,1)`;
-      els.runnerB.style.transition = `transform ${durationB}ms cubic-bezier(.12,.65,.22,1)`;
-      els.runnerA.style.setProperty('--progress', '1');
-      els.runnerB.style.setProperty('--progress', '1');
-    });
-
-    await wait(slowest * 1000 + 150);
-    if (token !== raceToken) return false;
-
-    els.runnerA.classList.remove('running');
-    els.runnerB.classList.remove('running');
-    els.status.textContent = 'FINISHED';
-
-    const aWins = timeA <= timeB;
-    const winnerRunner = aWins ? els.runnerA : els.runnerB;
-    const loserRunner = aWins ? els.runnerB : els.runnerA;
-    winnerRunner.classList.add('winner');
-    loserRunner.classList.add('loser');
-
-    await wait(1350);
-    return token === raceToken;
-  }
-
-  function showResults(timeA, timeB) {
-    const aWins = timeA <= timeB;
-    const winner = aWins ? matchup[0] : matchup[1];
-    const winnerTime = aWins ? timeA : timeB;
-
-    els.winnerName.textContent = winner.name.toUpperCase();
-    els.winnerTime.textContent = `${winnerTime.toFixed(2)}s`;
-    els.resultTimeA.textContent = `${timeA.toFixed(2)}s`;
-    els.resultTimeB.textContent = `${timeB.toFixed(2)}s`;
-
-    els.winnerAvatar.classList.remove('avatar-a', 'avatar-b');
-    els.winnerAvatar.classList.add(winner.avatar === 'a' ? 'avatar-a' : 'avatar-b');
-
-    const rows = document.querySelectorAll('.result-row');
-    rows.forEach(row => row.classList.remove('winner-row'));
-    rows[aWins ? 0 : 1].classList.add('winner-row');
-
-    saveBest(winnerTime);
-    showScreen('results');
-  }
-
-  async function runTrial({ newMatchup = false } = {}) {
-    resetRaceVisuals();
-    if (newMatchup) randomMatchup();
-    const token = raceToken;
-
-    const revealed = await revealSequence(token);
-    if (!revealed) return;
-
-    showScreen('race');
-    await wait(350);
-    const counted = await raceCountdown(token);
-    if (!counted) return;
-
-    let timeA = calculateTime(matchup[0]);
-    let timeB = calculateTime(matchup[1]);
-    if (Math.abs(timeA - timeB) < 0.025) timeB += 0.035;
-
-    const completed = await animateRace(token, timeA, timeB);
-    if (!completed) return;
-    showResults(timeA, timeB);
-  }
-
-  els.start.addEventListener('click', () => runTrial());
-  els.rematch.addEventListener('click', () => runTrial({ newMatchup: true }));
-  els.back.addEventListener('click', goBackToTrials);
-  els.exit.addEventListener('click', goBackToTrials);
-  els.records.addEventListener('click', openRecords);
-  els.resultsRecords.addEventListener('click', openRecords);
-  els.recordsClose.addEventListener('click', closeRecords);
-  els.recordsModal.addEventListener('click', e => { if (e.target === els.recordsModal) closeRecords(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRecords(); });
-
-  document.querySelectorAll('.record-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.record-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.record-pane').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(`record-${tab.dataset.recordTab}`).classList.add('active');
-    });
-  });
-
-  updateBestDisplay();
-  syncNames();
+  els.start.addEventListener('click',()=>runTrial());els.shuffle.addEventListener('click',randomMatchup);els.rematch.addEventListener('click',()=>{randomMatchup();showScreen('intro')});els.back.addEventListener('click',goBackToTrials);els.exit.addEventListener('click',goBackToTrials);els.records.addEventListener('click',openRecords);els.resultsRecords.addEventListener('click',openRecords);els.recordsClose.addEventListener('click',closeRecords);els.recordsModal.addEventListener('click',e=>{if(e.target===els.recordsModal)closeRecords()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeRecords()});document.querySelectorAll('.record-tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.record-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.record-pane').forEach(p=>p.classList.remove('active'));tab.classList.add('active');$('record-'+tab.dataset.recordTab).classList.add('active')}));updateBestDisplay();syncMatchup();
 })();
