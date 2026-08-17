@@ -39,9 +39,16 @@
   </main>
   <script>
     document.getElementById('backToTurf').addEventListener('click',function(){
-      /* Never use history.back() here. That caused a loop between the
-         TURF shell and Trials. Replace the current history entry with the
-         TURF root so one click always returns to the main site. */
+      /* When Trials is opened by the TURF wrapper, close the Trials layer.
+         The main Apps Script iframe remains loaded underneath, so there is
+         no account-recovery boot at all. */
+      try{
+        if(window.parent && window.parent!==window){
+          window.parent.postMessage({type:'turf-close-trials'},'*');
+          return;
+        }
+      }catch(e){}
+      /* Standalone fallback only. */
       window.location.replace('https://turftrials.com/');
     });
   </script>
