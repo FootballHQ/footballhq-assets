@@ -1,29 +1,38 @@
 /* ============================================================
-   TURF V88.92 — SAFE TRIALS ENTRY
+   TURF V88.93 — RELIABLE TRIALS OVERLAY
 
    - Leaves every native sidebar button untouched.
    - Adds Trials as one extra button only.
-   - Opens Trials through the top-level turftrials.com wrapper.
-   - Does NOT send the app Home before opening Trials.
-   - Back to TURF can still return the live app to Home in-place.
+   - Opens Trials INSIDE the already-running TURF app in a fullscreen iframe.
+   - No top/parent wrapper dependency.
+   - No Apps Script reload, so account recovery is not triggered.
+   - Back to TURF closes the overlay and returns the live app to Home.
    ============================================================ */
 (function(){
   'use strict';
-  if(window.__TURF_V8892_SAFE_TRIALS__) return;
-  window.__TURF_V8892_SAFE_TRIALS__=true;
+  if(window.__TURF_V8893_TRIALS_OVERLAY__) return;
+  window.__TURF_V8893_TRIALS_OVERLAY__=true;
 
   var TRIALS_URL='https://turftrials.com/trials/';
+  var overlay=null;
+  var frame=null;
 
   function qs(s,r){return (r||document).querySelector(s)}
 
   function style(){
-    if(document.getElementById('turfV8892TrialsCss')) return;
+    if(document.getElementById('turfV8893TrialsCss')) return;
     var s=document.createElement('style');
-    s.id='turfV8892TrialsCss';
+    s.id='turfV8893TrialsCss';
     s.textContent=`
       #fhqSidebar.fhq-sidebar{overflow-y:auto!important;overflow-x:hidden!important;scrollbar-width:thin!important}
       #turfTrialsNav{position:relative!important}
       #turfTrialsNav:after{content:"NEW";margin-left:auto;font-size:8px;font-weight:1000;letter-spacing:.12em;color:#9bddff;border:1px solid rgba(122,209,255,.35);background:rgba(122,209,255,.08);border-radius:999px;padding:2px 5px}
+      #turfTrialsOverlay{
+        position:fixed!important;inset:0!important;z-index:2147483000!important;
+        display:none!important;background:#07111c!important;
+      }
+      #turfTrialsOverlay.open{display:block!important}
+      #turfTrialsOverlay iframe{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border:0!important;background:#07111c!important;display:block!important}
     `;
     document.head.appendChild(s);
   }
@@ -40,6 +49,20 @@
     return false;
   }
 
+  function ensureOverlay(){
+    if(overlay && document.documentElement.contains(overlay)) return overlay;
+    overlay=document.createElement('div');
+    overlay.id='turfTrialsOverlay';
+    overlay.setAttribute('aria-hidden','true');
+    frame=document.createElement('iframe');
+    frame.id='turfTrialsOverlayFrame';
+    frame.title='TURF Trials';
+    frame.setAttribute('allow','fullscreen; clipboard-read; clipboard-write');
+    overlay.appendChild(frame);
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
   function openTrials(e){
     if(e){
       e.preventDefault();
@@ -47,18 +70,20 @@
       if(e.stopImmediatePropagation)e.stopImmediatePropagation();
     }
 
-    /* Apps Script can be nested inside Google's own frame, so post to TOP,
-       not merely parent. The turftrials.com wrapper listens there. */
-    try{
-      if(window.top && window.top!==window){
-        window.top.postMessage({type:'turf-open-trials',path:'/trials/'},'*');
-        return false;
-      }
-    }catch(err){}
-
-    /* Standalone Apps Script fallback. */
-    window.location.href=TRIALS_URL;
+    /* Set the live app's return destination first, then cover it immediately. */
+    goHome();
+    ensureOverlay();
+    if(!frame.getAttribute('src')) frame.setAttribute('src',TRIALS_URL);
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
     return false;
+  }
+
+  function closeTrials(){
+    if(!overlay) return;
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+    goHome();
   }
 
   function addTrials(){
@@ -79,14 +104,17 @@
     return true;
   }
 
-  /* The top wrapper sends this only AFTER Back to TURF is clicked. */
+  /* Trials pages post this to their immediate parent, which is now this app. */
   window.addEventListener('message',function(e){
     var d=e&&e.data;
-    if(d&&typeof d==='object'&&d.type==='turf-go-home') goHome();
+    if(!d || typeof d!=='object') return;
+    if(d.type==='turf-close-trials') closeTrials();
+    if(d.type==='turf-go-home'){closeTrials();goHome();}
   });
 
   function boot(){
     style();
+    ensureOverlay();
     var tries=0;
     var timer=setInterval(function(){
       tries++;
