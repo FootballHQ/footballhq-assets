@@ -151,5 +151,17 @@
   </div>
 
   <script src="./game.js"></script>
+  <script>
+    (function(){
+      function backToTrials(e){
+        if(e){e.preventDefault();e.stopImmediatePropagation();}
+        location.href='/trials/';
+      }
+      var x=document.getElementById('exit-btn');
+      var back=document.getElementById('back-btn');
+      if(x)x.addEventListener('click',backToTrials,true);
+      if(back)back.addEventListener('click',backToTrials,true);
+    })();
+  </script>
 </body>
 </html>
