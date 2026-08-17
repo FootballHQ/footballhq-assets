@@ -10,6 +10,13 @@
     start: document.getElementById('start-btn'),
     rematch: document.getElementById('rematch-btn'),
     back: document.getElementById('back-btn'),
+    exit: document.getElementById('exit-btn'),
+    records: document.getElementById('records-btn'),
+    resultsRecords: document.getElementById('results-records-btn'),
+    recordsModal: document.getElementById('records-modal'),
+    recordsClose: document.getElementById('records-close'),
+    personalBest: document.getElementById('personal-best'),
+    modalPersonalBest: document.getElementById('modal-personal-best'),
     revealCount: document.getElementById('reveal-count'),
     revealTitle: document.getElementById('reveal-title'),
     countdown: document.getElementById('countdown'),
@@ -38,6 +45,7 @@
     { id: 'flash', name: 'Flash', speed: 93, burst: 90, consistency: 85, avatar: 'b' }
   ];
 
+  const BEST_KEY = 'turf.trials.40yard.best';
   let matchup = [roster[0], roster[1]];
   let raceToken = 0;
 
@@ -64,6 +72,43 @@
     els.laneNameB.textContent = b.name;
     els.resultNameA.textContent = a.name;
     els.resultNameB.textContent = b.name;
+  }
+
+  function getPersonalBest() {
+    const raw = Number(localStorage.getItem(BEST_KEY));
+    return Number.isFinite(raw) && raw > 0 ? raw : null;
+  }
+
+  function updateBestDisplay() {
+    const best = getPersonalBest();
+    const text = best ? `${best.toFixed(2)}s` : '—';
+    els.personalBest.textContent = text;
+    els.modalPersonalBest.textContent = text;
+  }
+
+  function saveBest(time) {
+    const best = getPersonalBest();
+    if (!best || time < best) localStorage.setItem(BEST_KEY, String(time));
+    updateBestDisplay();
+  }
+
+  function openRecords() {
+    updateBestDisplay();
+    els.recordsModal.classList.remove('hidden');
+  }
+
+  function closeRecords() {
+    els.recordsModal.classList.add('hidden');
+  }
+
+  function goBackToTrials() {
+    raceToken += 1;
+    if (document.referrer && document.referrer.includes(location.host)) {
+      history.back();
+      setTimeout(() => { location.href = '/'; }, 350);
+    } else {
+      location.href = '/';
+    }
   }
 
   function resetRaceVisuals() {
@@ -174,6 +219,7 @@
     rows.forEach(row => row.classList.remove('winner-row'));
     rows[aWins ? 0 : 1].classList.add('winner-row');
 
+    saveBest(winnerTime);
     showScreen('results');
   }
 
@@ -201,11 +247,23 @@
 
   els.start.addEventListener('click', () => runTrial());
   els.rematch.addEventListener('click', () => runTrial({ newMatchup: true }));
-  els.back.addEventListener('click', () => {
-    resetRaceVisuals();
-    randomMatchup();
-    showScreen('intro');
+  els.back.addEventListener('click', goBackToTrials);
+  els.exit.addEventListener('click', goBackToTrials);
+  els.records.addEventListener('click', openRecords);
+  els.resultsRecords.addEventListener('click', openRecords);
+  els.recordsClose.addEventListener('click', closeRecords);
+  els.recordsModal.addEventListener('click', e => { if (e.target === els.recordsModal) closeRecords(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRecords(); });
+
+  document.querySelectorAll('.record-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.record-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.record-pane').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`record-${tab.dataset.recordTab}`).classList.add('active');
+    });
   });
 
+  updateBestDisplay();
   syncNames();
 })();
