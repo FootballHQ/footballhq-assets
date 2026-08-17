@@ -12,9 +12,9 @@
     iframe{width:100%;height:100%;border:0;display:block;background:#0b1723}
     .loading{position:absolute;inset:0;display:grid;place-items:center;color:#d9efff;background:#0b1723;z-index:0;font-weight:800;letter-spacing:.12em}
     #turfApp{position:relative;z-index:1}
-    #turfTrialsLayer{position:fixed;inset:0;z-index:20;background:#07111c;display:none}
+    #turfTrialsLayer{position:fixed;inset:0;z-index:999999;background:#07111c;display:none}
     #turfTrialsLayer.open{display:block}
-    #turfTrialsFrame{position:absolute;inset:0;z-index:1}
+    #turfTrialsFrame{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0}
   </style>
 </head>
 <body>
@@ -30,18 +30,24 @@
   </div>
 
   <div id="turfTrialsLayer" aria-hidden="true">
-    <iframe id="turfTrialsFrame" title="TURF Trials" allow="fullscreen"></iframe>
+    <iframe id="turfTrialsFrame" title="TURF Trials" allow="fullscreen; clipboard-read; clipboard-write"></iframe>
   </div>
 
   <script>
     (function(){
+      'use strict';
       var layer=document.getElementById('turfTrialsLayer');
       var frame=document.getElementById('turfTrialsFrame');
       var app=document.getElementById('turfApp');
 
+      function normalizeTrialsPath(path){
+        var p=String(path||'/trials/');
+        if(p.indexOf('/trials/')!==0) p='/trials/';
+        return p;
+      }
+
       function openTrials(path){
-        var target=String(path||'/trials/');
-        if(target.indexOf('/trials/')!==0) target='/trials/';
+        var target=normalizeTrialsPath(path);
         if(frame.getAttribute('src')!==target) frame.setAttribute('src',target);
         layer.classList.add('open');
         layer.setAttribute('aria-hidden','false');
@@ -49,24 +55,28 @@
       }
 
       function closeTrialsToHome(){
-        /* Keep the already-loaded Apps Script/account session alive. */
         layer.classList.remove('open');
         layer.setAttribute('aria-hidden','true');
         document.title='TURF';
-
-        /* Tell the existing app iframe to switch to Home. This is a normal
-           in-app navigation, not a reload, so account recovery does not run. */
         try{
           if(app && app.contentWindow){
-            app.contentWindow.postMessage({type:'turf-go-home'},'*');
+            app.contentWindow.postMessage({type:'turf-go-home',version:'8895'},'*');
           }
         }catch(e){}
       }
 
       window.addEventListener('message',function(e){
         var d=e&&e.data;
+        if(typeof d==='string'){
+          if(d==='turf-open-trials') openTrials('/trials/');
+          if(d==='turf-close-trials') closeTrialsToHome();
+          return;
+        }
         if(!d||typeof d!=='object') return;
-        if(d.type==='turf-open-trials') openTrials(d.path||'/trials/');
+        if(d.type==='turf-open-trials'){
+          openTrials(d.path||'/trials/');
+          try{if(e.source)e.source.postMessage({type:'turf-trials-opened',version:'8895'},'*')}catch(_e){}
+        }
         if(d.type==='turf-close-trials') closeTrialsToHome();
       });
 
