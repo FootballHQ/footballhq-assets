@@ -4,12 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TURF — Trials: 40-Yard Dash</title>
-  <meta name="theme-color" content="#07120c" />
+  <meta name="theme-color" content="#0a1320" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <main class="game-shell" aria-live="polite">
     <header class="topbar">
+      <button id="exit-btn" class="icon-btn exit-btn" type="button" aria-label="Back to Trials" title="Back to Trials">×</button>
       <div class="brand" aria-label="TURF">
         <span class="brand-mark">T</span>
         <div>
@@ -17,12 +18,15 @@
           <div class="brand-mode">TRIALS</div>
         </div>
       </div>
-      <div class="trial-chip">TRIAL 01</div>
+      <div class="topbar-actions">
+        <button id="records-btn" class="records-btn" type="button">WORLD RECORDS</button>
+        <div class="trial-chip">TRIAL 01</div>
+      </div>
     </header>
 
     <section id="screen-intro" class="screen active">
       <div class="hero-card">
-        <div class="eyebrow">WELCOME TO TRIALS</div>
+        <div class="eyebrow">TRIAL 01</div>
         <h1>40-YARD DASH</h1>
         <p>Two Turf competitors. Forty yards. One winner.</p>
         <div class="matchup-preview">
@@ -108,6 +112,12 @@
           </div>
         </div>
 
+        <div class="record-strip">
+          <span>YOUR BEST</span>
+          <strong id="personal-best">—</strong>
+          <button id="results-records-btn" type="button">VIEW WORLD RECORDS</button>
+        </div>
+
         <div class="result-actions">
           <button id="rematch-btn" class="primary-btn">RUN IT AGAIN</button>
           <button id="back-btn" class="secondary-btn">BACK TO TRIALS</button>
@@ -115,6 +125,30 @@
       </div>
     </section>
   </main>
+
+  <div id="records-modal" class="records-modal hidden" role="dialog" aria-modal="true" aria-labelledby="records-title">
+    <div class="records-panel">
+      <button id="records-close" class="records-close" type="button" aria-label="Close records">×</button>
+      <div class="eyebrow">TRIAL 01</div>
+      <h2 id="records-title">40-YARD DASH RECORDS</h2>
+      <div class="record-tabs" role="tablist">
+        <button class="record-tab active" data-record-tab="world" type="button">WORLD</button>
+        <button class="record-tab" data-record-tab="personal" type="button">YOUR BEST</button>
+      </div>
+      <div id="record-world" class="record-pane active">
+        <div class="records-empty">
+          <strong>GLOBAL RECORD BOARD</strong>
+          <p>The tab is built and ready. Global records will populate from the TURF account/leaderboard backend when Trials is connected to the main site.</p>
+        </div>
+      </div>
+      <div id="record-personal" class="record-pane">
+        <div class="personal-record-card">
+          <span>FASTEST TIME ON THIS DEVICE</span>
+          <strong id="modal-personal-best">—</strong>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="./game.js"></script>
 </body>
