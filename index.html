@@ -11,18 +11,63 @@
     .shell{position:fixed;inset:0;background:#0b1723}
     iframe{width:100%;height:100%;border:0;display:block;background:#0b1723}
     .loading{position:absolute;inset:0;display:grid;place-items:center;color:#d9efff;background:#0b1723;z-index:0;font-weight:800;letter-spacing:.12em}
-    iframe{position:relative;z-index:1}
+    #turfApp{position:relative;z-index:1}
+    #turfTrialsLayer{position:fixed;inset:0;z-index:20;background:#07111c;display:none}
+    #turfTrialsLayer.open{display:block}
+    #turfTrialsFrame{position:absolute;inset:0;z-index:1}
   </style>
 </head>
 <body>
   <div class="shell">
     <div class="loading">LOADING TURF…</div>
     <iframe
+      id="turfApp"
       src="https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec"
       title="TURF"
       allow="clipboard-read; clipboard-write; fullscreen"
       referrerpolicy="strict-origin-when-cross-origin">
     </iframe>
   </div>
+
+  <div id="turfTrialsLayer" aria-hidden="true">
+    <iframe id="turfTrialsFrame" title="TURF Trials" allow="fullscreen"></iframe>
+  </div>
+
+  <script>
+    (function(){
+      var layer=document.getElementById('turfTrialsLayer');
+      var frame=document.getElementById('turfTrialsFrame');
+
+      function openTrials(path){
+        var target=String(path||'/trials/');
+        if(target.indexOf('/trials/')!==0) target='/trials/';
+        if(frame.getAttribute('src')!==target) frame.setAttribute('src',target);
+        layer.classList.add('open');
+        layer.setAttribute('aria-hidden','false');
+        document.title='TURF — Trials';
+      }
+
+      function closeTrials(){
+        layer.classList.remove('open');
+        layer.setAttribute('aria-hidden','true');
+        document.title='TURF';
+        /* Do NOT clear/reload the main Apps Script iframe. Its account session
+           and current Home state stay alive underneath the Trials layer. */
+      }
+
+      window.addEventListener('message',function(e){
+        var d=e&&e.data;
+        if(!d||typeof d!=='object') return;
+        if(d.type==='turf-open-trials') openTrials(d.path||'/trials/');
+        if(d.type==='turf-close-trials') closeTrials();
+      });
+
+      /* Optional direct links such as turftrials.com/?trials=1. */
+      try{
+        var p=new URLSearchParams(location.search);
+        if(p.get('trials')==='1') openTrials('/trials/');
+      }catch(e){}
+    })();
+  </script>
 </body>
 </html>
