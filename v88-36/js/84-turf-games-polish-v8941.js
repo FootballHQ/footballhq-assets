@@ -1,7 +1,7 @@
 /* ============================================================
    TURF V89.41 — GAMES POLISH / REGRESSION FIXES
    Load AFTER 83-turf-games-master-rules-v8940.js.
-   Focuses on late-render UI/state regressions without replacing core engines.
+   This version aggressively re-enforces late-render fixes.
    ============================================================ */
 (function(){
 'use strict';
@@ -13,26 +13,27 @@ function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAl
 function txt(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim()}
 function visible(el){if(!el)return false;var c=getComputedStyle(el);return c.display!=='none'&&c.visibility!=='hidden'&&c.opacity!=='0'}
 function host(){return q('#fgSpecialGame')||q('#fgGridGame')||q('#footballGameOverlay')||document.body}
+function titleText(){
+  var h=host();
+  var candidates=qa('.fg-game-title,.fg-special-title,.fg-newgame-title,h1,h2,h3',h).filter(visible);
+  return candidates.map(txt).join(' | ').toUpperCase();
+}
 function mode(){
-  var h=host(), all=qa('.fg-game-title,.fg-special-title,.fg-newgame-title,h1,h2,h3',h);
-  for(var i=0;i<all.length;i++){
-    if(!visible(all[i]))continue;
-    var t=txt(all[i]).toUpperCase();
-    if(t==='ACTIVE PLAYERS'||t==='CURRENT PLAYERS'||t==='PLAYERS')return 'players';
-    if(t==='GRID'||t==='NFL GRID')return 'grid';
-    if(t==='LEGENDS')return 'legends';
-    if(t==='WHO AM I?')return 'whoami';
-    if(t==='CAREER PATH')return 'career';
-    if(t==='HIGHER / LOWER'||t==='HIGHER/LOWER')return 'higherlower';
-    if(t==='IMPOSTER'||t==='NFL IMPOSTER')return 'imposter';
-    if(t==='CONNECTIONS'||t==='NFL CONNECTIONS')return 'connections';
-    if(t==='STAT LINE')return 'statline';
-    if(t==='DRAFT CLASS')return 'draftclass';
-    if(t==='MOGGER')return 'mogger';
-    if(t==='TIMELINE'||t==='NFL TIMELINE')return 'timeline';
-    if(t==='FRANCHISE FINDER'||t==='GUESS THE TEAM')return 'franchise';
-    if(t==='DEPTH CHART')return 'depth';
-  }
+  var t=titleText();
+  if(/\b(ACTIVE PLAYERS|CURRENT PLAYERS|PLAYERS)\b/.test(t))return 'players';
+  if(/\b(NFL GRID|GRID)\b/.test(t))return 'grid';
+  if(/\bLEGENDS\b/.test(t))return 'legends';
+  if(/WHO AM I\?/.test(t))return 'whoami';
+  if(/CAREER PATH/.test(t))return 'career';
+  if(/HIGHER\s*\/\s*LOWER/.test(t))return 'higherlower';
+  if(/\b(NFL IMPOSTER|IMPOSTER)\b/.test(t))return 'imposter';
+  if(/\b(NFL CONNECTIONS|CONNECTIONS)\b/.test(t))return 'connections';
+  if(/STAT LINE/.test(t))return 'statline';
+  if(/DRAFT CLASS/.test(t))return 'draftclass';
+  if(/\bMOGGER\b/.test(t))return 'mogger';
+  if(/\b(NFL TIMELINE|TIMELINE)\b/.test(t))return 'timeline';
+  if(/FRANCHISE FINDER|GUESS THE TEAM/.test(t))return 'franchise';
+  if(/DEPTH CHART/.test(t))return 'depth';
   return '';
 }
 function daily(){
@@ -50,35 +51,56 @@ document.addEventListener('click',function(e){
     qa('#fgSuggestions,.fg-suggestions,[role="listbox"]').forEach(function(box){
       box.innerHTML='';
       box.classList.remove('show','open','active');
-      box.style.display='none';
+      box.style.setProperty('display','none','important');
     });
   },0);
 },true);
 
 function fixHigherLower(){
   if(mode()!=='higherlower')return;
-  qa('button,[role="button"]',host()).forEach(function(b){
-    if(txt(b).toUpperCase()==='PLAY'){
+  var h=host();
+  qa('button,[role="button"]',h).forEach(function(b){
+    var t=txt(b).replace(/✓/g,'').trim().toUpperCase();
+    if(t==='PLAY'){
+      /* Remove it from the DOM so an older renderer cannot reactivate it. */
       b.disabled=true;
-      b.style.setProperty('display','none','important');
       b.setAttribute('aria-hidden','true');
+      b.style.setProperty('display','none','important');
+      b.style.setProperty('visibility','hidden','important');
+      b.style.setProperty('pointer-events','none','important');
+      if(b.parentNode) b.parentNode.removeChild(b);
     }
+  });
+  qa('*',h).forEach(function(el){
+    if(!el.children.length&&/^0\s*(?:TO|[-–—])\s*0$/i.test(txt(el)))el.style.setProperty('display','none','important');
   });
 }
 
 function fixWhoAmI(){
   if(mode()!=='whoami')return;
   var h=host();
-  qa('button',h).forEach(function(b){
-    if(/GIVE UP/i.test(txt(b))) b.style.setProperty('display','none','important');
-  });
-  var reveal=qa('button',h).filter(function(b){return /REVEAL NEXT HINT/i.test(txt(b))&&visible(b)});
-  reveal.forEach(function(b,i){if(i>0)b.style.setProperty('display','none','important')});
-  if(daily()){
-    var clues=qa('.fg-clue-item,.fg-team-clue',h).filter(visible);
-    if(clues.length>1){
-      for(var i=1;i<clues.length;i++) clues[i].style.setProperty('display','none','important');
+  /* Give Up is not part of the approved Who Am I design. Remove every copy. */
+  qa('button,[role="button"]',h).forEach(function(b){
+    if(/^GIVE UP$/i.test(txt(b))){
+      b.style.setProperty('display','none','important');
+      b.disabled=true;
+      if(b.parentNode)b.parentNode.removeChild(b);
     }
+  });
+  /* Keep exactly one Reveal Next Hint button, regardless of which renderer created it. */
+  var reveal=qa('button,[role="button"]',h).filter(function(b){return /REVEAL NEXT HINT/i.test(txt(b))});
+  reveal.forEach(function(b,i){
+    if(i===0){
+      b.style.removeProperty('display');
+      b.style.removeProperty('visibility');
+      b.removeAttribute('aria-hidden');
+    }else if(b.parentNode){
+      b.parentNode.removeChild(b);
+    }
+  });
+  if(daily()){
+    var clues=qa('.fg-clue-item,.fg-team-clue',h);
+    clues.forEach(function(c,i){c.style.setProperty('display',i===0?'':'none','important')});
   }
 }
 
@@ -111,10 +133,7 @@ function fixConnections(){
       if(names[txt(x).toLowerCase()])x.style.setProperty('display','none','important');
     });
   }
-  var resultOpen=q('#fgResultOverlay.open');
-  if(resultOpen){
-    qa('.fg-connections-grid,.fg-connection-board',h).forEach(function(g){g.style.setProperty('display','none','important')});
-  }
+  if(q('#fgResultOverlay.open'))qa('.fg-connections-grid,.fg-connection-board',h).forEach(function(g){g.style.setProperty('display','none','important')});
 }
 
 function fixTimeline(){
@@ -146,8 +165,7 @@ function styleDifficulty(){
     var key=txt(b).toUpperCase();
     var card=b.closest('.fg-difficulty-card,[class*="difficulty-card"],.fg-choice-card')||b.parentElement;
     if(!card||card.querySelector('.turf8941-diff-desc'))return;
-    var p=document.createElement('div');p.className='turf8941-diff-desc';
-    p.textContent=(descriptions[m]&&descriptions[m][key])||'';
+    var p=document.createElement('div');p.className='turf8941-diff-desc';p.textContent=(descriptions[m]&&descriptions[m][key])||'';
     if(p.textContent)card.appendChild(p);
   });
 }
@@ -156,28 +174,17 @@ function moveNewGames(){
   var page=q('#gamesPage,.games-page,#fgGamesPage')||document;
   var cards=qa('.fg-game-card,.game-card,[data-game]',page);
   function byTitle(name){return cards.find(function(c){return txt(c).toUpperCase().indexOf(name)>=0})}
-  var depth=byTitle('DEPTH CHART'), cham=byTitle('CHAMELEON'), two=byTitle('TWO FACE');
+  var depth=byTitle('DEPTH CHART'),cham=byTitle('CHAMELEON'),two=byTitle('TWO FACE');
   if(!depth||!cham||!two||!depth.parentElement)return;
   var parent=depth.parentElement;
   if(cham.parentElement!==parent)parent.appendChild(cham);
   if(two.parentElement!==parent)parent.appendChild(two);
-  cham.classList.add('turf8941-standard-card');
-  two.classList.add('turf8941-standard-card');
+  cham.classList.add('turf8941-standard-card');two.classList.add('turf8941-standard-card');
 }
 
 function tameConfetti(){
-  qa('canvas').forEach(function(c){
-    var id=(c.id||'')+' '+(c.className||'');
-    if(/confetti/i.test(id)){
-      c.style.pointerEvents='none';
-      c.style.willChange='auto';
-      c.style.transform='translateZ(0)';
-    }
-  });
-  qa('.confetti,.confetti-piece,[class*="confetti"]',document).forEach(function(el,i){
-    if(i>70)el.remove();
-    else{el.style.animationDuration='900ms';el.style.willChange='transform,opacity'}
-  });
+  qa('canvas').forEach(function(c){var id=(c.id||'')+' '+(c.className||'');if(/confetti/i.test(id)){c.style.pointerEvents='none';c.style.willChange='auto';c.style.transform='translateZ(0)'}});
+  qa('.confetti,.confetti-piece,[class*="confetti"]',document).forEach(function(el,i){if(i>70)el.remove();else{el.style.animationDuration='900ms';el.style.willChange='transform,opacity'}});
 }
 
 function addCss(){
@@ -191,20 +198,12 @@ function addCss(){
   `;document.head.appendChild(s);
 }
 
-function run(){
-  addCss();
-  fixHigherLower();
-  fixWhoAmI();
-  fixImposterDefault();
-  fixConnections();
-  fixTimeline();
-  styleDifficulty();
-  moveNewGames();
-  tameConfetti();
-}
+function run(){addCss();fixHigherLower();fixWhoAmI();fixImposterDefault();fixConnections();fixTimeline();styleDifficulty();moveNewGames();tameConfetti()}
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
-[60,160,350,700,1200,2200,4000].forEach(function(ms){setTimeout(run,ms)});
+[0,30,80,150,300,600,1000,1600,2500,4000,6500,10000].forEach(function(ms){setTimeout(run,ms)});
 var timer=null;
-new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,35)}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','aria-hidden']});
+new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,12)}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,characterData:true,attributeFilter:['class','style','aria-hidden','disabled']});
+/* Native renderers can repaint after observers settle; keep a lightweight authority loop while a game modal is open. */
+setInterval(function(){if(q('#fgSpecialGame')||q('#fgGridGame')||q('#footballGameOverlay'))run()},250);
 })();
