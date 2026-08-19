@@ -1,0 +1,92 @@
+/* TURF V89.44 — DATA/ENGINE BACKEND HELPERS
+   Paste at the ABSOLUTE BOTTOM of Code.gs.
+   This is additive: it does not replace the existing H2H queue/gameplay backend.
+
+   Purpose:
+   - Build a historical player->team/position index from nflverse season rosters.
+   - Search that index for Grid so players qualify for every franchise they played for.
+   - Keep the build chunked so Apps Script does not time out.
+*/
+
+var TURF_V8944_ROSTER_FIRST_YEAR_ = 1920;
+var TURF_V8944_ROSTER_LAST_YEAR_ = 2026;
+var TURF_V8944_INDEX_PREFIX_ = 'TURF_V8944_GRID_INDEX_';
+var TURF_V8944_CURSOR_KEY_ = 'TURF_V8944_GRID_CURSOR';
+
+function turfV8944Norm_(v){
+  return String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+function turfV8944Csv_(txt){
+  return Utilities.parseCsv(txt||'');
+}
+
+function turfV8944BuildHistoricalGridIndexChunk(maxYears){
+  maxYears = Math.max(1, Math.min(Number(maxYears)||6, 10));
+  var props = PropertiesService.getScriptProperties();
+  var cursor = Number(props.getProperty(TURF_V8944_CURSOR_KEY_) || TURF_V8944_ROSTER_FIRST_YEAR_);
+  if (cursor > TURF_V8944_ROSTER_LAST_YEAR_) return {ok:true,done:true,next:null};
+
+  var processed=[];
+  for (var y=cursor; y<=TURF_V8944_ROSTER_LAST_YEAR_ && processed.length<maxYears; y++) {
+    var url='https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_'+y+'.csv';
+    try{
+      var res=UrlFetchApp.fetch(url,{muteHttpExceptions:true,followRedirects:true});
+      if(res.getResponseCode()!==200){processed.push({year:y,ok:false});continue;}
+      var rows=turfV8944Csv_(res.getContentText());
+      if(!rows.length){processed.push({year:y,ok:false});continue;}
+      var head=rows[0].map(function(x){return String(x||'').trim().toLowerCase();});
+      function col(names){for(var i=0;i<names.length;i++){var p=head.indexOf(names[i]);if(p>=0)return p;}return -1;}
+      var nameCol=col(['full_name','player_name','name']);
+      var teamCol=col(['team','team_abbr','team_abbreviation']);
+      var posCol=col(['position','pos']);
+      if(nameCol<0||teamCol<0){processed.push({year:y,ok:false});continue;}
+
+      var byPrefix={};
+      for(var r=1;r<rows.length;r++){
+        var row=rows[r],name=String(row[nameCol]||'').trim(),team=String(row[teamCol]||'').trim(),pos=posCol>=0?String(row[posCol]||'').trim():'';
+        if(!name||!team)continue;
+        var n=turfV8944Norm_(name);if(!n)continue;
+        var prefix=n.slice(0,2)||'__';
+        if(!byPrefix[prefix])byPrefix[prefix]=[];
+        byPrefix[prefix].push([name,team,pos,y]);
+      }
+      Object.keys(byPrefix).forEach(function(prefix){
+        var key=TURF_V8944_INDEX_PREFIX_+prefix;
+        var old=[];try{old=JSON.parse(props.getProperty(key)||'[]');}catch(e){}
+        var map={};
+        old.concat(byPrefix[prefix]).forEach(function(x){
+          var k=turfV8944Norm_(x[0])+'|'+String(x[1]).toUpperCase()+'|'+String(x[2]).toUpperCase();
+          if(!map[k]||Number(x[3])<Number(map[k][3]))map[k]=x;
+        });
+        props.setProperty(key,JSON.stringify(Object.keys(map).map(function(k){return map[k];})));
+      });
+      processed.push({year:y,ok:true});
+    }catch(err){processed.push({year:y,ok:false,error:String(err)});}
+  }
+  var next=cursor+processed.length;
+  props.setProperty(TURF_V8944_CURSOR_KEY_,String(next));
+  return {ok:true,done:next>TURF_V8944_ROSTER_LAST_YEAR_,next:next,processed:processed};
+}
+
+function turfV8944GridSearch(query){
+  query=turfV8944Norm_(query);if(query.length<2)return {ok:true,players:[]};
+  var props=PropertiesService.getScriptProperties();
+  var key=TURF_V8944_INDEX_PREFIX_+query.slice(0,2);
+  var rows=[];try{rows=JSON.parse(props.getProperty(key)||'[]');}catch(e){}
+  var map={};
+  rows.forEach(function(x){
+    if(turfV8944Norm_(x[0]).indexOf(query)!==0)return;
+    var n=turfV8944Norm_(x[0]);
+    if(!map[n])map[n]={name:x[0],teams:[],positions:[]};
+    if(map[n].teams.indexOf(x[1])<0)map[n].teams.push(x[1]);
+    if(x[2]&&map[n].positions.indexOf(x[2])<0)map[n].positions.push(x[2]);
+  });
+  return {ok:true,players:Object.keys(map).map(function(k){return map[k];}).slice(0,40)};
+}
+
+function turfV8944GridIndexStatus(){
+  var p=PropertiesService.getScriptProperties();
+  var c=Number(p.getProperty(TURF_V8944_CURSOR_KEY_)||TURF_V8944_ROSTER_FIRST_YEAR_);
+  return {ok:true,nextYear:c,done:c>TURF_V8944_ROSTER_LAST_YEAR_};
+}
