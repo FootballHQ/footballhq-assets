@@ -1,0 +1,97 @@
+/* TURF V89.40 — H2H MASTER BACKEND ADD-ON
+   Paste BELOW turf-h2h-gameplay-backend-v8937.gs.txt in Code.gs.
+   Extends the H2H trivia bank beyond 100 questions and adds defensive
+   state cleanup/validation helpers without replacing the v89.30 queue or
+   v89.37 synchronized gameplay functions.
+*/
+
+(function(){
+  if (typeof TURF_H2H_TRIVIA_ === 'undefined' || !Array.isArray(TURF_H2H_TRIVIA_)) return;
+  var more = [
+    {q:'Which team drafted Peyton Manning first overall in 1998?',a:['Colts','Broncos','Chargers','Jets'],c:0},
+    {q:'Who was selected first overall in the 2001 NFL Draft?',a:['Michael Vick','LaDainian Tomlinson','Drew Brees','Richard Seymour'],c:0},
+    {q:'Which franchise drafted Ray Lewis in 1996?',a:['Ravens','Steelers','Browns','Dolphins'],c:0},
+    {q:'Who won Super Bowl XXXV MVP?',a:['Ray Lewis','Trent Dilfer','Jamal Lewis','Shannon Sharpe'],c:0},
+    {q:'Which team drafted Ed Reed?',a:['Ravens','Texans','Jets','Dolphins'],c:0},
+    {q:'Which school did Aaron Donald attend?',a:['Pittsburgh','Penn State','Ohio State','Michigan'],c:0},
+    {q:'Who was the first overall pick in the 2011 NFL Draft?',a:['Cam Newton','Von Miller','A.J. Green','Julio Jones'],c:0},
+    {q:'Which team drafted Russell Wilson?',a:['Seahawks','Broncos','Packers','Raiders'],c:0},
+    {q:'Who won Super Bowl XLIII MVP?',a:['Santonio Holmes','Ben Roethlisberger','James Harrison','Larry Fitzgerald'],c:0},
+    {q:'Which team drafted Adrian Peterson?',a:['Vikings','Bears','Cardinals','Lions'],c:0},
+    {q:'Who was drafted first overall in 2007?',a:['JaMarcus Russell','Calvin Johnson','Joe Thomas','Adrian Peterson'],c:0},
+    {q:'Which franchise drafted Larry Fitzgerald?',a:['Cardinals','Vikings','Steelers','49ers'],c:0},
+    {q:'Who won the 2006 AP NFL MVP award?',a:['LaDainian Tomlinson','Peyton Manning','Drew Brees','Larry Johnson'],c:0},
+    {q:'Which team drafted Drew Brees?',a:['Chargers','Saints','Dolphins','Cowboys'],c:0},
+    {q:'Which school did Joe Burrow finish his college career at?',a:['LSU','Ohio State','Alabama','Clemson'],c:0},
+    {q:'Who was selected first overall in the 2020 NFL Draft?',a:['Joe Burrow','Chase Young','Tua Tagovailoa','Justin Herbert'],c:0},
+    {q:'Which team drafted Justin Herbert?',a:['Chargers','Dolphins','Bengals','Raiders'],c:0},
+    {q:'Who won AP Offensive Player of the Year for the 2022 season?',a:['Justin Jefferson','Patrick Mahomes','Jalen Hurts','Tyreek Hill'],c:0},
+    {q:'Which franchise drafted Davante Adams in 2014?',a:['Packers','Raiders','49ers','Broncos'],c:0},
+    {q:'Which team drafted T.J. Watt?',a:['Steelers','Packers','Cowboys','Texans'],c:0},
+    {q:'Who was selected third overall in the 2018 NFL Draft?',a:['Sam Darnold','Josh Allen','Baker Mayfield','Saquon Barkley'],c:0},
+    {q:'Which team drafted Nick Bosa?',a:['49ers','Chargers','Raiders','Cardinals'],c:0},
+    {q:'Who was the second overall pick in the 2019 NFL Draft?',a:['Nick Bosa','Quinnen Williams','Josh Allen','Devin White'],c:0},
+    {q:'Which franchise drafted Josh Jacobs?',a:['Raiders','Packers','Chiefs','Broncos'],c:0},
+    {q:'Which school did Lamar Jackson attend?',a:['Louisville','Clemson','Florida State','Miami'],c:0},
+    {q:'Who won the Heisman Trophy in 2016 before becoming an NFL quarterback?',a:['Lamar Jackson','Deshaun Watson','Baker Mayfield','Patrick Mahomes'],c:0},
+    {q:'Which team drafted Deebo Samuel?',a:['49ers','Panthers','Raiders','Titans'],c:0},
+    {q:'Which school did CeeDee Lamb attend?',a:['Oklahoma','Texas','TCU','Baylor'],c:0},
+    {q:'Which team drafted CeeDee Lamb?',a:['Cowboys','Eagles','Giants','Raiders'],c:0},
+    {q:'Which franchise drafted Justin Jefferson?',a:['Vikings','Eagles','Bills','Saints'],c:0},
+    {q:'Who was selected immediately before Justin Jefferson in the 2020 first round?',a:['Jalen Reagor','Brandon Aiyuk','CeeDee Lamb','Henry Ruggs III'],c:0},
+    {q:'Which team drafted Amon-Ra St. Brown?',a:['Lions','Bears','Packers','Vikings'],c:0},
+    {q:'Which school did Amon-Ra St. Brown attend?',a:['USC','UCLA','Oregon','Stanford'],c:0},
+    {q:'Who was the first tight end selected in the 2021 NFL Draft?',a:['Kyle Pitts','Pat Freiermuth','Tommy Tremble','Hunter Long'],c:0},
+    {q:'Which team drafted Kyle Pitts?',a:['Falcons','Dolphins','Panthers','Bengals'],c:0},
+    {q:'Which team drafted Mark Andrews?',a:['Ravens','Chiefs','Cardinals','Browns'],c:0},
+    {q:'Which school did Travis Kelce attend?',a:['Cincinnati','Ohio State','Miami (OH)','Louisville'],c:0},
+    {q:'Which franchise drafted George Kittle in the fifth round?',a:['49ers','Seahawks','Packers','Chiefs'],c:0},
+    {q:'Who won Super Bowl LV MVP?',a:['Tom Brady','Rob Gronkowski','Devin White','Leonard Fournette'],c:0},
+    {q:'Which team drafted Mike Evans?',a:['Buccaneers','Texans','Titans','Bills'],c:0},
+    {q:'Which school did Mike Evans attend?',a:['Texas A&M','Texas','Baylor','TCU'],c:0},
+    {q:'Which team drafted Cooper Kupp?',a:['Rams','Seahawks','49ers','Bengals'],c:0},
+    {q:'Which school did Cooper Kupp attend?',a:['Eastern Washington','Washington State','Washington','Boise State'],c:0},
+    {q:'Which team drafted Puka Nacua?',a:['Rams','Chargers','Seahawks','Raiders'],c:0},
+    {q:'Which school did Puka Nacua finish his college career at?',a:['BYU','Utah','USC','Oregon'],c:0},
+    {q:'Which franchise drafted Breece Hall?',a:['Jets','Bills','Bears','Texans'],c:0},
+    {q:'Which school did Breece Hall attend?',a:['Iowa State','Iowa','Kansas State','Oklahoma State'],c:0},
+    {q:'Which team drafted Jahmyr Gibbs?',a:['Lions','Falcons','Panthers','Bengals'],c:0},
+    {q:'Which school did Jahmyr Gibbs finish his college career at?',a:['Alabama','Georgia Tech','Georgia','Auburn'],c:0},
+    {q:'Which franchise drafted Bijan Robinson?',a:['Falcons','Cowboys','Texans','Cardinals'],c:0},
+    {q:'Which school did Bijan Robinson attend?',a:['Texas','Texas A&M','Oklahoma','TCU'],c:0},
+    {q:'Which team drafted Jonathan Taylor?',a:['Colts','Packers','Bills','Dolphins'],c:0},
+    {q:'Which school did Jonathan Taylor attend?',a:['Wisconsin','Michigan','Iowa','Minnesota'],c:0},
+    {q:'Which franchise drafted Derrick Henry?',a:['Titans','Jaguars','Cowboys','Ravens'],c:0},
+    {q:'Who won the 2020 AP Offensive Player of the Year award?',a:['Derrick Henry','Aaron Rodgers','Davante Adams','Patrick Mahomes'],c:0},
+    {q:'Which team drafted Myles Garrett?',a:['Browns','Texans','49ers','Bears'],c:0},
+    {q:'Which school did Myles Garrett attend?',a:['Texas A&M','Texas','Alabama','LSU'],c:0},
+    {q:'Which team drafted Micah Parsons?',a:['Cowboys','Giants','Eagles','Washington'],c:0},
+    {q:'Which school did Micah Parsons attend?',a:['Penn State','Ohio State','Michigan','Pittsburgh'],c:0},
+    {q:'Which franchise drafted Sauce Gardner?',a:['Jets','Giants','Lions','Texans'],c:0},
+    {q:'Which school did Sauce Gardner attend?',a:['Cincinnati','Ohio State','Michigan','Louisville'],c:0},
+    {q:'Which team drafted Patrick Surtain II?',a:['Broncos','Dolphins','Cowboys','Raiders'],c:0},
+    {q:'Which school did Patrick Surtain II attend?',a:['Alabama','LSU','Georgia','Florida'],c:0},
+    {q:'Which franchise drafted Maxx Crosby?',a:['Raiders','Lions','Bears','Packers'],c:0},
+    {q:'Which school did Maxx Crosby attend?',a:['Eastern Michigan','Michigan','Michigan State','Toledo'],c:0},
+    {q:'Who won Super Bowl LVII MVP?',a:['Patrick Mahomes','Jalen Hurts','Travis Kelce','Chris Jones'],c:0},
+    {q:'Who won Super Bowl LVIII MVP?',a:['Patrick Mahomes','Brock Purdy','Travis Kelce','Chris Jones'],c:0}
+  ];
+  for (var i=0;i<more.length;i++) TURF_H2H_TRIVIA_.push(more[i]);
+})();
+
+/* Defensive state sanitizer used by polling/init callers. */
+function turfH2HV8940SanitizeState_(st) {
+  if (!st || typeof st !== 'object') return st;
+  if (!st.players) st.players = {A:{name:'Player A'},B:{name:'Player B'}};
+  if (!st.players.A) st.players.A={name:'Player A'};
+  if (!st.players.B) st.players.B={name:'Player B'};
+  if (st.turn !== 'A' && st.turn !== 'B') st.turn = (Math.random()<0.5?'A':'B');
+  if (!Array.isArray(st.usedQuestions)) st.usedQuestions=[];
+  if (!st.status) st.status='active';
+  if (!st.moveNo) st.moveNo=0;
+  return st;
+}
+
+function turfH2HV8940QuestionCount() {
+  return {ok:true,count:(typeof TURF_H2H_TRIVIA_!=='undefined'&&Array.isArray(TURF_H2H_TRIVIA_)?TURF_H2H_TRIVIA_.length:0)};
+}
