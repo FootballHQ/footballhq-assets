@@ -1,0 +1,209 @@
+/* TURF V89.37 — H2H GAMEPLAY BACKEND EXTENSION
+   Paste BELOW the existing v89.30 matchmaking backend in Code.gs.
+   Adds synchronized Trivia Tac Toe, 4 in a Row, and Cases match state.
+*/
+var TURF_H2H_GAME_TTL_MS_ = 45 * 60 * 1000;
+var TURF_H2H_GAME_PREFIX_ = 'TURF_H2H_GAME_V8937_';
+
+var TURF_H2H_TRIVIA_ = [
+ {q:'Which franchise drafted Brett Favre?',a:['Atlanta Falcons','Green Bay Packers','New York Jets','Minnesota Vikings'],c:0},
+ {q:'Which team selected Eli Manning first overall in 2004 before trading him?',a:['New York Giants','San Diego Chargers','Oakland Raiders','Arizona Cardinals'],c:1},
+ {q:'Who was the first defensive player selected in the 2014 NFL Draft?',a:['Khalil Mack','Jadeveon Clowney','Aaron Donald','Anthony Barr'],c:1},
+ {q:'Which quarterback was drafted 199th overall in 2000?',a:['Drew Brees','Tom Brady','Marc Bulger','Matt Hasselbeck'],c:1},
+ {q:'Which team drafted Davante Adams?',a:['Raiders','Packers','Rams','49ers'],c:1},
+ {q:'Which school did Patrick Mahomes attend?',a:['Texas','Texas Tech','TCU','Oklahoma'],c:1},
+ {q:'Which franchise drafted Randy Moss?',a:['Vikings','Raiders','Patriots','Titans'],c:0},
+ {q:'Who won Super Bowl XLVIII MVP?',a:['Russell Wilson','Kam Chancellor','Malcolm Smith','Marshawn Lynch'],c:2},
+ {q:'Which player recorded 22.5 sacks in the 2021 season?',a:['T.J. Watt','Myles Garrett','Nick Bosa','Micah Parsons'],c:0},
+ {q:'Which team drafted Aaron Rodgers?',a:['49ers','Packers','Jets','Raiders'],c:1},
+ {q:'Which player was drafted immediately before Patrick Mahomes in 2017?',a:['Christian McCaffrey','John Ross','Marshon Lattimore','Deshaun Watson'],c:1},
+ {q:'Which school produced both Joe Burrow and Ja\'Marr Chase?',a:['Alabama','LSU','Ohio State','Clemson'],c:1},
+ {q:'Who was the No. 1 overall pick in the 2018 NFL Draft?',a:['Saquon Barkley','Baker Mayfield','Sam Darnold','Josh Allen'],c:1},
+ {q:'Which team originally drafted Drew Brees?',a:['Saints','Chargers','Dolphins','Cowboys'],c:1},
+ {q:'Which receiver won the Triple Crown in 2021?',a:['Davante Adams','Cooper Kupp','Justin Jefferson','Tyreek Hill'],c:1},
+ {q:'Which quarterback started Super Bowl 50 for Carolina?',a:['Cam Newton','Jake Delhomme','Teddy Bridgewater','Sam Darnold'],c:0},
+ {q:'Which team selected Lamar Jackson in the 2018 draft?',a:['Ravens','Bills','Jets','Browns'],c:0},
+ {q:'Who was selected directly after Baker Mayfield in the 2018 draft?',a:['Sam Darnold','Saquon Barkley','Denzel Ward','Bradley Chubb'],c:1},
+ {q:'Which player was the 2012 AP NFL MVP?',a:['Peyton Manning','Adrian Peterson','Aaron Rodgers','Tom Brady'],c:1},
+ {q:'Which franchise drafted Rob Gronkowski?',a:['Buccaneers','Patriots','Cardinals','Bills'],c:1},
+ {q:'Which team did Marshawn Lynch begin his NFL career with?',a:['Seahawks','Bills','Raiders','Packers'],c:1},
+ {q:'Who led the NFL in rushing yards in 2020?',a:['Derrick Henry','Dalvin Cook','Nick Chubb','Jonathan Taylor'],c:0},
+ {q:'Which team drafted Julio Jones?',a:['Falcons','Browns','Titans','Alabama'],c:0},
+ {q:'Which franchise selected Matthew Stafford first overall?',a:['Rams','Lions','Browns','Raiders'],c:1},
+ {q:'Which defensive player won Super Bowl 50 MVP?',a:['Von Miller','Luke Kuechly','Aqib Talib','DeMarcus Ware'],c:0},
+ {q:'Which player was drafted 10th overall in 2017?',a:['Patrick Mahomes','Deshaun Watson','Mitchell Trubisky','Christian McCaffrey'],c:0},
+ {q:'Which team did Kurt Warner win Super Bowl XXXIV with?',a:['Cardinals','Rams','Giants','Packers'],c:1},
+ {q:'Which team drafted Jalen Hurts?',a:['Eagles','Cowboys','Commanders','Ravens'],c:0},
+ {q:'Who was the first wide receiver selected in the 2020 NFL Draft?',a:['Justin Jefferson','CeeDee Lamb','Henry Ruggs III','Jerry Jeudy'],c:2},
+ {q:'Which school did Josh Allen attend?',a:['Wyoming','Boise State','Utah State','Colorado State'],c:0},
+ {q:'Which franchise drafted Travis Kelce?',a:['Chiefs','Eagles','Bengals','Browns'],c:0},
+ {q:'Who was Super Bowl XLIX MVP?',a:['Tom Brady','Julian Edelman','Malcolm Butler','Rob Gronkowski'],c:0},
+ {q:'Which team drafted Christian McCaffrey?',a:['49ers','Panthers','Broncos','Colts'],c:1},
+ {q:'Which quarterback was selected third overall in 2021?',a:['Zach Wilson','Trey Lance','Justin Fields','Mac Jones'],c:1},
+ {q:'Which team drafted DK Metcalf?',a:['Seahawks','Titans','Ravens','Packers'],c:0},
+ {q:'Who won the 2015 NFL MVP award?',a:['Cam Newton','Tom Brady','Carson Palmer','Adrian Peterson'],c:0},
+ {q:'Which franchise drafted Tyreek Hill?',a:['Chiefs','Dolphins','Jets','Chargers'],c:0},
+ {q:'Which team did Peyton Manning finish his career with?',a:['Colts','Broncos','Titans','Cardinals'],c:1},
+ {q:'Who was selected No. 2 overall in the 2020 NFL Draft?',a:['Chase Young','Joe Burrow','Jeff Okudah','Tua Tagovailoa'],c:0},
+ {q:'Which team drafted George Kittle?',a:['49ers','Chiefs','Bears','Packers'],c:0},
+ {q:'Which player won Offensive Rookie of the Year in 2020?',a:['Justin Herbert','Joe Burrow','Justin Jefferson','Jonathan Taylor'],c:0},
+ {q:'Which franchise drafted Micah Parsons?',a:['Cowboys','Giants','Eagles','Steelers'],c:0},
+ {q:'Which team selected Calvin Johnson second overall in 2007?',a:['Raiders','Lions','Browns','Falcons'],c:1},
+ {q:'Who was the first overall pick in 2005?',a:['Aaron Rodgers','Alex Smith','Ronnie Brown','Braylon Edwards'],c:1},
+ {q:'Which quarterback was drafted by the Chargers in 2004 and immediately traded to the Giants?',a:['Philip Rivers','Eli Manning','Ben Roethlisberger','J.P. Losman'],c:1},
+ {q:'Which team drafted Terrell Owens?',a:['49ers','Eagles','Cowboys','Bills'],c:0},
+ {q:'Which player won Super Bowl LVI MVP?',a:['Matthew Stafford','Aaron Donald','Cooper Kupp','Odell Beckham Jr.'],c:2},
+ {q:'Which team drafted A.J. Brown?',a:['Titans','Eagles','Ravens','Colts'],c:0},
+ {q:'Which school did Justin Jefferson attend?',a:['LSU','Alabama','Ohio State','Clemson'],c:0},
+ {q:'Which franchise drafted Derrick Henry?',a:['Titans','Ravens','Jaguars','Cowboys'],c:0},
+ {q:'Who won the 2019 NFL MVP?',a:['Patrick Mahomes','Lamar Jackson','Russell Wilson','Christian McCaffrey'],c:1},
+ {q:'Which team selected Sauce Gardner fourth overall in 2022?',a:['Jets','Giants','Texans','Lions'],c:0},
+ {q:'Who was the first quarterback selected in the 2017 NFL Draft?',a:['Patrick Mahomes','Deshaun Watson','Mitchell Trubisky','DeShone Kizer'],c:2},
+ {q:'Which team drafted Stefon Diggs?',a:['Vikings','Bills','Texans','Patriots'],c:0},
+ {q:'Which player was drafted fifth overall in 2021?',a:['Ja\'Marr Chase','Jaylen Waddle','Kyle Pitts','Penei Sewell'],c:0},
+ {q:'Which team selected Myles Garrett first overall?',a:['Browns','Texans','Jets','Bears'],c:0},
+ {q:'Who won Super Bowl LI MVP?',a:['Tom Brady','James White','Julio Jones','Matt Ryan'],c:0},
+ {q:'Which franchise drafted DeAndre Hopkins?',a:['Texans','Cardinals','Titans','Chiefs'],c:0},
+ {q:'Which quarterback was the 32nd and final pick of the 2018 first round?',a:['Lamar Jackson','Josh Rosen','Baker Mayfield','Josh Allen'],c:0},
+ {q:'Which player won the 2022 AP NFL MVP?',a:['Jalen Hurts','Patrick Mahomes','Josh Allen','Justin Jefferson'],c:1}
+];
+
+var TURF_CASE_POOLS_ = {
+ RB:[['Jahmyr Gibbs',21.6],['Bijan Robinson',20.8],['Saquon Barkley',19.7],['Josh Jacobs',17.6],['Breece Hall',16.9],['James Cook',16.1],['Kyren Williams',15.8],['David Montgomery',13.4],['Rachaad White',10.6],['Sean Tucker',2.2],['De\'Von Achane',18.8],['Jonathan Taylor',18.1]],
+ WR:[['Ja\'Marr Chase',20.9],['Justin Jefferson',20.3],['CeeDee Lamb',19.4],['Amon-Ra St. Brown',18.7],['Puka Nacua',18.2],['Nico Collins',16.8],['A.J. Brown',16.3],['Drake London',15.7],['Terry McLaurin',13.1],['Jalen Nailor',7.4],['Mike Evans',14.9],['Garrett Wilson',14.3]],
+ TE:[['Brock Bowers',15.8],['Trey McBride',15.0],['George Kittle',13.7],['Travis Kelce',12.9],['Sam LaPorta',12.4],['Mark Andrews',11.8],['T.J. Hockenson',11.3],['Dallas Goedert',10.6],['Dalton Kincaid',9.8],['Chig Okonkwo',7.1],['Kyle Pitts',10.2],['Jake Ferguson',9.5]],
+ QB:[['Josh Allen',24.8],['Lamar Jackson',24.2],['Jalen Hurts',23.5],['Jayden Daniels',22.9],['Patrick Mahomes',22.5],['Joe Burrow',21.8],['Caleb Williams',20.4],['Justin Herbert',19.9],['Baker Mayfield',18.8],['Bryce Young',15.1],['Drake Maye',19.2],['C.J. Stroud',18.3]]
+};
+
+function turfH2HGameInit(matchId, gameId, slot, username) {
+  return turfH2HWithGameLock_(function(){
+    var st=turfH2HLoadGame_(matchId);
+    if(!st){ st=turfH2HNewGame_(matchId,gameId); }
+    if(st.gameId!==String(gameId||'')) return {ok:false,error:'wrong_game'};
+    slot=turfH2HSlot_(slot); if(!slot) return {ok:false,error:'bad_slot'};
+    st.players[slot].name=turfH2HSafeName_(username,slot);
+    st.players[slot].ready=true;
+    st.updatedAt=Date.now();
+    turfH2HSaveGame_(st);
+    return turfH2HPublicGame_(st,slot);
+  });
+}
+function turfH2HGamePoll(matchId, slot){
+  var st=turfH2HLoadGame_(matchId); if(!st)return {ok:false,error:'missing_match'};
+  slot=turfH2HSlot_(slot); if(!slot)return {ok:false,error:'bad_slot'};
+  return turfH2HPublicGame_(st,slot);
+}
+function turfH2HGameChooseMove(matchId, slot, move){
+  return turfH2HWithGameLock_(function(){
+    var st=turfH2HLoadGame_(matchId); slot=turfH2HSlot_(slot);
+    if(!st||!slot)return {ok:false,error:'missing'};
+    if(st.status!=='active'||st.turn!==slot)return {ok:false,error:'not_your_turn'};
+    if(st.pending)return {ok:false,error:'question_pending'};
+    if(st.gameId==='ttt'){
+      move=Number(move); if(move<0||move>8||st.board[move])return {ok:false,error:'bad_move'};
+    }else if(st.gameId==='connect4'){
+      move=Number(move); if(move<0||move>6||st.board[0][move])return {ok:false,error:'bad_move'};
+    }else return {ok:false,error:'wrong_game'};
+    var qu=turfH2HPickQuestion_(st);
+    st.pending={slot:slot,move:move,qid:qu.id}; st.updatedAt=Date.now(); turfH2HSaveGame_(st);
+    return turfH2HPublicGame_(st,slot);
+  });
+}
+function turfH2HGameAnswer(matchId, slot, answerIndex){
+  return turfH2HWithGameLock_(function(){
+    var st=turfH2HLoadGame_(matchId); slot=turfH2HSlot_(slot);
+    if(!st||!slot||!st.pending||st.pending.slot!==slot)return {ok:false,error:'no_question'};
+    var qu=TURF_H2H_TRIVIA_[Number(st.pending.qid)]; if(!qu)return {ok:false,error:'bad_question'};
+    var correct=Number(answerIndex)===Number(qu.c);
+    if(correct){
+      if(st.gameId==='ttt') st.board[Number(st.pending.move)]=slot;
+      if(st.gameId==='connect4') turfH2HDrop_(st.board,Number(st.pending.move),slot);
+    }
+    st.lastResult={slot:slot,correct:correct,question:qu.q};
+    st.pending=null; st.moveNo++;
+    var winner=turfH2HWinner_(st);
+    if(winner){st.status='finished';st.winner=winner;}
+    else if(turfH2HBoardFull_(st)){st.status='finished';st.winner='DRAW';}
+    else st.turn=(slot==='A'?'B':'A');
+    st.updatedAt=Date.now(); turfH2HSaveGame_(st);
+    var out=turfH2HPublicGame_(st,slot); out.answerCorrect=correct; return out;
+  });
+}
+
+function turfH2HCasesAction(matchId, slot, action, value){
+ return turfH2HWithGameLock_(function(){
+  var st=turfH2HLoadGame_(matchId); slot=turfH2HSlot_(slot);
+  if(!st||st.gameId!=='deal'||!slot)return {ok:false,error:'missing'};
+  if(st.status!=='active'||st.turn!==slot)return {ok:false,error:'not_your_turn'};
+  var p=st.cases[slot]; action=String(action||'');
+  if(action==='choose'){
+    var n=Number(value); if(p.myCase||n<1||n>10||p.opened[n])return {ok:false,error:'bad_case'}; p.myCase=n;
+  } else if(action==='open'){
+    var c=Number(value); if(!p.myCase||p.offer||p.finalChoice||c<1||c>10||c===p.myCase||p.opened[c])return {ok:false,error:'bad_case'};
+    p.opened[c]=true; p.openedThisPhase++;
+    var needed=[3,3,2][Math.min(p.stage,2)];
+    if(p.openedThisPhase>=needed){p.offer=turfH2HMakeOffer_(st,p);p.openedThisPhase=0;}
+  } else if(action==='offer'){
+    if(!p.offer)return {ok:false,error:'no_offer'};
+    var accept=String(value)==='accept';
+    if(accept){p.lockedPlayer={name:p.offer.name,projection:p.offer.projection,source:'BANKER'};p.offer=null;p.complete=true;turfH2HAfterCasesTurn_(st,slot);}
+    else {p.offer=null;if(p.stage>=2){p.finalChoice=true;}else{p.stage++;turfH2HAfterCasesTurn_(st,slot);}}
+  } else if(action==='final'){
+    if(!p.finalChoice)return {ok:false,error:'no_final'};
+    var remaining=turfH2HRemainingCase_(p); var chosen=(String(value)==='swap'?remaining:p.myCase);
+    var card=p.mapping[chosen]; p.lockedPlayer={name:card.name,projection:card.projection,source:(chosen===p.myCase?'CASE':'SWAP')};p.finalChoice=false;p.complete=true;turfH2HAfterCasesTurn_(st,slot);
+  } else return {ok:false,error:'bad_action'};
+  st.updatedAt=Date.now();turfH2HSaveGame_(st);return turfH2HPublicGame_(st,slot);
+ });
+}
+
+function turfH2HNewGame_(matchId,gameId){
+ gameId=String(gameId||''); var first=Math.random()<.5?'A':'B';
+ var st={matchId:String(matchId),gameId:gameId,createdAt:Date.now(),updatedAt:Date.now(),players:{A:{name:'Player A',ready:false},B:{name:'Player B',ready:false}},turn:first,first:first,status:'active',winner:'',moveNo:0,pending:null,used:[],lastResult:null};
+ if(gameId==='ttt')st.board=['','','','','','','','',''];
+ if(gameId==='connect4')st.board=Array.from({length:6},function(){return ['','','','','','',''];});
+ if(gameId==='deal'){st.round=0;st.positions=['RB','WR','TE','QB'];st.lineups={A:[],B:[]};st.cases={A:turfH2HNewCasesPlayer_('RB'),B:turfH2HNewCasesPlayer_('RB')};}
+ return st;
+}
+function turfH2HNewCasesPlayer_(pos){
+ var pool=TURF_CASE_POOLS_[pos].slice();for(var i=pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=pool[i];pool[i]=pool[j];pool[j]=t;}pool=pool.slice(0,10);
+ var mapping={};for(var k=1;k<=10;k++)mapping[k]={name:pool[k-1][0],projection:pool[k-1][1]};
+ return {position:pos,mapping:mapping,myCase:0,opened:{},stage:0,openedThisPhase:0,offer:null,finalChoice:false,complete:false,lockedPlayer:null};
+}
+function turfH2HAfterCasesTurn_(st,slot){
+ var other=slot==='A'?'B':'A';
+ if(st.cases.A.complete&&st.cases.B.complete){
+  st.lineups.A.push(st.cases.A.lockedPlayer);st.lineups.B.push(st.cases.B.lockedPlayer);st.round++;
+  if(st.round>=st.positions.length){st.status='finished';var a=turfH2HLineupTotal_(st.lineups.A),b=turfH2HLineupTotal_(st.lineups.B);st.winner=a===b?'DRAW':(a>b?'A':'B');return;}
+  var pos=st.positions[st.round];st.cases.A=turfH2HNewCasesPlayer_(pos);st.cases.B=turfH2HNewCasesPlayer_(pos);st.turn=other;return;
+ }
+ st.turn=other;
+}
+function turfH2HMakeOffer_(st,p){
+ var vals=[];for(var k=1;k<=10;k++){if(!p.opened[k])vals.push(p.mapping[k].projection);}var avg=vals.reduce(function(a,b){return a+b;},0)/Math.max(1,vals.length);
+ var pos=p.position,pool=TURF_CASE_POOLS_[pos].filter(function(x){for(var k=1;k<=10;k++)if(p.mapping[k].name===x[0])return false;return true;});
+ pool.sort(function(a,b){return Math.abs(a[1]-avg)-Math.abs(b[1]-avg);});var pick=pool[Math.min(p.stage,pool.length-1)]||[pos+' Player',Math.round(avg*10)/10];
+ var factor=[.92,.98,1.0][Math.min(p.stage,2)];return {name:pick[0],projection:Math.round(Math.min(pick[1],avg*factor)*10)/10};
+}
+function turfH2HRemainingCase_(p){for(var k=1;k<=10;k++)if(k!==p.myCase&&!p.opened[k])return k;return p.myCase;}
+function turfH2HLineupTotal_(arr){return Math.round(arr.reduce(function(s,x){return s+Number(x.projection||0);},0)*10)/10;}
+function turfH2HPickQuestion_(st){
+ var avail=[];for(var i=0;i<TURF_H2H_TRIVIA_.length;i++)if(st.used.indexOf(i)<0)avail.push(i);if(!avail.length){st.used=[];for(var j=0;j<TURF_H2H_TRIVIA_.length;j++)avail.push(j);}var id=avail[Math.floor(Math.random()*avail.length)];st.used.push(id);return {id:id};
+}
+function turfH2HPublicGame_(st,slot){
+ var out=JSON.parse(JSON.stringify(st));
+ if(out.pending){var q=TURF_H2H_TRIVIA_[Number(out.pending.qid)];out.question=(out.pending.slot===slot?{q:q.q,a:q.a}:null);delete out.pending.qid;}else out.question=null;
+ if(out.cases){var other=slot==='A'?'B':'A';out.myCases=out.cases[slot];out.opponentCases=out.cases[other];delete out.cases;}
+ return {ok:true,state:out};
+}
+function turfH2HWinner_(st){if(st.gameId==='ttt'){var b=st.board,w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(var i=0;i<w.length;i++){var x=w[i];if(b[x[0]]&&b[x[0]]===b[x[1]]&&b[x[1]]===b[x[2]])return b[x[0]];}}
+ if(st.gameId==='connect4'){var g=st.board;for(var r=0;r<6;r++)for(var c=0;c<7;c++){var s=g[r][c];if(!s)continue;if(c<=3&&g[r][c+1]===s&&g[r][c+2]===s&&g[r][c+3]===s)return s;if(r<=2&&g[r+1][c]===s&&g[r+2][c]===s&&g[r+3][c]===s)return s;if(r<=2&&c<=3&&g[r+1][c+1]===s&&g[r+2][c+2]===s&&g[r+3][c+3]===s)return s;if(r>=3&&c<=3&&g[r-1][c+1]===s&&g[r-2][c+2]===s&&g[r-3][c+3]===s)return s;}}
+ return '';}
+function turfH2HBoardFull_(st){if(st.gameId==='ttt')return st.board.every(function(x){return !!x;});if(st.gameId==='connect4')return st.board[0].every(function(x){return !!x;});return false;}
+function turfH2HDrop_(g,col,slot){for(var r=5;r>=0;r--)if(!g[r][col]){g[r][col]=slot;return true;}return false;}
+function turfH2HSlot_(s){s=String(s||'').toUpperCase();return s==='A'||s==='B'?s:'';}
+function turfH2HSafeName_(n,s){n=String(n||'').replace(/[<>]/g,'').trim();return n.slice(0,28)||(s==='A'?'Player A':'Player B');}
+function turfH2HGameKey_(id){return TURF_H2H_GAME_PREFIX_+String(id||'').replace(/[^A-Za-z0-9_\-]/g,'').slice(0,80);}
+function turfH2HLoadGame_(id){try{var p=PropertiesService.getScriptProperties(),raw=p.getProperty(turfH2HGameKey_(id));if(!raw)return null;var st=JSON.parse(raw);if(Date.now()-Number(st.updatedAt||0)>TURF_H2H_GAME_TTL_MS_){p.deleteProperty(turfH2HGameKey_(id));return null;}return st;}catch(e){return null;}}
+function turfH2HSaveGame_(st){PropertiesService.getScriptProperties().setProperty(turfH2HGameKey_(st.matchId),JSON.stringify(st));}
+function turfH2HWithGameLock_(fn){var l=LockService.getScriptLock();if(!l.tryLock(8000))return {ok:false,error:'busy'};try{return fn();}finally{l.releaseLock();}}
