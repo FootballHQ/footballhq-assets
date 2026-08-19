@@ -1,0 +1,199 @@
+/* ============================================================
+   TURF V89.30 — APPS SCRIPT H2H MATCHMAKING BACKEND
+   Paste into Code.gs (top-level, not inside another function).
+
+   Client functions expected:
+     turfH2HJoinOrPoll(gameId, token)
+     turfH2HCancel(token)
+   ============================================================ */
+
+var TURF_H2H_ALLOWED_GAMES_ = {
+  deal: 'Cases',
+  ttt: 'Trivia Tac Toe',
+  connect4: '4 in a Row'
+};
+var TURF_H2H_WAIT_TTL_MS_ = 30000;   // abandoned searches disappear quickly
+var TURF_H2H_MATCH_TTL_MS_ = 120000; // keep a completed pairing long enough for both clients to receive it
+
+function turfH2HJoinOrPoll(gameId, token) {
+  gameId = String(gameId || '').trim().toLowerCase();
+  token = String(token || '').trim();
+  if (!TURF_H2H_ALLOWED_GAMES_[gameId]) {
+    return { ok:false, matched:false, error:'invalid_game' };
+  }
+  if (!/^h2h_[A-Za-z0-9_\-]{8,100}$/.test(token)) {
+    return { ok:false, matched:false, error:'invalid_token' };
+  }
+
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(8000)) {
+    return { ok:false, matched:false, retry:true, error:'queue_busy' };
+  }
+
+  try {
+    var now = Date.now();
+    var props = PropertiesService.getScriptProperties();
+    var key = turfH2HQueueKey_(gameId);
+    var queue = turfH2HReadQueue_(props, key);
+
+    // Remove searches that stopped polling, and old delivered matches.
+    queue = queue.filter(function(p) {
+      var age = now - Number(p.lastSeen || p.joinedAt || 0);
+      return p.matchId ? age <= TURF_H2H_MATCH_TTL_MS_ : age <= TURF_H2H_WAIT_TTL_MS_;
+    });
+
+    var me = null;
+    for (var i = 0; i < queue.length; i++) {
+      if (queue[i].token === token) { me = queue[i]; break; }
+    }
+
+    // If this browser has already been paired, simply return its match.
+    if (me && me.matchId) {
+      me.lastSeen = now;
+      turfH2HWriteQueue_(props, key, queue);
+      return turfH2HMatchResponse_(me);
+    }
+
+    // First poll from this search: enter the queue.
+    if (!me) {
+      me = {
+        token: token,
+        gameId: gameId,
+        joinedAt: now,
+        lastSeen: now,
+        status: 'waiting',
+        matchId: '',
+        opponentToken: '',
+        playerSlot: ''
+      };
+      queue.push(me);
+    } else {
+      me.lastSeen = now;
+      me.status = 'waiting';
+    }
+
+    // Find the oldest OTHER live player waiting for the same game.
+    var opponent = null;
+    for (var j = 0; j < queue.length; j++) {
+      var p = queue[j];
+      if (p.token === token) continue;
+      if (p.matchId || p.status !== 'waiting') continue;
+      if ((now - Number(p.lastSeen || 0)) > TURF_H2H_WAIT_TTL_MS_) continue;
+      if (!opponent || Number(p.joinedAt) < Number(opponent.joinedAt)) opponent = p;
+    }
+
+    if (opponent) {
+      var matchId = 'match_' + Utilities.getUuid().replace(/-/g, '').slice(0, 20);
+      opponent.matchId = matchId;
+      opponent.opponentToken = token;
+      opponent.playerSlot = 'A';
+      opponent.status = 'matched';
+      opponent.lastSeen = now;
+
+      me.matchId = matchId;
+      me.opponentToken = opponent.token;
+      me.playerSlot = 'B';
+      me.status = 'matched';
+      me.lastSeen = now;
+
+      turfH2HWriteQueue_(props, key, queue);
+      return turfH2HMatchResponse_(me);
+    }
+
+    turfH2HWriteQueue_(props, key, queue);
+    return {
+      ok:true,
+      matched:false,
+      gameId:gameId,
+      waiting:true,
+      queueSize:turfH2HWaitingCount_(queue),
+      waitedMs:Math.max(0, now - Number(me.joinedAt || now))
+    };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function turfH2HCancel(token) {
+  token = String(token || '').trim();
+  if (!token) return { ok:true, removed:false };
+
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(8000)) return { ok:false, retry:true };
+
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var removed = false;
+    Object.keys(TURF_H2H_ALLOWED_GAMES_).forEach(function(gameId) {
+      var key = turfH2HQueueKey_(gameId);
+      var queue = turfH2HReadQueue_(props, key);
+      var next = queue.filter(function(p) {
+        if (p.token === token && !p.matchId) { removed = true; return false; }
+        return true;
+      });
+      if (next.length !== queue.length) turfH2HWriteQueue_(props, key, next);
+    });
+    return { ok:true, removed:removed };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// Optional admin/debug helper. Safe to run manually from Apps Script editor.
+function turfH2HDebugQueues() {
+  var props = PropertiesService.getScriptProperties();
+  var out = {};
+  Object.keys(TURF_H2H_ALLOWED_GAMES_).forEach(function(gameId) {
+    out[gameId] = turfH2HReadQueue_(props, turfH2HQueueKey_(gameId));
+  });
+  Logger.log(JSON.stringify(out, null, 2));
+  return out;
+}
+
+// Optional emergency reset if testing leaves old queue state behind.
+function turfH2HResetQueues() {
+  var props = PropertiesService.getScriptProperties();
+  Object.keys(TURF_H2H_ALLOWED_GAMES_).forEach(function(gameId) {
+    props.deleteProperty(turfH2HQueueKey_(gameId));
+  });
+  return { ok:true };
+}
+
+function turfH2HQueueKey_(gameId) {
+  return 'TURF_H2H_QUEUE_V8930_' + String(gameId).toUpperCase();
+}
+
+function turfH2HReadQueue_(props, key) {
+  try {
+    var raw = props.getProperty(key);
+    if (!raw) return [];
+    var parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function turfH2HWriteQueue_(props, key, queue) {
+  props.setProperty(key, JSON.stringify(queue.slice(-40)));
+}
+
+function turfH2HWaitingCount_(queue) {
+  var n = 0;
+  for (var i = 0; i < queue.length; i++) {
+    if (!queue[i].matchId && queue[i].status === 'waiting') n++;
+  }
+  return n;
+}
+
+function turfH2HMatchResponse_(me) {
+  return {
+    ok:true,
+    matched:true,
+    gameId:me.gameId,
+    matchId:me.matchId,
+    opponentId:me.opponentToken,
+    opponentName:'TURF Opponent',
+    playerSlot:me.playerSlot || ''
+  };
+}
