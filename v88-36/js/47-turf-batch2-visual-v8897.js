@@ -1,13 +1,13 @@
 /* ============================================================
    TURF V88.97 — BATCH 2 VISUAL ENTRYPOINT
-   v89.34 FINAL LOGO AUTHORITY
+   v89.35 LOGO SIZE + TOP-RIGHT TARGET FIX
 
    Authentication/account logic unchanged.
    ============================================================ */
 (function(){
 'use strict';
-if(window.__TURF_V8897_ENTRY_8934__)return;
-window.__TURF_V8897_ENTRY_8934__=true;
+if(window.__TURF_V8897_ENTRY_8935__)return;
+window.__TURF_V8897_ENTRY_8935__=true;
 
 function load(src,key,next){
   if(document.querySelector('script[data-turf-visual="'+key+'"]')){if(next)next();return}
@@ -19,17 +19,17 @@ function load(src,key,next){
 }
 
 var B='https://footballhq.github.io/footballhq-assets/v88-36/js/';
-load(B+'88-turf-home2-v8918.js?v=8934','8918',function(){
-  load(B+'89-turf-home2b-v8919.js?v=8934','8919',function(){
-    load(B+'90-turf-favicon-v8920.js?v=8934','8920',function(){
-      load(B+'91-turf-auth-session-lock-v8921.js?v=8934','8921',function(){
-        load(B+'92-turf-auth-profile-authority-v8922.js?v=8934','8922',function(){
-          load(B+'93-turf-pass-authority-v8923.js?v=8934','8923',function(){
-            load(B+'96-turf-coin-ui-cleanup-v8928.js?v=8934','8928',function(){
-              load(B+'97-turf-visual-polish-v8929.js?v=8934','8929',function(){
-                load(B+'98-turf-visual-polish-v8930.js?v=8934','8930',function(){
-                  load(B+'99-turf-visual-cleanup-v8931.js?v=8934','8931',function(){
-                    load(B+'100-turf-final-logo-v8934.js?v=8934','8934');
+load(B+'88-turf-home2-v8918.js?v=8935','8918',function(){
+  load(B+'89-turf-home2b-v8919.js?v=8935','8919',function(){
+    load(B+'90-turf-favicon-v8920.js?v=8935','8920',function(){
+      load(B+'91-turf-auth-session-lock-v8921.js?v=8935','8921',function(){
+        load(B+'92-turf-auth-profile-authority-v8922.js?v=8935','8922',function(){
+          load(B+'93-turf-pass-authority-v8923.js?v=8935','8923',function(){
+            load(B+'96-turf-coin-ui-cleanup-v8928.js?v=8935','8928',function(){
+              load(B+'97-turf-visual-polish-v8929.js?v=8935','8929',function(){
+                load(B+'98-turf-visual-polish-v8930.js?v=8935','8930',function(){
+                  load(B+'99-turf-visual-cleanup-v8931.js?v=8935','8931',function(){
+                    load(B+'100-turf-final-logo-v8934.js?v=8935','8935');
                   });
                 });
               });
