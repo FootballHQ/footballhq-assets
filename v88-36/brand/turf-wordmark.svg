@@ -1,18 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 420" role="img" aria-label="TURF — Compete Collect Climb">
   <defs>
-    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#edf4fa"/><stop offset="0.72" stop-color="#9eb4c7"/><stop offset="1" stop-color="#ffffff"/>
+    <linearGradient id="silver" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.3" stop-color="#edf2f6"/>
+      <stop offset="0.58" stop-color="#aab5bf"/>
+      <stop offset="0.8" stop-color="#fbfcfd"/>
+      <stop offset="1" stop-color="#909ba6"/>
     </linearGradient>
     <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#62e6ff"/><stop offset="0.55" stop-color="#0b9cff"/><stop offset="1" stop-color="#2456ff"/>
+      <stop offset="0" stop-color="#3ad8ff"/>
+      <stop offset="0.5" stop-color="#079cff"/>
+      <stop offset="1" stop-color="#1458ff"/>
     </linearGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="b"/>
+      <feOffset dy="8" result="o"/>
+      <feColorMatrix in="o" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .62 0" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
-  <g transform="translate(34 28)">
-    <path d="M78 38h300l-27 88h-90l-66 220h-96l66-220H51z" fill="#06111c" stroke="url(#blue)" stroke-width="22" stroke-linejoin="round" filter="url(#glow)"/>
-    <path d="M78 38h300l-27 88h-90l-66 220h-96l66-220H51z" fill="url(#metal)" stroke="#0a1a29" stroke-width="8" stroke-linejoin="round"/>
-    <text x="390" y="250" fill="url(#metal)" stroke="#0a1a29" stroke-width="6" paint-order="stroke" font-family="Arial Black, Impact, sans-serif" font-size="235" font-style="italic" letter-spacing="-12">TURF</text>
-    <rect x="407" y="288" width="1000" height="56" rx="8" fill="#08131e" stroke="url(#blue)" stroke-width="3"/>
-    <text x="907" y="326" text-anchor="middle" fill="#f5f8fb" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" font-style="italic" letter-spacing="11">COMPETE • COLLECT • CLIMB</text>
+  <g transform="translate(36 26)" filter="url(#glow)">
+    <path d="M72 38h304l-30 92h-102l-64 216H90l64-216H42z" fill="#06101a" stroke="#02070b" stroke-width="24" stroke-linejoin="round"/>
+    <path d="M72 38h304l-30 92h-102l-64 216H90l64-216H42z" fill="#06101a" stroke="url(#blue)" stroke-width="16" stroke-linejoin="round"/>
+    <path d="M80 48h278l-20 62H226l-64 216h-49l64-216H62z" fill="url(#silver)" stroke="#111a22" stroke-width="6" stroke-linejoin="round"/>
+    <text x="410" y="250" fill="url(#silver)" stroke="#111a22" stroke-width="7" paint-order="stroke" font-family="Arial Black,Impact,sans-serif" font-size="228" font-style="italic" letter-spacing="-13">TURF</text>
+    <path d="M428 292h910" stroke="url(#blue)" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+    <text x="883" y="338" text-anchor="middle" fill="#22bfff" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="800" font-style="italic" letter-spacing="10">COMPETE • COLLECT • CLIMB</text>
   </g>
 </svg>
