@@ -1,22 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="TURF T mark">
   <defs>
-    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="silver" x1="0" y1="0" x2="0.9" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.42" stop-color="#eef5fb"/>
-      <stop offset="0.72" stop-color="#9fb4c8"/>
-      <stop offset="1" stop-color="#ffffff"/>
+      <stop offset="0.28" stop-color="#eef2f5"/>
+      <stop offset="0.55" stop-color="#aeb8c1"/>
+      <stop offset="0.78" stop-color="#f7f9fb"/>
+      <stop offset="1" stop-color="#8f9aa5"/>
     </linearGradient>
     <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#63e7ff"/>
-      <stop offset="0.55" stop-color="#0b9cff"/>
-      <stop offset="1" stop-color="#2356ff"/>
+      <stop offset="0" stop-color="#39d7ff"/>
+      <stop offset="0.5" stop-color="#079cff"/>
+      <stop offset="1" stop-color="#1458ff"/>
     </linearGradient>
-    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="10" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur"/>
+      <feOffset dx="0" dy="12" result="off"/>
+      <feColorMatrix in="off" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .65 0" result="shadow"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="glow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
-  <path d="M92 86h328l-30 96H294l-72 244h-104l72-244H62z" fill="#05101a" stroke="url(#blue)" stroke-width="30" stroke-linejoin="round" filter="url(#glow)"/>
-  <path d="M92 86h328l-30 96H294l-72 244h-104l72-244H62z" fill="url(#metal)" stroke="#0a1b2b" stroke-width="10" stroke-linejoin="round"/>
-  <path d="M104 108h278" stroke="#ffffff" stroke-opacity=".65" stroke-width="8" stroke-linecap="round"/>
+  <g filter="url(#shadow)">
+    <path d="M93 92h330l-34 104h-112l-66 224H112l66-224H58z" fill="#06101a" stroke="#02070b" stroke-width="28" stroke-linejoin="round"/>
+    <path d="M93 92h330l-34 104h-112l-66 224H112l66-224H58z" fill="#06101a" stroke="url(#blue)" stroke-width="18" stroke-linejoin="round"/>
+    <path d="M101 103h303l-23 70H258l-66 224h-55l66-224H80z" fill="url(#silver)" stroke="#111a22" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M111 118h266" stroke="#ffffff" stroke-opacity=".72" stroke-width="7" stroke-linecap="round"/>
+    <path d="M157 382 218 178" stroke="#ffffff" stroke-opacity=".18" stroke-width="7" stroke-linecap="round"/>
+  </g>
 </svg>
