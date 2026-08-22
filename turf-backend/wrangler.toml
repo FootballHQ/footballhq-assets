@@ -1,0 +1,12 @@
+name = "turf-api-migration"
+main = "src/index.js"
+compatibility_date = "2026-08-22"
+workers_dev = true
+
+# All real credentials stay in Cloudflare Worker secrets/vars.
+# Nothing here points production turftrials.com at this Worker.
+
+[vars]
+ALLOWED_ORIGINS = "https://turftrials.com,https://footballhq.github.io"
+ACCOUNTS_SHEET = "Accounts"
+AUTH_SHEET = "TURF_Auth"
