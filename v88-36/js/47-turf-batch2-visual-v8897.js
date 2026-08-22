@@ -1,15 +1,14 @@
 /* ============================================================
    TURF V88.97 — BATCH 2 VISUAL ENTRYPOINT
-   v89.39 APPROVED BRAND + FINAL FIX LAYER
+   v89.40 APPROVED BRAND + ACCOUNT CONTINUITY
 
    Authentication/account logic is protected by the auth authority layers.
-   Legacy visual layers load first; the exact approved TURF brand authority
-   and v89.39 final fixes load last so older renderers cannot overwrite them.
+   Profile/account surfaces are loaded before final visual/continuity guards.
    ============================================================ */
 (function(){
 'use strict';
-if(window.__TURF_V8897_ENTRY_8939__)return;
-window.__TURF_V8897_ENTRY_8939__=true;
+if(window.__TURF_V8897_ENTRY_8940__)return;
+window.__TURF_V8897_ENTRY_8940__=true;
 
 function load(src,key,next){
   if(document.querySelector('script[data-turf-visual="'+key+'"]')){if(next)next();return}
@@ -21,18 +20,22 @@ function load(src,key,next){
 }
 
 var B='https://footballhq.github.io/footballhq-assets/v88-36/js/';
-load(B+'88-turf-home2-v8918.js?v=8939','8918',function(){
-  load(B+'89-turf-home2b-v8919.js?v=8939','8919',function(){
-    load(B+'90-turf-favicon-v8920.js?v=8939','8920',function(){
-      load(B+'91-turf-auth-session-lock-v8921.js?v=8939','8921',function(){
-        load(B+'92-turf-auth-profile-authority-v8922.js?v=8939','8922',function(){
-          load(B+'93-turf-pass-authority-v8923.js?v=8939','8923',function(){
-            load(B+'96-turf-coin-ui-cleanup-v8928.js?v=8939','8928',function(){
-              load(B+'97-turf-visual-polish-v8929.js?v=8939','8929',function(){
-                load(B+'98-turf-visual-polish-v8930.js?v=8939','8930',function(){
-                  load(B+'99-turf-visual-cleanup-v8931.js?v=8939','8931',function(){
-                    load(B+'102-turf-approved-brand-v8937.js?v=8939','8937',function(){
-                      load(B+'103-turf-final-fixes-v8939.js?v=8939','8939');
+load(B+'88-turf-home2-v8918.js?v=8940','8918',function(){
+  load(B+'89-turf-home2b-v8919.js?v=8940','8919',function(){
+    load(B+'90-turf-favicon-v8920.js?v=8940','8920',function(){
+      load(B+'91-turf-auth-session-lock-v8921.js?v=8940','8921',function(){
+        load(B+'92-turf-auth-profile-authority-v8922.js?v=8940','8922',function(){
+          load(B+'93-turf-pass-authority-v8923.js?v=8940','8923',function(){
+            load(B+'94-turf-account-surfaces-authority-v8924.js?v=8940','8924',function(){
+              load(B+'96-turf-coin-ui-cleanup-v8928.js?v=8940','8928',function(){
+                load(B+'97-turf-visual-polish-v8929.js?v=8940','8929',function(){
+                  load(B+'98-turf-visual-polish-v8930.js?v=8940','8930',function(){
+                    load(B+'99-turf-visual-cleanup-v8931.js?v=8940','8931',function(){
+                      load(B+'102-turf-approved-brand-v8937.js?v=8940','8937',function(){
+                        load(B+'103-turf-final-fixes-v8939.js?v=8940','8939',function(){
+                          load(B+'104-turf-account-continuity-v8940.js?v=8940','8940');
+                        });
+                      });
                     });
                   });
                 });
