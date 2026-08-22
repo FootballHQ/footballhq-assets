@@ -1,14 +1,16 @@
 /* ============================================================
-   TURF v89.42 — SINGLE AUTH AUTHORITY + EXACT HERO EDGE
-   - The top-level turftrials.com wrapper owns Google sign-in.
-   - Disables the older Google button/gate inside the Apps Script iframe.
-   - Keeps the iframe auth bridge/backend handlers intact.
-   - Forces Home hero right edge to the exact Home content right edge.
+   TURF v89.46 — SINGLE AUTH UI WITHOUT BREAKING AUTH HANDLERS
+   - The top-level turftrials.com wrapper owns the visible Google sign-in.
+   - The older Google button/gate inside the Apps Script iframe stays hidden.
+   - IMPORTANT: do NOT monkeypatch google.accounts.id.initialize/renderButton/
+     prompt. The legacy iframe auth code still needs those APIs so its Google
+     credential/backend bridge can initialize and answer turf-auth-google.
+   - Keeps exact Home hero alignment behavior.
    ============================================================ */
 (function(){
 'use strict';
-if(window.__TURF_SINGLE_AUTH_HERO_8942__)return;
-window.__TURF_SINGLE_AUTH_HERO_8942__=true;
+if(window.__TURF_SINGLE_AUTH_HERO_8946__)return;
+window.__TURF_SINGLE_AUTH_HERO_8946__=true;
 
 function q(s,r){try{return (r||document).querySelector(s)}catch(e){return null}}
 
@@ -19,41 +21,23 @@ function hideLegacyInnerGate(){
     gate.classList.add('turf-auth-hidden');
     gate.setAttribute('aria-hidden','true');
     gate.style.setProperty('display','none','important');
+    gate.style.setProperty('visibility','hidden','important');
     gate.style.setProperty('pointer-events','none','important');
   }
   var btn=q('#turfGoogleButton');
   if(btn){
-    btn.innerHTML='';
-    btn.style.setProperty('display','none','important');
+    /* Hide the duplicate inner button visually, but leave its DOM and the
+       Google Identity API untouched so existing auth initialization can run. */
+    btn.style.setProperty('position','fixed','important');
+    btn.style.setProperty('left','-10000px','important');
+    btn.style.setProperty('top','-10000px','important');
+    btn.style.setProperty('width','1px','important');
+    btn.style.setProperty('height','1px','important');
+    btn.style.setProperty('overflow','hidden','important');
+    btn.style.setProperty('opacity','0','important');
+    btn.style.setProperty('pointer-events','none','important');
     btn.setAttribute('aria-hidden','true');
   }
-}
-
-/* This runs only inside the Apps Script iframe. The outer turftrials.com
-   page has its own separate window and keeps its Google button normally. */
-function disableInnerGoogleUI(){
-  try{
-    if(!window.google||!google.accounts||!google.accounts.id)return false;
-    var id=google.accounts.id;
-    if(id.__turf8942Disabled)return true;
-    id.__turf8942Disabled=true;
-    id.initialize=function(){};
-    id.renderButton=function(el){
-      try{if(el){el.innerHTML='';el.style.display='none';}}catch(e){}
-    };
-    id.prompt=function(){};
-    return true;
-  }catch(e){return false}
-}
-
-function armGoogleScript(){
-  try{
-    document.querySelectorAll('script[src*="accounts.google.com/gsi/client"]').forEach(function(s){
-      if(s.dataset.turf8942Armed==='1')return;
-      s.dataset.turf8942Armed='1';
-      s.addEventListener('load',function(){disableInnerGoogleUI();hideLegacyInnerGate()},{once:true});
-    });
-  }catch(e){}
 }
 
 function alignHero(){
@@ -75,12 +59,11 @@ function alignHero(){
   }catch(e){}
 }
 
-function run(){hideLegacyInnerGate();armGoogleScript();disableInnerGoogleUI();alignHero()}
+function run(){hideLegacyInnerGate();alignHero()}
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 [0,50,120,250,500,900,1500,2500,4000,6500].forEach(function(ms){setTimeout(run,ms)});
 window.addEventListener('resize',function(){setTimeout(alignHero,30);setTimeout(alignHero,180)});
-
 try{
   var timer=null;
   new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,25)}).observe(document.documentElement,{childList:true,subtree:true});
