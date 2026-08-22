@@ -1,6 +1,6 @@
 /* ============================================================
    TURF V88.97 — BATCH 2 VISUAL ENTRYPOINT
-   v89.57 SIGN-IN FIRST / CLEAN AUTH FLOW + LOCKED HERO + POLISHED BRAND/PROFILE
+   v89.58 SIGN-IN FIRST / CLEAN AUTH FLOW + LOCKED HERO + MEASURED BRAND FIT
 
    Auth behavior is unchanged from the working v89.48 flow.
    This file only adds a late presentation-only layout enforcement pass.
@@ -113,20 +113,36 @@ function enforceSidebarBrand(){
   var box=document.getElementById('fhqBrandHome');
   var img=document.getElementById('turfV8940SidebarLogo');
   if(!box||!img)return;
-  box.style.setProperty('height','122px','important');
-  box.style.setProperty('min-height','122px','important');
-  box.style.setProperty('padding','10px 12px','important');
+
+  /* Use the actual sidebar/brand-box dimensions instead of an arbitrary scale. */
+  var sidebar=document.getElementById('fhqSidebar');
+  var sr=sidebar?sidebar.getBoundingClientRect():null;
+  var current=box.getBoundingClientRect();
+  var boxW=Math.round((sr&&sr.width)||current.width||282);
+  var boxH=Math.round(current.height||122);
+  if(boxH<118)boxH=122;
+
+  box.style.setProperty('box-sizing','border-box','important');
+  box.style.setProperty('width','100%','important');
+  box.style.setProperty('height',boxH+'px','important');
+  box.style.setProperty('min-height',boxH+'px','important');
+  box.style.setProperty('padding','8px 9px','important');
   box.style.setProperty('overflow','hidden','important');
   box.style.setProperty('display','flex','important');
   box.style.setProperty('align-items','center','important');
   box.style.setProperty('justify-content','center','important');
+  box.style.setProperty('background','radial-gradient(circle at 34% 42%,rgba(18,108,157,.18),transparent 58%),linear-gradient(180deg,#061725 0%,#04131f 100%)','important');
+  box.style.setProperty('border-bottom','1px solid rgba(38,190,255,.16)','important');
+
   img.style.setProperty('display','block','important');
-  img.style.setProperty('width','100%','important');
-  img.style.setProperty('height','100%','important');
-  img.style.setProperty('max-width','none','important');
-  img.style.setProperty('max-height','none','important');
+  img.style.setProperty('box-sizing','border-box','important');
+  img.style.setProperty('width',Math.max(180,boxW-18)+'px','important');
+  img.style.setProperty('height',Math.max(76,boxH-16)+'px','important');
+  img.style.setProperty('max-width','calc(100% - 2px)','important');
+  img.style.setProperty('max-height','calc(100% - 2px)','important');
   img.style.setProperty('object-fit','contain','important');
-  img.style.setProperty('transform','scale(1.06)','important');
+  img.style.setProperty('object-position','center center','important');
+  img.style.setProperty('transform','translateX(-4px)','important');
   img.style.setProperty('transform-origin','center','important');
 }
 
@@ -147,10 +163,14 @@ function enforceProfile(){
   img.style.setProperty('height','34px','important');
   img.style.setProperty('object-fit','contain','important');
   img.style.setProperty('border-radius','11px','important');
-  img.style.setProperty('filter','drop-shadow(0 0 8px rgba(67,201,255,.20))','important');
+  img.style.setProperty('filter','drop-shadow(0 0 7px rgba(67,201,255,.16))','important');
+
+  /* Remove the redundant outer ring; the avatar tile already supplies its own edge. */
   btn.style.setProperty('background-image','none','important');
-  btn.style.setProperty('background','linear-gradient(160deg,#09283b,#061722)','important');
-  btn.style.setProperty('border-color','rgba(83,201,255,.48)','important');
+  btn.style.setProperty('background','transparent','important');
+  btn.style.setProperty('border','none','important');
+  btn.style.setProperty('box-shadow','none','important');
+  btn.style.setProperty('outline','none','important');
   btn.setAttribute('aria-label','Open profile');
 }
 
