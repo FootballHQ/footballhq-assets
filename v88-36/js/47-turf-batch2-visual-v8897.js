@@ -59,7 +59,8 @@ function load(src,key,next){
    Do NOT load 91/92/93/94/103/104/105/106/107 here. Those were layered auth
    persistence/recovery shims. Native Batch 1B auth already does the direct
    Google -> google.script.run -> turfBatch1GoogleSignIn flow and is the sole
-   authority now. Keep only presentation/branding cleanup. */
+   authority now. Keep only presentation/branding cleanup.
+   108 is presentation-only and does not touch auth/account state. */
 var B='https://footballhq.github.io/footballhq-assets/v88-36/js/';
 load(B+'88-turf-home2-v8918.js?v=8948','8918',function(){
   load(B+'89-turf-home2b-v8919.js?v=8948','8919',function(){
@@ -69,7 +70,9 @@ load(B+'88-turf-home2-v8918.js?v=8948','8918',function(){
           load(B+'98-turf-visual-polish-v8930.js?v=8948','8930',function(){
             load(B+'99-turf-visual-cleanup-v8931.js?v=8948','8931',function(){
               load(B+'102-turf-approved-brand-v8937.js?v=8948','8937',function(){
-                suppressOldRecovery();
+                load(B+'108-turf-layout-balance-v8954.js?v=8954','8954',function(){
+                  suppressOldRecovery();
+                });
               });
             });
           });
