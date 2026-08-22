@@ -1,42 +1,30 @@
 /* ============================================================
-   TURF v89.46 — SINGLE AUTH UI WITHOUT BREAKING AUTH HANDLERS
-   - The top-level turftrials.com wrapper owns the visible Google sign-in.
-   - The older Google button/gate inside the Apps Script iframe stays hidden.
-   - IMPORTANT: do NOT monkeypatch google.accounts.id.initialize/renderButton/
-     prompt. The legacy iframe auth code still needs those APIs so its Google
-     credential/backend bridge can initialize and answer turf-auth-google.
-   - Keeps exact Home hero alignment behavior.
+   TURF v89.47 — RESTORE NATIVE APPS SCRIPT AUTH
+   - Stop hiding the Apps Script auth gate and Google button.
+   - Let Google sign-in run in the same Apps Script frame that owns
+     google.script.run, removing the fragile cross-origin credential bridge.
+   - Keep exact Home hero alignment behavior after authentication.
    ============================================================ */
 (function(){
 'use strict';
-if(window.__TURF_SINGLE_AUTH_HERO_8946__)return;
-window.__TURF_SINGLE_AUTH_HERO_8946__=true;
+if(window.__TURF_NATIVE_AUTH_8947__)return;
+window.__TURF_NATIVE_AUTH_8947__=true;
 
 function q(s,r){try{return (r||document).querySelector(s)}catch(e){return null}}
 
-function hideLegacyInnerGate(){
-  try{document.documentElement.classList.remove('turf-auth-locked')}catch(e){}
+function restoreNativeAuth(){
   var gate=q('#turfAuthGate');
   if(gate){
-    gate.classList.add('turf-auth-hidden');
-    gate.setAttribute('aria-hidden','true');
-    gate.style.setProperty('display','none','important');
-    gate.style.setProperty('visibility','hidden','important');
-    gate.style.setProperty('pointer-events','none','important');
+    gate.classList.remove('turf-auth-hidden');
+    gate.removeAttribute('aria-hidden');
+    gate.style.removeProperty('display');
+    gate.style.removeProperty('visibility');
+    gate.style.removeProperty('pointer-events');
   }
   var btn=q('#turfGoogleButton');
   if(btn){
-    /* Hide the duplicate inner button visually, but leave its DOM and the
-       Google Identity API untouched so existing auth initialization can run. */
-    btn.style.setProperty('position','fixed','important');
-    btn.style.setProperty('left','-10000px','important');
-    btn.style.setProperty('top','-10000px','important');
-    btn.style.setProperty('width','1px','important');
-    btn.style.setProperty('height','1px','important');
-    btn.style.setProperty('overflow','hidden','important');
-    btn.style.setProperty('opacity','0','important');
-    btn.style.setProperty('pointer-events','none','important');
-    btn.setAttribute('aria-hidden','true');
+    ['position','left','top','width','height','overflow','opacity','pointer-events','display','visibility'].forEach(function(p){btn.style.removeProperty(p)});
+    btn.removeAttribute('aria-hidden');
   }
 }
 
@@ -59,13 +47,9 @@ function alignHero(){
   }catch(e){}
 }
 
-function run(){hideLegacyInnerGate();alignHero()}
-
+function run(){restoreNativeAuth();alignHero()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
-[0,50,120,250,500,900,1500,2500,4000,6500].forEach(function(ms){setTimeout(run,ms)});
+[0,50,120,250,500,900,1500,2500,4000].forEach(function(ms){setTimeout(run,ms)});
 window.addEventListener('resize',function(){setTimeout(alignHero,30);setTimeout(alignHero,180)});
-try{
-  var timer=null;
-  new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,25)}).observe(document.documentElement,{childList:true,subtree:true});
-}catch(e){}
+window.addEventListener('turf:auth-ready',function(){setTimeout(alignHero,0);setTimeout(alignHero,250)});
 })();
