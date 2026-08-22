@@ -1,6 +1,6 @@
 /* ============================================================
    TURF V88.97 — BATCH 2 VISUAL ENTRYPOINT
-   v89.58 SIGN-IN FIRST / CLEAN AUTH FLOW + LOCKED HERO + MEASURED BRAND FIT
+   v89.59 SIGN-IN FIRST / CLEAN AUTH FLOW + LOCKED HERO + MEASURED BRAND FIT
 
    Auth behavior is unchanged from the working v89.48 flow.
    This file only adds a late presentation-only layout enforcement pass.
@@ -159,13 +159,24 @@ function enforceProfile(){
   img.src=PROFILE_SVG;
   img.alt='Profile';
   img.style.setProperty('display','block','important');
-  img.style.setProperty('width','34px','important');
-  img.style.setProperty('height','34px','important');
+  img.style.setProperty('width','36px','important');
+  img.style.setProperty('height','36px','important');
   img.style.setProperty('object-fit','contain','important');
   img.style.setProperty('border-radius','11px','important');
   img.style.setProperty('filter','drop-shadow(0 0 7px rgba(67,201,255,.16))','important');
 
-  /* Remove the redundant outer ring; the avatar tile already supplies its own edge. */
+  /* Match the profile control footprint to the neighboring header buttons. */
+  btn.style.setProperty('width','44px','important');
+  btn.style.setProperty('min-width','44px','important');
+  btn.style.setProperty('height','44px','important');
+  btn.style.setProperty('min-height','44px','important');
+  btn.style.setProperty('padding','4px','important');
+  btn.style.setProperty('display','inline-flex','important');
+  btn.style.setProperty('align-items','center','important');
+  btn.style.setProperty('justify-content','center','important');
+  btn.style.setProperty('box-sizing','border-box','important');
+
+  /* Keep the no-double-ring treatment. */
   btn.style.setProperty('background-image','none','important');
   btn.style.setProperty('background','transparent','important');
   btn.style.setProperty('border','none','important');
