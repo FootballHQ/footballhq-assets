@@ -1,6 +1,6 @@
 /* ============================================================
    TURF V88.97 — BATCH 2 VISUAL ENTRYPOINT
-   v89.56 SIGN-IN FIRST / CLEAN AUTH FLOW + DIRECT LAYOUT ENFORCEMENT
+   v89.57 SIGN-IN FIRST / CLEAN AUTH FLOW + LOCKED HERO + POLISHED BRAND/PROFILE
 
    Auth behavior is unchanged from the working v89.48 flow.
    This file only adds a late presentation-only layout enforcement pass.
@@ -10,10 +10,6 @@
 if(window.__TURF_V8897_ENTRY_8948__)return;
 window.__TURF_V8897_ENTRY_8948__=true;
 
-/* IMPORTANT: this entrypoint is parsed well before the native Batch 1B auth
-   code in Apps Script Index.html. Clearing ONLY the wrapper session token here
-   means resumeSaved() sees no token and opens the Google sign-in gate instead
-   of launching the stale recovery flow. Server-side account data is untouched. */
 try{localStorage.removeItem('turfAuthAccountTokenV1')}catch(e){}
 try{sessionStorage.removeItem('turfAuthAccountTokenV1')}catch(e){}
 
@@ -50,14 +46,14 @@ function load(src,key,next){
 }
 
 var B='https://footballhq.github.io/footballhq-assets/v88-36/js/';
-load(B+'88-turf-home2-v8918.js?v=8956','8918',function(){
-  load(B+'89-turf-home2b-v8919.js?v=8956','8919',function(){
-    load(B+'90-turf-favicon-v8920.js?v=8956','8920',function(){
-      load(B+'96-turf-coin-ui-cleanup-v8928.js?v=8956','8928',function(){
-        load(B+'97-turf-visual-polish-v8929.js?v=8956','8929',function(){
-          load(B+'98-turf-visual-polish-v8930.js?v=8956','8930',function(){
-            load(B+'99-turf-visual-cleanup-v8931.js?v=8956','8931',function(){
-              load(B+'102-turf-approved-brand-v8937.js?v=8956','8937',function(){
+load(B+'88-turf-home2-v8918.js?v=8957','8918',function(){
+  load(B+'89-turf-home2b-v8919.js?v=8957','8919',function(){
+    load(B+'90-turf-favicon-v8920.js?v=8957','8920',function(){
+      load(B+'96-turf-coin-ui-cleanup-v8928.js?v=8957','8928',function(){
+        load(B+'97-turf-visual-polish-v8929.js?v=8957','8929',function(){
+          load(B+'98-turf-visual-polish-v8930.js?v=8957','8930',function(){
+            load(B+'99-turf-visual-cleanup-v8931.js?v=8957','8931',function(){
+              load(B+'102-turf-approved-brand-v8937.js?v=8957','8937',function(){
                 suppressOldRecovery();
                 enforceLayout();
               });
@@ -70,7 +66,7 @@ load(B+'88-turf-home2-v8918.js?v=8956','8918',function(){
 });
 
 /* ===== PRESENTATION ONLY: NO AUTH / ACCOUNT / STORAGE WRITES ===== */
-var PROFILE_SVG='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#173c58"/><stop offset="1" stop-color="#071522"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="14" fill="url(#g)" stroke="#43c9ff" stroke-opacity=".55" stroke-width="2"/><circle cx="32" cy="23" r="10" fill="#dff7ff"/><path d="M15 52c2-12 9-18 17-18s15 6 17 18" fill="#83d9ff"/></svg>');
+var PROFILE_SVG='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0f3853"/><stop offset="1" stop-color="#061621"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f3fbff"/><stop offset="1" stop-color="#79d3f9"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)" stroke="#4fd1ff" stroke-opacity=".58" stroke-width="2"/><circle cx="32" cy="23" r="9.5" fill="url(#fg)"/><path d="M14 53c1.8-11.7 8.7-18.2 18-18.2S48.2 41.3 50 53" fill="url(#fg)"/><circle cx="32" cy="32" r="24" fill="none" stroke="#57cfff" stroke-opacity=".10" stroke-width="2"/></svg>');
 
 function findFeaturedRight(){
   var home=document.getElementById('fhqHome');
@@ -97,6 +93,7 @@ function findFeaturedRight(){
   return best?best.getBoundingClientRect().right:0;
 }
 
+/* HERO LOCK: same sizing logic that produced the approved current result. */
 function enforceHero(){
   var hero=document.querySelector('#fhqHome .fhq-hero');
   if(!hero)return;
@@ -118,7 +115,7 @@ function enforceSidebarBrand(){
   if(!box||!img)return;
   box.style.setProperty('height','122px','important');
   box.style.setProperty('min-height','122px','important');
-  box.style.setProperty('padding','6px 8px','important');
+  box.style.setProperty('padding','10px 12px','important');
   box.style.setProperty('overflow','hidden','important');
   box.style.setProperty('display','flex','important');
   box.style.setProperty('align-items','center','important');
@@ -129,7 +126,7 @@ function enforceSidebarBrand(){
   img.style.setProperty('max-width','none','important');
   img.style.setProperty('max-height','none','important');
   img.style.setProperty('object-fit','contain','important');
-  img.style.setProperty('transform','scale(1.16)','important');
+  img.style.setProperty('transform','scale(1.06)','important');
   img.style.setProperty('transform-origin','center','important');
 }
 
@@ -146,11 +143,14 @@ function enforceProfile(){
   img.src=PROFILE_SVG;
   img.alt='Profile';
   img.style.setProperty('display','block','important');
-  img.style.setProperty('width','32px','important');
-  img.style.setProperty('height','32px','important');
+  img.style.setProperty('width','34px','important');
+  img.style.setProperty('height','34px','important');
   img.style.setProperty('object-fit','contain','important');
-  img.style.setProperty('border-radius','10px','important');
+  img.style.setProperty('border-radius','11px','important');
+  img.style.setProperty('filter','drop-shadow(0 0 8px rgba(67,201,255,.20))','important');
   btn.style.setProperty('background-image','none','important');
+  btn.style.setProperty('background','linear-gradient(160deg,#09283b,#061722)','important');
+  btn.style.setProperty('border-color','rgba(83,201,255,.48)','important');
   btn.setAttribute('aria-label','Open profile');
 }
 
