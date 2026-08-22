@@ -1,6 +1,6 @@
 /* ============================================================
    TURF V88.97 — BATCH 2 VISUAL ENTRYPOINT
-   v89.59 SIGN-IN FIRST / CLEAN AUTH FLOW + LOCKED HERO + MEASURED BRAND FIT
+   v89.60 SIGN-IN FIRST / CLEAN AUTH FLOW + LOCKED HERO + MEASURED BRAND FIT
 
    Auth behavior is unchanged from the working v89.48 flow.
    This file only adds a late presentation-only layout enforcement pass.
@@ -66,7 +66,7 @@ load(B+'88-turf-home2-v8918.js?v=8957','8918',function(){
 });
 
 /* ===== PRESENTATION ONLY: NO AUTH / ACCOUNT / STORAGE WRITES ===== */
-var PROFILE_SVG='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0f3853"/><stop offset="1" stop-color="#061621"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f3fbff"/><stop offset="1" stop-color="#79d3f9"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)" stroke="#4fd1ff" stroke-opacity=".58" stroke-width="2"/><circle cx="32" cy="23" r="9.5" fill="url(#fg)"/><path d="M14 53c1.8-11.7 8.7-18.2 18-18.2S48.2 41.3 50 53" fill="url(#fg)"/><circle cx="32" cy="32" r="24" fill="none" stroke="#57cfff" stroke-opacity=".10" stroke-width="2"/></svg>');
+var PROFILE_SVG='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0f3853"/><stop offset="1" stop-color="#061621"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f3fbff"/><stop offset="1" stop-color="#79d3f9"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)"/><circle cx="32" cy="23" r="9.5" fill="url(#fg)"/><path d="M14 53c1.8-11.7 8.7-18.2 18-18.2S48.2 41.3 50 53" fill="url(#fg)"/></svg>');
 
 function findFeaturedRight(){
   var home=document.getElementById('fhqHome');
@@ -114,7 +114,6 @@ function enforceSidebarBrand(){
   var img=document.getElementById('turfV8940SidebarLogo');
   if(!box||!img)return;
 
-  /* Use the actual sidebar/brand-box dimensions instead of an arbitrary scale. */
   var sidebar=document.getElementById('fhqSidebar');
   var sr=sidebar?sidebar.getBoundingClientRect():null;
   var current=box.getBoundingClientRect();
@@ -159,27 +158,27 @@ function enforceProfile(){
   img.src=PROFILE_SVG;
   img.alt='Profile';
   img.style.setProperty('display','block','important');
-  img.style.setProperty('width','36px','important');
-  img.style.setProperty('height','36px','important');
+  img.style.setProperty('width','28px','important');
+  img.style.setProperty('height','28px','important');
   img.style.setProperty('object-fit','contain','important');
-  img.style.setProperty('border-radius','11px','important');
-  img.style.setProperty('filter','drop-shadow(0 0 7px rgba(67,201,255,.16))','important');
+  img.style.setProperty('border-radius','9px','important');
+  img.style.setProperty('filter','drop-shadow(0 0 6px rgba(67,201,255,.14))','important');
 
-  /* Match the profile control footprint to the neighboring header buttons. */
+  /* Match the trophy / bell / menu header controls exactly. */
   btn.style.setProperty('width','44px','important');
   btn.style.setProperty('min-width','44px','important');
+  btn.style.setProperty('max-width','44px','important');
   btn.style.setProperty('height','44px','important');
   btn.style.setProperty('min-height','44px','important');
-  btn.style.setProperty('padding','4px','important');
-  btn.style.setProperty('display','inline-flex','important');
-  btn.style.setProperty('align-items','center','important');
-  btn.style.setProperty('justify-content','center','important');
+  btn.style.setProperty('max-height','44px','important');
+  btn.style.setProperty('padding','0','important');
+  btn.style.setProperty('display','grid','important');
+  btn.style.setProperty('place-items','center','important');
   btn.style.setProperty('box-sizing','border-box','important');
-
-  /* Keep the no-double-ring treatment. */
+  btn.style.setProperty('border-radius','14px','important');
   btn.style.setProperty('background-image','none','important');
-  btn.style.setProperty('background','transparent','important');
-  btn.style.setProperty('border','none','important');
+  btn.style.setProperty('background','linear-gradient(160deg,#0c2536,#071927)','important');
+  btn.style.setProperty('border','1px solid rgba(78,191,245,.35)','important');
   btn.style.setProperty('box-shadow','none','important');
   btn.style.setProperty('outline','none','important');
   btn.setAttribute('aria-label','Open profile');
