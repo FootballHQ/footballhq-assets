@@ -1,0 +1,63 @@
+import {HttpError,safeError,corsHeaders,json,requireOrigin} from './common.js';
+import {handlesAuthRpc,handleAuthRpc} from './auth-rpc.js';
+import {handlesAccountRpc,handleAccountRpc} from './account-rpc.js';
+import {handlesGameRpc,handleGameRpc} from './game-rpc.js';
+import {handlesDraftRpc,handleDraftRpc} from './draft-rpc.js';
+import {handlesH2HRpc,handleH2HRpc} from './h2h-rpc.js';
+import {handleTrialsGridRpc,handleTrialsHttp,handleGridAdmin} from './trials-grid-rpc.js';
+
+const TRIAL_GRID_RPC=new Set(['turfV8905TrialInventory','turfV8944GridSearch','turfV8944GridIndexStatus']);
+
+export default {
+  async fetch(request,env){
+    const origin=request.headers.get('Origin')||'';
+    const cors=corsHeaders(origin,env);
+    const url=new URL(request.url);
+
+    if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
+    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2},200,cors);
+
+    try{
+      if(url.pathname.startsWith('/trials/')){
+        requireOrigin(origin,env);
+        requireEnv(env);
+        const response=await handleTrialsHttp(request,env);
+        if(response)return response;
+      }
+      if(url.pathname==='/admin/grid-index/build'){
+        requireOrigin(origin,env);
+        requireEnv(env);
+        const response=await handleGridAdmin(request,env);
+        if(response)return response;
+      }
+      if(url.pathname!=='/rpc'||request.method!=='POST')return json({ok:false,error:'Not found.'},404,cors);
+
+      requireOrigin(origin,env);
+      requireEnv(env);
+      const body=await request.json().catch(()=>({}));
+      const method=String(body?.method||'');
+      const args=Array.isArray(body?.args)?body.args:[];
+      let result;
+
+      if(handlesAuthRpc(method))result=await handleAuthRpc(method,args,env);
+      else if(handlesAccountRpc(method))result=await handleAccountRpc(method,args,env);
+      else if(handlesGameRpc(method))result=await handleGameRpc(method,args,env);
+      else if(handlesDraftRpc(method))result=await handleDraftRpc(method,args,env);
+      else if(handlesH2HRpc(method))result=await handleH2HRpc(method,args,env);
+      else if(TRIAL_GRID_RPC.has(method))result=await handleTrialsGridRpc(method,args,env);
+      else throw new HttpError(403,'RPC method is not enabled in TURF migration V2.');
+
+      return json({ok:true,result},200,cors);
+    }catch(err){
+      return json({ok:false,error:safeError(err)},err instanceof HttpError?err.status:500,cors);
+    }
+  }
+};
+
+function requireEnv(env){
+  const missing=[];
+  ['GOOGLE_SERVICE_ACCOUNT_EMAIL','GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY','TURF_GOOGLE_CLIENT_ID','TURF_SPREADSHEET_ID'].forEach(k=>{
+    if(!String(env[k]||'').trim())missing.push(k);
+  });
+  if(missing.length)throw new HttpError(503,'Migration backend is not configured yet: '+missing.join(', '));
+}
