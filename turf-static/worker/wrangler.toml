@@ -2,6 +2,7 @@ name = "turftest-api"
 main = "index.js"
 compatibility_date = "2026-08-23"
 workers_dev = true
+keep_vars = true
 
 [vars]
 ALLOWED_ORIGINS = "https://turftrials.com"
