@@ -59,7 +59,6 @@
       const res = await fetch(config.baseUrl + '/rpc', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        credentials: 'include',
         signal: controller.signal,
         body: JSON.stringify({method, args: args || []})
       });
