@@ -1,12 +1,12 @@
 /* TURF static-host migration configuration.
- * SAFE DEFAULTS: this branch does not point at production and cannot replace the live site by itself.
+ * SAFE DEFAULTS: this branch is isolated and does not replace the live site by itself.
  */
 (function(global){
   'use strict';
   global.TURF_STATIC_CONFIG={
     migrationMode:true,
     productionCutover:false,
-    apiBaseUrl:'',
+    apiBaseUrl:'https://turftest-api.turftrials.workers.dev',
     apiTransport:'http',
     googleClientId:'981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com'
   };
