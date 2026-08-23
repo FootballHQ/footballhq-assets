@@ -20,11 +20,23 @@
     return {...config};
   }
 
+  function recoverStaticConfig(){
+    const s=global.TURF_STATIC_CONFIG||{};
+    if(!config.baseUrl && typeof s.apiBaseUrl==='string' && s.apiBaseUrl.trim()){
+      config.baseUrl=s.apiBaseUrl.trim().replace(/\/$/,'');
+    }
+    if(config.transport==='auto' && ['gas','http'].includes(s.apiTransport)){
+      config.transport=s.apiTransport;
+    }
+    return {...config};
+  }
+
   function hasGas(){
     return !!(global.google && google.script && google.script.run);
   }
 
   function chosenTransport(){
+    recoverStaticConfig();
     if(config.transport === 'gas') return 'gas';
     if(config.transport === 'http') return 'http';
     return hasGas() ? 'gas' : 'http';
@@ -52,6 +64,7 @@
   }
 
   async function httpCall(method, args){
+    recoverStaticConfig();
     if(!config.baseUrl) throw new Error('TURF API base URL is not configured.');
     const controller = new AbortController();
     const timer = setTimeout(()=>controller.abort(), config.timeout);
