@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TURF Rankings Editor</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#06131f;color:#eef8ff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:#071724;border-bottom:1px solid #1f536d}.brand{font-size:22px;font-weight:950;letter-spacing:.08em}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid #2b6687;background:#0d2c40;color:#eef8ff;border-radius:10px;padding:9px 12px;font-weight:850;cursor:pointer}.btn.primary{background:#105178;border-color:#2f9bd0}.btn.danger{border-color:#8b4650;background:#3a1b22}.btn:disabled{opacity:.45;cursor:not-allowed}.wrap{max-width:1500px;margin:0 auto;padding:18px}.intro{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:14px}.intro h1{margin:0 0 4px;font-size:28px}.intro p{margin:0;color:#89a8b9}.status{min-height:22px;color:#8dcff0;font-size:13px;margin-top:6px}.status.bad{color:#ff9e9e}.gate{max-width:460px;margin:70px auto;padding:24px;border:1px solid #24526b;border-radius:18px;background:#0a1c29}.gate input{width:100%;margin:12px 0;padding:12px;border-radius:10px;border:1px solid #315e77;background:#07141f;color:#fff}.toolbar{display:none;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{min-width:260px;flex:1;padding:10px 12px;border:1px solid #27546e;border-radius:9px;background:#081925;color:#fff}.tableWrap{display:none;overflow:auto;border:1px solid #234f67;border-radius:14px;background:#071823}.table{width:100%;border-collapse:collapse;min-width:1050px}.table th{position:sticky;top:69px;background:#0a2030;color:#91b8cc;text-align:left;font-size:11px;letter-spacing:.06em;padding:10px;border-bottom:1px solid #29576f}.table td{padding:7px 8px;border-bottom:1px solid rgba(71,123,148,.18);vertical-align:middle}.table tr:hover{background:rgba(34,124,167,.08)}.rank{width:54px;color:#7edbff;font-weight:900;text-align:center}.cell{width:100%;padding:8px 9px;border:1px solid #274d63;border-radius:7px;background:#06141f;color:#eef8ff}.player{min-width:220px}.pos{min-width:80px}.team{min-width:90px}.tier{min-width:110px}.notes{min-width:240px}.rowBtns{white-space:nowrap}.mini{padding:7px 8px;border-radius:7px;border:1px solid #2a566f;background:#0a2637;color:#eaf7ff;cursor:pointer;margin-right:4px}.mini.delete{border-color:#7b3a45;color:#ffbdc2}.foot{padding:14px 2px;color:#65879a;font-size:12px}.unsaved{color:#ffd57d}.saved{color:#7ee0a8}@media(max-width:800px){.top{align-items:flex-start;flex-direction:column}.table th{top:112px}.intro{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand">TURF • RANKINGS EDITOR</div><div class="actions"><button id="reloadBtn" class="btn" disabled>Reload</button><button id="addBtn" class="btn" disabled>Add Player</button><button id="saveBtn" class="btn primary" disabled>Save Rankings</button></div></header>
+<div class="wrap">
+  <section id="gate" class="gate">
+    <h2>Editor access</h2>
+    <p>Enter your TURF editor key. It is kept only in this browser tab.</p>
+    <input id="keyInput" type="password" autocomplete="off" placeholder="Editor key">
+    <button id="unlockBtn" class="btn primary" style="width:100%">Open Rankings Editor</button>
+    <div id="gateStatus" class="status"></div>
+  </section>
+
+  <section id="editor" hidden>
+    <div class="intro"><div><h1>2026 TURF Rankings</h1><p>Edit the live master rankings while the main TURF build stays open in another tab.</p><div id="status" class="status"></div></div><div id="count"></div></div>
+    <div id="toolbar" class="toolbar"><input id="search" placeholder="Search player, team, position, tier…"><button id="clearBtn" class="btn">Clear Search</button></div>
+    <div id="tableWrap" class="tableWrap"><table class="table"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Team</th><th>Tier</th><th>Notes</th><th>Move / Remove</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="foot">Changes are local until you click <strong>Save Rankings</strong>.</div>
+  </section>
+</div>
+<script src="./js/turf-config.js?v=20260823-editor1"></script>
+<script src="./js/turf-api.js?v=20260823-editor1"></script>
+<script>
+(function(){
+'use strict';
+var key='',players=[],dirty=false,filter='';
+var gate=document.getElementById('gate'),editor=document.getElementById('editor'),keyInput=document.getElementById('keyInput'),gateStatus=document.getElementById('gateStatus'),status=document.getElementById('status'),rows=document.getElementById('rows'),count=document.getElementById('count'),toolbar=document.getElementById('toolbar'),tableWrap=document.getElementById('tableWrap'),search=document.getElementById('search'),saveBtn=document.getElementById('saveBtn'),reloadBtn=document.getElementById('reloadBtn'),addBtn=document.getElementById('addBtn');
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]})}
+function setStatus(t,cls){status.textContent=t||'';status.className='status '+(cls||'')}
+function setGate(t,bad){gateStatus.textContent=t||'';gateStatus.className='status'+(bad?' bad':'')}
+function markDirty(){dirty=true;setStatus('Unsaved changes','unsaved')}
+function normalize(p){return {player:String(p&&p.player||''),position:String(p&&p.position||''),team:String(p&&p.team||''),tier:String(p&&p.tier||''),notes:String(p&&p.notes||'')}}
+function visibleIndexes(){var f=filter.trim().toLowerCase();return players.map(function(p,i){return {p:p,i:i}}).filter(function(x){if(!f)return true;return [x.p.player,x.p.position,x.p.team,x.p.tier,x.p.notes].join(' ').toLowerCase().indexOf(f)>=0})}
+function render(){var list=visibleIndexes();rows.innerHTML=list.map(function(x){var p=x.p,i=x.i;return '<tr data-i="'+i+'"><td class="rank">'+(i+1)+'</td><td><input class="cell player" data-k="player" value="'+esc(p.player)+'"></td><td><input class="cell pos" data-k="position" value="'+esc(p.position)+'"></td><td><input class="cell team" data-k="team" value="'+esc(p.team)+'"></td><td><input class="cell tier" data-k="tier" value="'+esc(p.tier)+'"></td><td><input class="cell notes" data-k="notes" value="'+esc(p.notes)+'"></td><td class="rowBtns"><button class="mini" data-a="up" title="Move up">↑</button><button class="mini" data-a="down" title="Move down">↓</button><button class="mini delete" data-a="delete">Remove</button></td></tr>'}).join('');count.textContent=players.length+' players';
+ rows.querySelectorAll('input[data-k]').forEach(function(inp){inp.addEventListener('input',function(){var tr=this.closest('tr'),i=Number(tr.dataset.i),k=this.dataset.k;if(players[i]){players[i][k]=this.value;markDirty()}})});
+ rows.querySelectorAll('button[data-a]').forEach(function(b){b.addEventListener('click',function(){var tr=this.closest('tr'),i=Number(tr.dataset.i),a=this.dataset.a;if(a==='up'&&i>0){var t=players[i-1];players[i-1]=players[i];players[i]=t;markDirty();render()}else if(a==='down'&&i<players.length-1){var t2=players[i+1];players[i+1]=players[i];players[i]=t2;markDirty();render()}else if(a==='delete'){if(confirm('Remove '+(players[i]&&players[i].player||'this player')+' from the working rankings?')){players.splice(i,1);markDirty();render()}}})});
+}
+async function load(){setStatus('Loading rankings…');saveBtn.disabled=true;reloadBtn.disabled=true;addBtn.disabled=true;try{var data=await TurfApi.rpc('getRankings');players=(Array.isArray(data)?data:[]).map(normalize);dirty=false;render();toolbar.style.display='flex';tableWrap.style.display='block';saveBtn.disabled=false;reloadBtn.disabled=false;addBtn.disabled=false;setStatus('Rankings loaded','saved')}catch(e){setStatus('Could not load rankings: '+(e.message||e),'bad')}}
+async function unlock(){var k=keyInput.value.trim();if(!k){setGate('Enter the editor key.',true);return}setGate('Checking editor access…');document.getElementById('unlockBtn').disabled=true;try{var ok=await TurfApi.rpc('isEditor',k);if(!ok)throw new Error('That editor key was not accepted.');key=k;sessionStorage.setItem('turfRankingsEditorKey',k);gate.hidden=true;editor.hidden=false;await load()}catch(e){setGate(e.message||String(e),true);document.getElementById('unlockBtn').disabled=false}}
+async function save(){if(!key)return;saveBtn.disabled=true;setStatus('Saving rankings…');try{await TurfApi.rpc('saveRankings',players,key);dirty=false;setStatus('Saved ✓','saved')}catch(e){setStatus('Save failed: '+(e.message||e),'bad')}finally{saveBtn.disabled=false}}
+document.getElementById('unlockBtn').onclick=unlock;keyInput.addEventListener('keydown',function(e){if(e.key==='Enter')unlock()});saveBtn.onclick=save;reloadBtn.onclick=function(){if(dirty&&!confirm('Discard unsaved changes and reload from the server?'))return;load()};addBtn.onclick=function(){players.push({player:'New Player',position:'',team:'',tier:'',notes:''});filter='';search.value='';markDirty();render();setTimeout(function(){var last=rows.querySelector('tr:last-child .player');if(last){last.focus();last.select()}},20)};search.oninput=function(){filter=this.value;render()};document.getElementById('clearBtn').onclick=function(){search.value='';filter='';render()};window.addEventListener('beforeunload',function(e){if(dirty){e.preventDefault();e.returnValue=''}});
+var remembered=sessionStorage.getItem('turfRankingsEditorKey')||'';if(remembered){keyInput.value=remembered;setTimeout(unlock,20)}
+})();
+</script>
+</body></html>
