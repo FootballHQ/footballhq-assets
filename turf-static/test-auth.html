@@ -12,7 +12,9 @@
     button{margin:6px;padding:10px 16px;border-radius:10px;border:1px solid #2c688d;background:#12344b;color:#fff;font-weight:700}
     pre{white-space:pre-wrap;background:#061018;border-radius:12px;padding:14px;min-height:120px}
     .warn{color:#ffcf77}.ok{color:#7de0aa}.bad{color:#ff9696}
+    #googleButton{margin:14px 6px}
   </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <main>
@@ -20,9 +22,11 @@
     <h1>TURF static migration test</h1>
     <p class="warn">Isolated test only. This page does not replace turftrials.com or modify production.</p>
     <p id="transport"></p>
+    <div id="googleButton"></div>
     <button id="health">Check API configuration</button>
     <button id="resume">Test saved-session restore</button>
     <button id="guest">Test Guest auth</button>
+    <button id="signout">Clear saved test session</button>
     <pre id="out">Ready.</pre>
   </div>
 </main>
@@ -38,6 +42,23 @@
   document.getElementById('health').onclick=()=>show('Configuration',{config,transport:window.TurfApi&&TurfApi.transport()});
   document.getElementById('resume').onclick=async()=>{try{show('Resume result',await TurfAuth.resume())}catch(e){show('Resume error',null,e)}};
   document.getElementById('guest').onclick=async()=>{try{show('Guest result',await TurfAuth.guestSignIn())}catch(e){show('Guest error',null,e)}};
+  document.getElementById('signout').onclick=()=>{TurfAuth.signOut();show('Saved test session cleared',{ok:true})};
+
+  function initGoogle(){
+    if(!(window.google&&google.accounts&&google.accounts.id))return setTimeout(initGoogle,100);
+    if(!config.googleClientId)return show('Google configuration error',null,new Error('Missing Google client ID.'));
+    google.accounts.id.initialize({
+      client_id:config.googleClientId,
+      callback:async response=>{
+        try{show('Google sign-in result',await TurfAuth.googleSignIn(response&&response.credential))}
+        catch(e){show('Google sign-in error',null,e)}
+      },
+      auto_select:false,
+      cancel_on_tap_outside:false
+    });
+    google.accounts.id.renderButton(document.getElementById('googleButton'),{theme:'outline',size:'large',text:'signin_with',shape:'rectangular'});
+  }
+  initGoogle();
 })();
 </script>
 </body>
