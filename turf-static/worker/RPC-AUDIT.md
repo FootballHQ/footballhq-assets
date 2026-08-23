@@ -46,7 +46,7 @@ Important parity fixes included in V2 draft:
 
 ## Group 2 — game records/profile details
 
-Still to port and test:
+Still to merge into the deployable Worker and verify against the real migration backend:
 
 - `submitFootballHQUnlimitedReward`
 - `submitFootballHQGameBest`
@@ -57,7 +57,7 @@ Still to port and test:
 
 ## Group 3 — Draft Simulator multiplayer
 
-Still to port and test:
+Still to merge into the deployable Worker and verify end-to-end:
 
 - `createDraftRoom`
 - `joinDraftRoom`
@@ -68,11 +68,11 @@ Still to port and test:
 - `submitTimedAutoPick`
 - `postDraftChat`
 
-The associated `DraftRooms` sheet semantics, room TTL, turn ownership, CPU/autopick behavior, and chat filtering need to be kept compatible with the current frontend.
+The associated `DraftRooms` sheet semantics, room TTL, turn ownership, CPU/autopick behavior, and chat filtering need to stay compatible with the current frontend.
 
 ## Group 4 — H2H / competitive
 
-Still to port and test:
+Still to merge into the deployable Worker and verify end-to-end:
 
 - `turfH2HJoinOrPoll`
 - `turfH2HCancel`
@@ -82,16 +82,28 @@ Still to port and test:
 - `turfH2HGameAnswer`
 - `turfH2HCasesAction`
 
-These back Trials/Cases/Trivia Tac Toe/4 in a Row competitive flows and must be functional before root cutover.
+These back Cases / Trivia Tac Toe / 4 in a Row competitive flows and must be functional before root cutover.
 
 ## Group 5 — Trials / historical data bridge
 
-Still to port and test:
+A safe additive Worker module is now committed at `turf-static/worker/trials-grid-rpc.js`.
 
-- Trial world-record read/write behavior from `TURF_TrialRecords`
-- Trial inventory route introduced in V89.05
-- `turfV8944GridSearch`
-- related historical-grid index/status behavior if the current UI invokes it
+Implemented there:
+
+- 40-Yard Dash owned-card inventory using the signed-in account token.
+- Set 001 and all 40 Set 002 cards with current Trial stats/art paths.
+- `TURF_TrialRecords` read/write behavior, including one row per player/trial and faster-time-only replacement.
+- `/trials/inventory` HTTP endpoint.
+- `/trials/records` GET/POST endpoints.
+- `turfV8905TrialInventory` RPC adapter.
+- `turfV8944GridSearch` RPC adapter.
+- `turfV8944GridIndexStatus` RPC adapter.
+- Admin-only historical roster index builder for NFL roster years 1920–2026.
+- Historical Grid data stored in dedicated Sheets-backed index/meta tabs so no new Cloudflare KV binding is required for the first migration deployment.
+
+A separate additive browser client is committed at `turf-static/js/trials-worker-client.js`. It points to the migration Worker and is not yet loaded by the live Trial page.
+
+Local syntax validation passed. The live 40-Yard Dash is intentionally still untouched until these routes are merged into and deployed with Worker V2.
 
 ## Cutover rule
 
