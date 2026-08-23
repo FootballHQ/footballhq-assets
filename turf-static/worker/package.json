@@ -1,0 +1,12 @@
+{
+  "name": "turf-worker-v2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check index.js && node -e \"import('./index.js').then(()=>console.log('TURF Worker V2 import OK'))\"",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
