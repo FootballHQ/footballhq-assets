@@ -12,15 +12,24 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111c}
 </style>
 </head>
 <body>
-<iframe id="frame" src="./app-test.html?v=home8962a" title="TURF static Home test"></iframe>
-<div id="badge">STATIC HOME 8962 TEST</div>
+<iframe id="frame" src="./app-test.html?v=home8962b" title="TURF static Home test"></iframe>
+<div id="badge">STATIC HOME NEWER TEST</div>
 <script>
 (function(){
   'use strict';
   var frame=document.getElementById('frame');
+  function loadParity(){
+    var d;try{d=frame.contentDocument}catch(e){return}
+    if(!d||d.getElementById('turfStaticHomeParityLoader'))return;
+    var s=d.createElement('script');
+    s.id='turfStaticHomeParityLoader';
+    s.src='./js/static-home-parity.js?v=2';
+    (d.head||d.documentElement).appendChild(s);
+  }
   function patch(){
     var w,d;try{w=frame.contentWindow;d=frame.contentDocument}catch(e){return}
     if(!w||!d)return;
+    loadParity();
     var home=d.getElementById('fhqHome');
     if(home){
       home.classList.remove('hidden');
