@@ -1,0 +1,1 @@
+Temporary migration note: current-static-v14.html upload placeholder was created while preparing the direct static TURF build. Do not use this path for testing yet.
