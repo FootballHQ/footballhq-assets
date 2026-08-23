@@ -27,14 +27,14 @@
     <div class="foot">Changes are local until you click <strong>Save Rankings</strong>.</div>
   </section>
 </div>
-<script src="./js/turf-config.js?v=20260823-editor1"></script>
-<script src="./js/turf-api.js?v=20260823-editor1"></script>
+<script src="./js/turf-api.js?v=20260823-editor2"></script>
+<script src="./js/turf-config.js?v=20260823-editor2"></script>
 <script>
 (function(){
 'use strict';
 var key='',players=[],dirty=false,filter='';
 var gate=document.getElementById('gate'),editor=document.getElementById('editor'),keyInput=document.getElementById('keyInput'),gateStatus=document.getElementById('gateStatus'),status=document.getElementById('status'),rows=document.getElementById('rows'),count=document.getElementById('count'),toolbar=document.getElementById('toolbar'),tableWrap=document.getElementById('tableWrap'),search=document.getElementById('search'),saveBtn=document.getElementById('saveBtn'),reloadBtn=document.getElementById('reloadBtn'),addBtn=document.getElementById('addBtn');
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]})}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'})[c]})}
 function setStatus(t,cls){status.textContent=t||'';status.className='status '+(cls||'')}
 function setGate(t,bad){gateStatus.textContent=t||'';gateStatus.className='status'+(bad?' bad':'')}
 function markDirty(){dirty=true;setStatus('Unsaved changes','unsaved')}
