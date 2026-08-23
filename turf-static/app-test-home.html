@@ -5,37 +5,27 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TURF Static Home Test</title>
 <meta name="robots" content="noindex,nofollow">
-<style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111c}
-#frame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#07111c}
-#badge{position:fixed;right:12px;bottom:12px;z-index:2147483647;padding:7px 10px;border-radius:999px;background:rgba(5,16,25,.92);border:1px solid rgba(97,205,255,.45);color:#a9e6ff;font:700 11px/1 system-ui;pointer-events:none}
-</style>
+<style>html,body{margin:0;min-height:100%;background:#07111c;color:#eef8ff;font-family:Inter,system-ui,-apple-system,sans-serif}.boot{min-height:100vh;display:grid;place-items:center;color:#9ec7dc;font-weight:800}</style>
 </head>
 <body>
-<iframe id="frame" src="./app-test.html?v=home8962c" title="TURF static Home test"></iframe>
-<div id="badge">STATIC HOME FULL SHELL TEST</div>
+<div class="boot">Loading TURF static test…</div>
 <script>
 (function(){
   'use strict';
-  var frame=document.getElementById('frame');
-  function loadScript(d,id,src){if(d.getElementById(id))return;var s=d.createElement('script');s.id=id;s.src=src;(d.head||d.documentElement).appendChild(s)}
-  function loadParity(){
-    var d;try{d=frame.contentDocument}catch(e){return}
-    if(!d)return;
-    loadScript(d,'turfStaticHomeParityLoader','./js/static-home-parity.js?v=3');
-    loadScript(d,'turfStaticShellParityLoader','./js/static-shell-parity.js?v=3');
-  }
-  function patch(){
-    var w,d;try{w=frame.contentWindow;d=frame.contentDocument}catch(e){return}
-    if(!w||!d)return;
-    loadParity();
-    var home=d.getElementById('fhqHome');
-    if(home){home.classList.remove('hidden');home.style.setProperty('display','block','important');home.style.setProperty('visibility','visible','important');home.style.setProperty('opacity','1','important');home.style.setProperty('pointer-events','auto','important');home.style.setProperty('z-index','8500','important')}
-    var inner=d.querySelector('#fhqHome .fhq-home-inner');if(inner){inner.style.setProperty('display','block','important');inner.style.setProperty('visibility','visible','important');inner.style.setProperty('opacity','1','important')}
-    var gate=d.getElementById('staticGate');if(gate&&w.__TURF_AUTH_PROFILE__)gate.classList.add('hidden');
-    if(w.__TURF_AUTH_PROFILE__){var p=w.__TURF_AUTH_PROFILE__;var n=d.getElementById('fhqAccountName');if(n)n.textContent=p.username||'Guest';var pts=d.getElementById('fhqPoints');if(pts)pts.textContent=String(p.points||0);var life=d.getElementById('fhqDashLifetime');if(life)life.textContent=String(p.points||0);var streak=d.getElementById('fhqDashStreak');if(streak)streak.textContent=String(p.streakDays||0)}
-  }
-  frame.addEventListener('load',function(){patch();[80,220,500,900,1500,2500,4000,6500].forEach(function(ms){setTimeout(patch,ms)})});
+  /* Google Identity Services is unreliable when the login button lives inside
+     our previous nested iframe. Load the same isolated app as the TOP-LEVEL
+     document, then append the Home + shell parity layers. */
+  fetch('./app-test.html?v=fullshell-top-1',{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error('Could not load static TURF test');return r.text()})
+    .then(function(html){
+      var extra=''+
+        '<script src="./js/static-home-parity.js?v=3"><\/script>'+
+        '<script src="./js/static-shell-parity.js?v=3"><\/script>'+
+        '<div id="staticFullShellBadge" style="position:fixed;right:12px;bottom:12px;z-index:2147483647;padding:7px 10px;border-radius:999px;background:rgba(5,16,25,.92);border:1px solid rgba(97,205,255,.45);color:#a9e6ff;font:700 11px/1 system-ui;pointer-events:none">STATIC HOME FULL SHELL TEST</div>';
+      html=html.replace('</body>',extra+'</body>');
+      document.open();document.write(html);document.close();
+    })
+    .catch(function(err){document.body.innerHTML='<div class="boot">'+String(err&&err.message||err)+'</div>'});
 })();
 </script>
 </body>
