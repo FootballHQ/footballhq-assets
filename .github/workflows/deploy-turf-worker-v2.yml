@@ -2,9 +2,19 @@ name: Deploy TURF Worker V2
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'turf-static/worker/**'
+      - '.github/workflows/deploy-turf-worker-v2.yml'
 
 permissions:
   contents: read
+
+concurrency:
+  group: turf-worker-v2-deploy
+  cancel-in-progress: false
 
 jobs:
   deploy:
