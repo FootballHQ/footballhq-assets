@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TURF Static Home Test</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111c}
+#frame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#07111c}
+#badge{position:fixed;right:12px;bottom:12px;z-index:2147483647;padding:7px 10px;border-radius:999px;background:rgba(5,16,25,.92);border:1px solid rgba(97,205,255,.45);color:#a9e6ff;font:700 11px/1 system-ui;pointer-events:none}
+</style>
+</head>
+<body>
+<iframe id="frame" src="./app-test.html?v=home8962a" title="TURF static Home test"></iframe>
+<div id="badge">STATIC HOME 8962 TEST</div>
+<script>
+(function(){
+  'use strict';
+  var frame=document.getElementById('frame');
+  function patch(){
+    var w,d;try{w=frame.contentWindow;d=frame.contentDocument}catch(e){return}
+    if(!w||!d)return;
+    var home=d.getElementById('fhqHome');
+    if(home){
+      home.classList.remove('hidden');
+      home.style.setProperty('display','block','important');
+      home.style.setProperty('visibility','visible','important');
+      home.style.setProperty('opacity','1','important');
+      home.style.setProperty('pointer-events','auto','important');
+      home.style.setProperty('z-index','8500','important');
+    }
+    var inner=d.querySelector('#fhqHome .fhq-home-inner');
+    if(inner){
+      inner.style.setProperty('display','block','important');
+      inner.style.setProperty('visibility','visible','important');
+      inner.style.setProperty('opacity','1','important');
+    }
+    var gate=d.getElementById('staticGate');
+    if(gate && w.__TURF_AUTH_PROFILE__)gate.classList.add('hidden');
+    if(w.__TURF_AUTH_PROFILE__){
+      var p=w.__TURF_AUTH_PROFILE__;
+      var n=d.getElementById('fhqAccountName');if(n)n.textContent=p.username||'Guest';
+      var pts=d.getElementById('fhqPoints');if(pts)pts.textContent=String(p.points||0);
+      var life=d.getElementById('fhqDashLifetime');if(life)life.textContent=String(p.points||0);
+      var streak=d.getElementById('fhqDashStreak');if(streak)streak.textContent=String(p.streakDays||0);
+    }
+  }
+  frame.addEventListener('load',function(){patch();[80,220,500,900,1500,2500,4000,6500].forEach(function(ms){setTimeout(patch,ms)})});
+})();
+</script>
+</body>
+</html>
