@@ -6,7 +6,7 @@
 if(window.__TURF_WORKER_GAS_BRIDGE__)return;
 window.__TURF_WORKER_GAS_BRIDGE__=true;
 
-var API='https://turftest-api.turftrials.workers.dev';
+var API=(location&&location.hostname==='turftrials.com')?location.origin:'https://turftest-api.turftrials.workers.dev';
 var TIMEOUT=20000;
 
 function rpc(method,args){
@@ -18,7 +18,7 @@ function rpc(method,args){
     body:JSON.stringify({method:String(method||''),args:Array.isArray(args)?args:[]}),
     signal:ctrl?ctrl.signal:undefined,
     cache:'no-store',
-    credentials:'omit'
+    credentials:'same-origin'
   }).then(function(r){
     if(timer)clearTimeout(timer);
     return r.text().then(function(t){
