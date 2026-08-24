@@ -153,11 +153,44 @@
     return false;
   }
 
+  /* WORKER AUTH HANDOFF — presentation is untouched.
+     The top-level turftrials.com wrapper authenticates with the Worker and sends
+     the already-verified TURF profile here. This bypasses Apps Script auth RPCs. */
+  function applyWorkerProfile(profile){
+    if(!profile||!profile.token) return false;
+    var token=String(profile.token||'');
+    window.__TURF_AUTH_TOKEN__=token;
+    window.__TURF_AUTH_PROFILE__=profile;
+    try{localStorage.setItem('turfAuthAccountTokenV1',token)}catch(e){}
+    try{localStorage.setItem('footballHQAccountTokenV80',token)}catch(e){}
+    try{localStorage.setItem('turfAuthCachedProfileV1',JSON.stringify(profile))}catch(e){}
+    try{sessionStorage.setItem('turfStaticBootProfileV1',JSON.stringify(profile))}catch(e){}
+    try{document.documentElement.classList.remove('turf-auth-locked','fhq-identity-recovering')}catch(e){}
+    try{document.body.classList.remove('fhq-identity-recovering')}catch(e){}
+    var gate=qs('#turfAuthGate');if(gate)gate.classList.add('turf-auth-hidden');
+    try{if(typeof window.fhqSetRuntimeIdentity==='function')window.fhqSetRuntimeIdentity(profile)}catch(e){}
+    try{if(typeof window.fhqWriteLastConfirmedAccount==='function')window.fhqWriteLastConfirmedAccount(profile)}catch(e){}
+    try{if(typeof window.fhqSyncLocalProfileFromServer==='function')window.fhqSyncLocalProfileFromServer(profile)}catch(e){}
+    try{if(typeof window.fhqRememberLifetimePoints==='function')window.fhqRememberLifetimePoints(Number(profile.points)||0)}catch(e){}
+    try{if(typeof window.fhqRememberCoins==='function')window.fhqRememberCoins(Number(profile.hqCoins||profile.coins)||0)}catch(e){}
+    try{if(typeof window.fhqUpdateAccountUI==='function')window.fhqUpdateAccountUI(profile)}catch(e){}
+    try{if(typeof window.refreshFootballHQScoreDisplays==='function')window.refreshFootballHQScoreDisplays()}catch(e){}
+    try{if(typeof window.refreshFootballHQDashboard==='function')window.refreshFootballHQDashboard()}catch(e){}
+    try{window.dispatchEvent(new CustomEvent('turf:auth-ready',{detail:{profile:profile}}))}catch(e){}
+    sendTopMessage({type:'turf-auth-ready',token:token,username:String(profile.username||''),version:'worker-profile-1'});
+    return true;
+  }
+
   window.addEventListener('message',function(e){
     var d=e&&e.data;
     if(!d||typeof d!=='object') return;
     if(d.type==='turf-go-home') goHome();
-  });
+    if(d.type==='turf-auth-worker-profile'){
+      if(e.origin!=='https://turftrials.com') return;
+      if(e.source!==window.top) return;
+      applyWorkerProfile(d.profile||null);
+    }
+  },true);
 
   function boot(){
     addCss();ensureHub();
