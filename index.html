@@ -8,13 +8,13 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-21" />
-  <link rel="shortcut icon" type="image/png" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-21" />
-  <link rel="apple-touch-icon" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-21" />
+  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-22" />
+  <link rel="shortcut icon" type="image/png" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-22" />
+  <link rel="apple-touch-icon" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-22" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="/turf-static/js/turf-api.js?v=worker-auth-21"></script>
-  <script src="/turf-static/js/turf-config.js?v=worker-auth-21"></script>
-  <script src="/turf-static/js/turf-auth.js?v=worker-auth-21"></script>
+  <script src="/turf-static/js/turf-api.js?v=worker-auth-22"></script>
+  <script src="/turf-static/js/turf-config.js?v=worker-auth-22"></script>
+  <script src="/turf-static/js/turf-auth.js?v=worker-auth-22"></script>
   <style>
     :root{color-scheme:dark}
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
@@ -39,10 +39,10 @@
     #turfTrialsLayer{position:fixed;inset:0;z-index:999999;background:#07111c;display:none}#turfTrialsLayer.open{display:block}#turfTrialsFrame{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0}
   </style>
 </head>
-<body>
+<body data-turf-build="worker-auth-22">
   <div class="shell"><iframe id="turfApp" title="TURF" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
   <main id="turfAuthShell" aria-label="Sign in to TURF"><section class="auth-card">
-    <img class="auth-logo" src="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-21" alt="TURF" />
+    <img class="auth-logo" src="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-22" alt="TURF" />
     <h1 class="auth-title">TURF</h1><p class="auth-subtitle">Choose how you want to continue.</p>
     <div class="auth-options"><div id="googleButton" aria-label="Continue with Google"></div><button id="guestButton" class="auth-btn guest-btn" type="button">Continue as Guest</button><button class="auth-btn apple-btn" type="button" disabled>Continue with Apple <span class="coming">COMING SOON</span></button></div>
     <div id="authStatus" role="status" aria-live="polite"></div><p class="auth-note">Your sign-in choice determines which TURF account is loaded.</p>
@@ -51,25 +51,27 @@
   <script>
   (function(){
     'use strict';
+    var BUILD='worker-auth-22';
     var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
-    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.62&bridge=worker-auth-21';
-    var EXACT_T='/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-21';
+    /* Existing TURF app stays exactly where it is. Worker auth replaces only the outer sign-in path. */
+    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.62&bridge='+BUILD;
+    var EXACT_T='/v88-36/brand/turf-app-icon-v8953.png?v='+BUILD;
     var app=document.getElementById('turfApp'),guestButton=document.getElementById('guestButton'),googleButton=document.getElementById('googleButton'),status=document.getElementById('authStatus'),layer=document.getElementById('turfTrialsLayer'),frame=document.getElementById('turfTrialsFrame');
     var authStarted=false,googleRendered=false,pendingProfile=null,pendingLegacyAuth=null,appStarted=false,appRevealed=false,lastGoogleReset=0;
 
     function setStatus(message,isError){status.textContent=message||'';status.classList.toggle('error',!!isError)}
     function norm(p){p=String(p||'/trials/');return p.indexOf('/trials/')===0?p:'/trials/'}
     function openTrials(p){var t=norm(p);if(frame.getAttribute('src')!==t)frame.setAttribute('src',t);layer.classList.add('open');layer.setAttribute('aria-hidden','false');document.title='TURF — Trials'}
-    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'worker-auth-21'},'*')}catch(e){}}
+    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:BUILD},'*')}catch(e){}}
     function setFavicon(){document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"]').forEach(function(x){x.href=EXACT_T})}
     function remember(profile){try{sessionStorage.setItem('turfStaticBootProfileV1',JSON.stringify(profile||{}));localStorage.setItem('turfAuthCachedProfileV1',JSON.stringify(profile||{}));if(profile&&profile.token)localStorage.setItem('turfAuthAccountTokenV1',profile.token)}catch(e){}window.__TURF_AUTH_PROFILE__=profile||{};window.__TURF_AUTH_TOKEN__=profile&&profile.token||''}
     function reveal(){if(appRevealed)return;appRevealed=true;document.body.classList.add('turf-authenticated');setStatus('',false);authStarted=false;guestButton.disabled=false}
     function startApp(){if(appStarted)return;appStarted=true;app.src=APP_SRC+'&ts='+Date.now()}
-    function pushAuth(){if(!app.contentWindow||!appStarted)return;if(pendingProfile){try{app.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:pendingProfile,token:pendingProfile.token,version:'worker-auth-21'},'*')}catch(e){}}if(pendingLegacyAuth){try{app.contentWindow.postMessage(pendingLegacyAuth,'*')}catch(e){}}try{app.contentWindow.postMessage({type:'turf-auth-wrapper-ping',version:'worker-auth-21'},'*')}catch(e){}}
-    function schedulePushes(){[0,100,250,500,900,1500,2500,4000,6500,9000,13000].forEach(function(ms){setTimeout(pushAuth,ms)})}
-    function finish(profile,legacyAuth){if(!profile||!profile.token)throw new Error('No TURF profile returned.');remember(profile);pendingProfile=profile;pendingLegacyAuth=legacyAuth||null;startApp();reveal();pushAuth();schedulePushes()}
-    async function chooseGuest(){if(authStarted)return;authStarted=true;guestButton.disabled=true;try{setStatus('Loading your TURF account…',false);var gt=TurfAuth.getGuestToken();var p=await TurfAuth.guestSignIn();finish(p,{type:'turf-auth-guest',guestToken:gt,version:'worker-auth-21'})}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true)}}
-    async function onGoogleCredential(response){if(authStarted)return;var credential=response&&response.credential?String(response.credential):'';if(!credential){setStatus('Google sign-in did not return an account. Please try again.',true);return}authStarted=true;guestButton.disabled=true;try{setStatus('Loading your TURF account…',false);var p=await TurfAuth.googleSignIn(credential);finish(p,{type:'turf-auth-google',credential:credential,version:'worker-auth-21'})}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true);setTimeout(resetGoogle,250)}}
+    function pushAuth(){if(!app.contentWindow||!appStarted)return;if(pendingProfile){try{app.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:pendingProfile,token:pendingProfile.token,version:BUILD},'*')}catch(e){}}if(pendingLegacyAuth){try{app.contentWindow.postMessage(pendingLegacyAuth,'*')}catch(e){}}try{app.contentWindow.postMessage({type:'turf-auth-wrapper-ping',version:BUILD},'*')}catch(e){}}
+    function schedulePushes(){[0,60,150,300,600,1000,1800,3000,5000,8000].forEach(function(ms){setTimeout(pushAuth,ms)})}
+    function finish(profile,legacyAuth){if(!profile||!profile.token)throw new Error('No TURF profile returned.');remember(profile);pendingProfile=profile;pendingLegacyAuth=legacyAuth||null;reveal();pushAuth();schedulePushes()}
+    async function chooseGuest(){if(authStarted)return;authStarted=true;guestButton.disabled=true;try{setStatus('Loading your TURF account…',false);var gt=TurfAuth.getGuestToken();var p=await TurfAuth.guestSignIn();finish(p,{type:'turf-auth-guest',guestToken:gt,version:BUILD})}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true)}}
+    async function onGoogleCredential(response){if(authStarted)return;var credential=response&&response.credential?String(response.credential):'';if(!credential){setStatus('Google sign-in did not return an account. Please try again.',true);return}authStarted=true;guestButton.disabled=true;try{setStatus('Loading your TURF account…',false);var p=await TurfAuth.googleSignIn(credential);finish(p,{type:'turf-auth-google',credential:credential,version:BUILD})}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true);setTimeout(resetGoogle,250)}}
     function renderGoogle(){if(googleRendered)return true;if(!(window.google&&google.accounts&&google.accounts.id))return false;try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogleCredential,auto_select:false,cancel_on_tap_outside:true,ux_mode:'popup',itp_support:true,use_fedcm_for_button:false});googleButton.innerHTML='';google.accounts.id.renderButton(googleButton,{type:'standard',theme:'outline',size:'large',text:'signin_with',shape:'rectangular',logo_alignment:'left',width:360});googleRendered=true;return true}catch(e){setStatus('Google sign-in could not initialize. Please refresh and try again.',true);return false}}
     function resetGoogle(){if(appRevealed||authStarted)return;var now=Date.now();if(now-lastGoogleReset<500)return;lastGoogleReset=now;try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.cancel()}catch(e){}googleRendered=false;googleButton.innerHTML='';renderGoogle()}
     function startGoogleRenderer(){if(appRevealed)return;var googleAttempts=0,googleTimer=setInterval(function(){googleAttempts++;if(renderGoogle()||googleAttempts>60)clearInterval(googleTimer)},125)}
@@ -83,11 +85,13 @@
       if(d.type==='turf-open-trials')openTrials(d.path||'/trials/');if(d.type==='turf-close-trials')closeTrials();if(d.type==='turf-page-title'&&!layer.classList.contains('open'))document.title=String(d.title||'TURF').slice(0,80);if(d.type==='turf-favicon'){setFavicon();if(d.title&&!layer.classList.contains('open'))document.title=String(d.title).slice(0,80)}
     },true);
 
-    app.onload=function(){pushAuth();schedulePushes()};
+    app.onload=function(){pushAuth();if(pendingProfile)schedulePushes()};
     guestButton.addEventListener('click',chooseGuest);
     window.addEventListener('focus',function(){if(!appRevealed)setTimeout(resetGoogle,300)});
     document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&!appRevealed)setTimeout(resetGoogle,350)});
-    setFavicon();setStatus('',false);startGoogleRenderer();
+    setFavicon();setStatus('',false);
+    startApp(); /* preload the real TURF behind the sign-in screen */
+    startGoogleRenderer();
   })();
   </script>
 </body>
