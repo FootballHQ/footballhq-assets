@@ -1,3 +1,5 @@
 Trigger TURF Worker V2 deployment after push-based workflow enablement.
-Timestamp: 2026-08-23T16:02:00-07:00
-Live turftrials.com root is intentionally untouched.
+Timestamp: 2026-08-24T01:05:00-07:00
+Build: worker-login-6 exact TURF app proxy + Worker RPC transport only.
+Purpose: ensure turftrials.com wrapper and Worker /app endpoint are on the same auth-only cutover build.
+Visual policy: no Home/logo/topbar/game/collection reconstruction in Worker proxy.
