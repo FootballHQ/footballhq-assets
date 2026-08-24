@@ -17,6 +17,9 @@ function cleanupRecovery(){
         try{cs=getComputedStyle(p)}catch(e){cs=null}
         if(cs&&(cs.position==='fixed'||cs.position==='absolute')&&p.getBoundingClientRect().width>window.innerWidth*.5){
           p.style.setProperty('display','none','important');
+          p.style.setProperty('visibility','hidden','important');
+          p.style.setProperty('opacity','0','important');
+          p.style.setProperty('pointer-events','none','important');
           p.setAttribute('aria-hidden','true');
           break;
         }
@@ -24,6 +27,7 @@ function cleanupRecovery(){
       }
     }
   }
+  try{document.documentElement.classList.remove('fhq-identity-recovering');document.body.classList.remove('fhq-identity-recovering','recovering','account-loading','is-loading')}catch(e){}
 }
 
 function alignHero(){
@@ -44,8 +48,9 @@ function alignHero(){
 
 function apply(){cleanupRecovery();alignHero();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-[100,300,700,1200,2000,3500,6000].forEach(function(ms){setTimeout(apply,ms)});
+[50,100,200,350,600,1000,1800,3000,5000,8000].forEach(function(ms){setTimeout(apply,ms)});
 window.addEventListener('resize',alignHero);
-window.addEventListener('turf:auth-ready',function(){setTimeout(apply,0);setTimeout(apply,250)});
+window.addEventListener('message',function(e){var d=e&&e.data;if(d&&typeof d==='object'&&d.type==='turf-auth-worker-profile'){apply();[0,80,200,500,1000].forEach(function(ms){setTimeout(apply,ms)})}},true);
+window.addEventListener('turf:auth-ready',function(){apply();setTimeout(apply,120);setTimeout(apply,400)});
 try{document.addEventListener('turf:auth-ready',function(){setTimeout(apply,0)})}catch(e){}
 })();
