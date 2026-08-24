@@ -1,0 +1,1 @@
+Production login fix: Worker authenticates first, then the existing TURF v89.62 iframe is revealed immediately on iframe load while profile handoff continues. No visual reconstruction.
