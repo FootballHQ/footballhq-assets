@@ -99,9 +99,6 @@
     installRecoveryCss();
     hideKnownLegacyAuth();
     releaseInteraction();
-    /* A few short, non-invasive settles catch legacy auth classes that are added
-       immediately after profile injection. No whole-DOM observer and no repeated
-       navigation clicks. */
     [80,220,500,1000].forEach(function(ms){setTimeout(function(){
       hideKnownLegacyAuth();releaseInteraction();call('fhqUpdateAccountUI',[profile]);
     },ms)});
@@ -136,7 +133,8 @@
 
     setTimeout(function(){
       releaseInteraction();
-      post({type:'turf-auth-ready',version:'worker-profile-v4',token:token,username:String(profile.username||''),page:'home'});
+      /* Keep the established wrapper protocol name. Internal receiver revision is V4. */
+      post({type:'turf-auth-ready',version:'worker-profile-v3',token:token,username:String(profile.username||''),page:'home'});
     },120);
     return true;
   }
@@ -147,7 +145,7 @@
     if(applyProfile(d.profile||{})){try{e.stopImmediatePropagation();e.stopPropagation()}catch(_){}}
   },true);
 
-  function ready(){post({type:'turf-worker-profile-receiver-ready',version:'worker-profile-v4'})}
+  function ready(){post({type:'turf-worker-profile-receiver-ready',version:'worker-profile-v3'})}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){installRecoveryCss();ready()},{once:true});
   else{installRecoveryCss();ready()}
   [80,220,600,1400,3000].forEach(function(ms){setTimeout(ready,ms)});
