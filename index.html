@@ -52,7 +52,7 @@
   (function(){
     'use strict';
     var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
-    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.62&bridge=worker-auth-19';
+    var APP_SRC='/turf-static/exact-app-loader.html?build=worker-auth-20';
     var EXACT_T='/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-19';
     var app=document.getElementById('turfApp'),guestButton=document.getElementById('guestButton'),googleButton=document.getElementById('googleButton'),status=document.getElementById('authStatus'),layer=document.getElementById('turfTrialsLayer'),frame=document.getElementById('turfTrialsFrame');
     var authStarted=false,googleRendered=false,pendingProfile=null,appStarted=false,appRevealed=false,lastGoogleReset=0,readyTimer=null;
@@ -83,7 +83,6 @@
         if(!expected||d.version!=='worker-profile-v3'||received!==expected||d.page!=='home')return;
         pendingProfile=null;reveal();return;
       }
-      /* All old Apps Script auth/recovery messages are intentionally ignored. */
       if(String(d.type||'').indexOf('turf-auth-')===0)return;
       if(d.type==='turf-open-trials')openTrials(d.path||'/trials/');if(d.type==='turf-close-trials')closeTrials();if(d.type==='turf-page-title'&&!layer.classList.contains('open'))document.title=String(d.title||'TURF').slice(0,80);if(d.type==='turf-favicon'){setFavicon();if(d.title&&!layer.classList.contains('open'))document.title=String(d.title).slice(0,80)}
     },true);
