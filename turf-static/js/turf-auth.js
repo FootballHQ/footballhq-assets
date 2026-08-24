@@ -57,4 +57,28 @@
   }
 
   global.TurfAuth={googleSignIn,guestSignIn,resume,signOut(){clearSessionToken()},getSessionToken,getGuestToken,getCachedProfile};
+
+  /* Production root safety: Worker auth is authoritative. The existing TURF app
+     is still the exact current app; we only stop the outer sign-in shell from
+     waiting forever for a legacy Apps Script acknowledgement. */
+  function installRootRevealFallback(){
+    var frame=document.getElementById('turfApp'),status=document.getElementById('authStatus');
+    if(!frame||!status||window.__TURF_ROOT_WORKER_REVEAL_V1__)return;
+    window.__TURF_ROOT_WORKER_REVEAL_V1__=true;
+    var loaded=false,timer=null;
+    function signedIn(){return /^Signed in\. Opening TURF/i.test(String(status.textContent||'').trim())}
+    function hasProfile(){var p=getCachedProfile();return !!(p&&p.token)}
+    function reveal(){
+      if(!loaded||!signedIn()||!hasProfile()||document.body.classList.contains('turf-authenticated'))return;
+      clearTimeout(timer);timer=setTimeout(function(){
+        if(!loaded||!signedIn()||!hasProfile())return;
+        document.body.classList.add('turf-authenticated');
+        try{status.textContent=''}catch(_){}
+      },700);
+    }
+    frame.addEventListener('load',function(){loaded=true;reveal()});
+    try{new MutationObserver(reveal).observe(status,{childList:true,subtree:true,characterData:true})}catch(_){}
+    [500,1000,1800,3000,5000,8000,12000].forEach(function(ms){setTimeout(reveal,ms)});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installRootRevealFallback,{once:true});else installRootRevealFallback();
 })(window);
