@@ -8,8 +8,10 @@ import {handleTrialsGridRpc,handleTrialsHttp,handleGridAdmin} from './trials-gri
 
 const TRIAL_GRID_RPC=new Set(['turfV8905TrialInventory','turfV8944GridSearch','turfV8944GridIndexStatus']);
 const TURF_APP_SOURCE='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967';
-const TURF_BRIDGE_SRC='https://turftrials.com/turf-static/js/worker-gas-bridge.js?v=worker-login-3';
-const BUILD='inplace-turf-worker-v4';
+const TURF_BRIDGE_SRC='https://turftrials.com/turf-static/js/worker-gas-bridge.js?v=worker-login-4';
+const SAFE_RECEIVER_SRC='https://turftrials.com/v88-36/js/07-script-07.js?v=worker-auth-21-interaction';
+const SAFE_RECOVERY_SRC='https://turftrials.com/v88-36/js/107-turf-auth-recovery-hero-final-v8943.js?v=worker-auth-21-interaction';
+const BUILD='inplace-turf-worker-v5-interaction';
 
 export default {
   async fetch(request,env){
@@ -18,7 +20,7 @@ export default {
     const url=new URL(request.url);
 
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
-    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2,appProxy:true,loginBridge:3,build:BUILD},200,cors);
+    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2,appProxy:true,loginBridge:4,build:BUILD},200,cors);
 
     try{
       if(url.pathname==='/app'&&request.method==='GET')return await proxyCurrentTurfApp();
@@ -60,13 +62,20 @@ export default {
 
 async function proxyCurrentTurfApp(){
   const sourceUrl=TURF_APP_SOURCE+'&proxyts='+Date.now();
-  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/4.0'}});
+  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/5.0'}});
   const html=await upstream.text();
   if(!upstream.ok)throw new HttpError(502,'Current TURF app source returned HTTP '+upstream.status+'.');
   if(!/<html|<!doctype/i.test(html)||/Sorry, unable to open the file/i.test(html))throw new HttpError(502,'Current TURF app source is temporarily unavailable.');
 
-  const bridge='<script src="'+TURF_BRIDGE_SRC+'"></script>'+
-    '<script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-login-3";}catch(e){}</script>';
+  /* Preload the corrected receiver before the app's normal external scripts.
+     The V3 guard prevents any cached copy of the old broad recovery receiver
+     from running later. Loading the corrected v89.43 file first similarly sets
+     its own guard before a cached legacy copy can execute. */
+  const bridge='<script>try{window.__TURF_WORKER_PROFILE_RECEIVER_V3__=true;}catch(e){}</script>'+
+    '<script src="'+SAFE_RECEIVER_SRC+'"></script>'+
+    '<script src="'+SAFE_RECOVERY_SRC+'"></script>'+
+    '<script src="'+TURF_BRIDGE_SRC+'"></script>'+
+    '<script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-login-4";}catch(e){}</script>';
   let out=html;
   if(/<head[^>]*>/i.test(out))out=out.replace(/<head([^>]*)>/i,'<head$1>'+bridge);
   else if(/<body[^>]*>/i.test(out))out=out.replace(/<body([^>]*)>/i,'<body$1>'+bridge);
