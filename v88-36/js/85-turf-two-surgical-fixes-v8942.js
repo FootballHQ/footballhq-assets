@@ -3,8 +3,12 @@
    - Remove Higher/Lower PLAY control even after late renders
    - Remove Who Am I Give Up + duplicate reveal buttons
    - Do NOT mutate clue visibility after guesses (prevents glitching)
-   - After a valid TURF account token exists, clear stale recovery/auth
-     interaction blockers without changing any TURF visual presentation.
+   - Clear stale Apps Script recovery/auth interaction blockers.
+
+   IMPORTANT AUTH ARCHITECTURE:
+   turftrials.com now owns the sign-in gate. This Apps Script app is embedded
+   behind that gate, so the inner legacy gate must never block pointer/scroll
+   interaction after the parent reveals the app.
    ============================================================ */
 (function(){
 'use strict';
@@ -62,25 +66,16 @@ function fixWhoAmI(root){
   reveals.slice(1).forEach(function(btn){
     if(btn.parentNode) btn.parentNode.removeChild(btn);
   });
-  /* Intentionally leave clue rows alone. The native game owns clue progression. */
 }
 
-/* ---------- Live TURF auth/interactivity unlock ---------- */
+/* ---------- Live TURF parent-auth/interactivity unlock ---------- */
 var RECOVERY_WORDS=[
   'recovering your football hq account',
   'restoring your football hq account',
   'restoring your turf account'
 ];
-function authToken(){
-  try{
-    return String(
-      window.__TURF_AUTH_TOKEN__ ||
-      (typeof window.fhqGetToken==='function' ? window.fhqGetToken() : '') ||
-      localStorage.getItem('turfAuthAccountTokenV1') ||
-      ''
-    ).trim();
-  }catch(e){return '';}
-}
+var parentAuthSeen=false;
+
 function clearMainInteractionFlags(el){
   if(!el)return;
   try{el.removeAttribute('inert');}catch(e){}
@@ -106,24 +101,44 @@ function hideRecoveryOverlay(hit){
   return false;
 }
 function clearInteractionLock(){
-  if(!authToken())return false;
+  /*
+     Do NOT require an inner-frame token here. The parent turftrials.com
+     wrapper is the authentication authority and keeps this iframe hidden
+     and pointer-disabled until Worker auth succeeds.
+  */
   try{window.__fhqIdentityResolving=false;}catch(e){}
 
   [document.documentElement,document.body].forEach(function(el){
     if(!el)return;
     ['turf-auth-locked','fhq-identity-recovering','rankings-loading','loading','fhq-loading','account-loading','recovering','is-loading','modal-open'].forEach(function(c){el.classList.remove(c);});
     try{el.removeAttribute('inert');}catch(e){}
-    try{el.style.removeProperty('pointer-events');el.style.removeProperty('overflow');el.style.removeProperty('filter');el.style.removeProperty('opacity');}catch(e){}
+    try{
+      el.style.removeProperty('pointer-events');
+      el.style.removeProperty('filter');
+      el.style.removeProperty('opacity');
+      /* Do not force overflow here; native TURF sections own scrolling. */
+    }catch(e){}
   });
 
+  /* The parent wrapper owns auth now, so the legacy inner gate is obsolete. */
   var gate=document.getElementById('turfAuthGate');
-  if(gate&&document.documentElement.classList.contains('turf-parent-auth')){
+  if(gate){
     gate.classList.add('turf-auth-hidden');
+    gate.style.setProperty('display','none','important');
+    gate.style.setProperty('visibility','hidden','important');
+    gate.style.setProperty('opacity','0','important');
     gate.style.setProperty('pointer-events','none','important');
+    gate.setAttribute('aria-hidden','true');
   }
 
   ['#fhqSidebar','#turfTopbar','#fhqHome','#fhqMain','.fhq-main','.fhq-main-content'].forEach(function(sel){
     qa(sel).forEach(clearMainInteractionFlags);
+  });
+
+  /* Remove inert/pointer locks on the actual app panes, but leave modal/game
+     overlays alone so their native open/close logic is preserved. */
+  qa('#fhqSidebar,#turfTopbar,#fhqHome,#fhqMain,.fhq-main,.fhq-main-content,.fhq-nav').forEach(function(el){
+    try{el.removeAttribute('inert');el.style.setProperty('pointer-events','auto','important');}catch(e){}
   });
 
   qa('body *').forEach(function(el){
@@ -141,6 +156,18 @@ function enforce(){
   if(m==='higherlower') fixHigherLower(root);
   if(m==='whoami') fixWhoAmI(root);
 }
+
+/* Parent Worker-auth messages are explicit confirmation that the outer gate
+   has authenticated the user. We only use them to re-run the unlock; we do
+   not alter or replace the working login flow. */
+window.addEventListener('message',function(e){
+  var d=e&&e.data;
+  if(!d||typeof d!=='object')return;
+  if(d.type==='turf-auth-worker-profile'||d.type==='turf-auth-google'||d.type==='turf-auth-guest'||d.type==='turf-auth-wrapper-ping'){
+    parentAuthSeen=true;
+    [0,20,60,140,300,700,1400,2600].forEach(function(ms){setTimeout(clearInteractionLock,ms);});
+  }
+},true);
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',enforce,{once:true});
 else enforce();
