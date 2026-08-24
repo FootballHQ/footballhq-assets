@@ -7,6 +7,8 @@ import {handlesH2HRpc,handleH2HRpc} from './h2h-rpc.js';
 import {handleTrialsGridRpc,handleTrialsHttp,handleGridAdmin} from './trials-grid-rpc.js';
 
 const TRIAL_GRID_RPC=new Set(['turfV8905TrialInventory','turfV8944GridSearch','turfV8944GridIndexStatus']);
+const TURF_APP_SOURCE='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967';
+const TURF_BRIDGE_SRC='https://turftrials.com/turf-static/js/worker-gas-bridge.js?v=worker-login-1';
 
 export default {
   async fetch(request,env){
@@ -15,9 +17,12 @@ export default {
     const url=new URL(request.url);
 
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
-    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2},200,cors);
+    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2,appProxy:true},200,cors);
 
     try{
+      if(url.pathname==='/app'&&request.method==='GET'){
+        return await proxyCurrentTurfApp();
+      }
       if(url.pathname.startsWith('/trials/')){
         requireOrigin(origin,env);
         requireEnv(env);
@@ -53,6 +58,31 @@ export default {
     }
   }
 };
+
+async function proxyCurrentTurfApp(){
+  const sourceUrl=TURF_APP_SOURCE+'&proxyts='+Date.now();
+  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/1.0'}});
+  const html=await upstream.text();
+  if(!upstream.ok)throw new HttpError(502,'Current TURF app source returned HTTP '+upstream.status+'.');
+  if(!/<html|<!doctype/i.test(html)||/Sorry, unable to open the file/i.test(html)){
+    throw new HttpError(502,'Current TURF app source is temporarily unavailable.');
+  }
+
+  const bridge='<script src="'+TURF_BRIDGE_SRC+'"></script>'+
+    '<script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-login-1";}catch(e){}</script>';
+  let out=html;
+  if(/<\/body>/i.test(out))out=out.replace(/<\/body>/i,bridge+'</body>');
+  else out+=bridge;
+
+  return new Response(out,{status:200,headers:{
+    'Content-Type':'text/html; charset=utf-8',
+    'Cache-Control':'no-store, no-cache, must-revalidate, max-age=0',
+    'Pragma':'no-cache',
+    'Expires':'0',
+    'Referrer-Policy':'strict-origin-when-cross-origin',
+    'X-Content-Type-Options':'nosniff'
+  }});
+}
 
 function requireEnv(env){
   const missing=[];
