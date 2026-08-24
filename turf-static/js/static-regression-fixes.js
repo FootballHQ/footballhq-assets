@@ -1,11 +1,11 @@
 /* TURF static migration regression guard.
-   IMPORTANT: never rewrite approved 8962 branding/home presentation.
-   This file only guarantees Set 002 remains available, loads the 8962 visual lock,
-   and loads the game-overlay-only Batch 4 final UX layer. */
+   IMPORTANT: never rewrite approved/current TURF branding/home presentation.
+   This file guarantees Set 002 remains available, loads the exact current visual authorities,
+   and loads the finished Batch 4 destination layers. */
 (function(){
 'use strict';
-if(window.__TURF_STATIC_REGRESSION_FIXES_V2__)return;
-window.__TURF_STATIC_REGRESSION_FIXES_V2__=true;
+if(window.__TURF_STATIC_REGRESSION_FIXES_V3__)return;
+window.__TURF_STATIC_REGRESSION_FIXES_V3__=true;
 var SET2='The Sideline';
 function q(s,r){return (r||document).querySelector(s)}
 function token(){try{return String(typeof window.fhqGetToken==='function'?window.fhqGetToken():window.__TURF_AUTH_TOKEN__||'')}catch(e){return ''}}
@@ -35,15 +35,12 @@ function ensureCollections(){
   var t=token();if(!t||root.dataset.turfStaticSet2Loading==='1')return;root.dataset.turfStaticSet2Loading='1';
   try{google.script.run.withSuccessHandler(function(x){root.dataset.turfStaticSet2Loading='';if(x){window.__fhqLastCollectionsState=x;appendSet2(x)}}).withFailureHandler(function(){root.dataset.turfStaticSet2Loading=''}).getFootballHQCollections(t)}catch(e){root.dataset.turfStaticSet2Loading=''}
 }
-function loadApprovedLock(){
-  if(window.__TURF_STATIC_APPROVED_8962_LOCK__||q('script[data-turf-approved-8962]'))return;
-  var s=document.createElement('script');s.src='/turf-static/js/static-approved-8962-lock.js?v=8962-lock-1';s.async=false;s.setAttribute('data-turf-approved-8962','1');(document.head||document.documentElement).appendChild(s);
-}
-function loadBatch4Final(){
-  if(window.__TURF_STATIC_BATCH4_FINAL__||q('script[data-turf-batch4-final]'))return;
-  var s=document.createElement('script');s.src='/turf-static/js/static-batch4-final.js?v=batch4-final-1';s.async=false;s.setAttribute('data-turf-batch4-final','1');(document.head||document.documentElement).appendChild(s);
-}
-function run(){loadApprovedLock();loadBatch4Final();ensureCollections()}
+function loadOnce(src,attr){if(q('script['+attr+']'))return;var s=document.createElement('script');s.src=src;s.async=false;s.setAttribute(attr,'1');(document.head||document.documentElement).appendChild(s)}
+function loadApprovedLock(){if(window.__TURF_STATIC_APPROVED_8962_LOCK__||q('script[data-turf-approved-8962]'))return;loadOnce('/turf-static/js/static-approved-8962-lock.js?v=8962-lock-2','data-turf-approved-8962')}
+function loadBatch4Final(){if(window.__TURF_STATIC_BATCH4_FINAL__||q('script[data-turf-batch4-final]'))return;loadOnce('/turf-static/js/static-batch4-final.js?v=batch4-final-2','data-turf-batch4-final')}
+function loadCurrentVisuals(){if(window.__TURF_STATIC_CURRENT_VISUAL_AUTHORITY__||q('script[data-turf-current-visuals]'))return;loadOnce('/turf-static/js/static-current-visual-authority.js?v=current-com-1','data-turf-current-visuals')}
+function loadDestinations(){if(window.__TURF_BATCH4_DESTINATIONS__||q('script[data-turf-b4-destinations]'))return;loadOnce('/turf-static/js/static-batch4-destinations.js?v=destinations-1','data-turf-b4-destinations')}
+function run(){loadApprovedLock();loadBatch4Final();loadCurrentVisuals();loadDestinations();ensureCollections()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 [100,300,700,1400,2600,5000,8000].forEach(function(ms){setTimeout(run,ms)});
 if(window.MutationObserver){var timer;new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,80)}).observe(document.documentElement,{subtree:true,childList:true})}
