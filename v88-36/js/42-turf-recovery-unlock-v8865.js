@@ -1,8 +1,8 @@
 /* ============================================================
    TURF V88.65 — RECOVERY UI UNLOCK + TRIALS NAV
-   Cache-busted replacement for V88.64.
-   Preserves account recovery but will never let its legacy overlay
-   permanently block the site UI.
+   Login-safe recovery release. Does not change the working sign-in flow.
+   Preserves Trials/nav behavior while preventing the obsolete recovery
+   overlay from blocking TURF after authentication succeeds.
    ============================================================ */
 (function(){
   'use strict';
@@ -10,9 +10,13 @@
   window.__TURF_V8865__=true;
 
   var TRIALS_URL='https://turftrials.com/trials/';
-  var TARGET='recovering your football hq account';
+  var TARGETS=[
+    'recovering your football hq account',
+    'restoring your football hq account',
+    'restoring your turf account'
+  ];
 
-  function norm(v){return String(v||'').toLowerCase().replace(/\s+/g,' ').trim();}
+  function norm(v){return String(v||'').toLowerCase().replace(/\u2026/g,'...').replace(/\s+/g,' ').trim();}
 
   function openTrials(e){
     if(e){e.preventDefault();e.stopPropagation();}
@@ -56,53 +60,73 @@
 
   function containsTarget(el){
     if(!el || el.nodeType!==1) return false;
-    return norm(el.textContent).indexOf(TARGET)!==-1;
+    var t=norm(el.textContent);
+    for(var i=0;i<TARGETS.length;i++) if(t.indexOf(TARGETS[i])!==-1) return true;
+    return false;
+  }
+
+  function clearRecoveryState(){
+    try{window.__fhqIdentityResolving=false;}catch(_){}
+    [document.documentElement,document.body].forEach(function(el){
+      if(!el)return;
+      ['fhq-identity-recovering','rankings-loading','loading','fhq-loading','account-loading','recovering','is-loading','modal-open'].forEach(function(c){el.classList.remove(c);});
+      try{el.style.removeProperty('overflow');el.style.removeProperty('filter');el.style.removeProperty('opacity');}catch(_){}
+    });
   }
 
   function unlockRecovery(){
     try{
+      clearRecoveryState();
       var all=document.body ? document.body.querySelectorAll('*') : [];
-      var hit=null;
+      var released=false;
       for(var i=0;i<all.length;i++){
-        if(containsTarget(all[i])){
-          var children=all[i].children||[];
-          var childHas=false;
-          for(var j=0;j<children.length;j++) if(containsTarget(children[j])){childHas=true;break;}
-          if(!childHas){ hit=all[i]; break; }
+        var hit=all[i];
+        if(!containsTarget(hit)) continue;
+        var children=hit.children||[],childHas=false;
+        for(var j=0;j<children.length;j++) if(containsTarget(children[j])){childHas=true;break;}
+        if(childHas) continue;
+
+        var p=hit,candidates=[];
+        while(p && p!==document.body && candidates.length<14){candidates.push(p);p=p.parentElement;}
+
+        var overlay=null;
+        for(var k=0;k<candidates.length;k++){
+          var el=candidates[k],r,cs;
+          try{r=el.getBoundingClientRect();cs=getComputedStyle(el);}catch(_){continue;}
+          var large=r.width>innerWidth*.40 && r.height>innerHeight*.24;
+          var layer=cs.position==='fixed'||cs.position==='absolute'||parseInt(cs.zIndex||'0',10)>=5;
+          if(large&&layer){overlay=el;break;}
         }
-      }
-      if(!hit) return false;
-
-      var p=hit, candidates=[];
-      while(p && p!==document.body && candidates.length<12){candidates.push(p);p=p.parentElement;}
-
-      var overlay=null;
-      for(var k=0;k<candidates.length;k++){
-        var el=candidates[k], r=el.getBoundingClientRect(), cs=getComputedStyle(el);
-        if(r.width>innerWidth*.65 && r.height>innerHeight*.55 && (cs.position==='fixed'||cs.position==='absolute'||parseInt(cs.zIndex||'0',10)>=5)) overlay=el;
-      }
-      if(!overlay){
-        for(var q=candidates.length-1;q>=0;q--){
-          var rr=candidates[q].getBoundingClientRect();
-          if(rr.width>innerWidth*.75 && rr.height>innerHeight*.65){overlay=candidates[q];break;}
+        if(!overlay){
+          for(var q=candidates.length-1;q>=0;q--){
+            var rr;try{rr=candidates[q].getBoundingClientRect();}catch(_){continue;}
+            if(rr.width>innerWidth*.65 && rr.height>innerHeight*.45){overlay=candidates[q];break;}
+          }
         }
-      }
 
-      (overlay||hit).style.setProperty('display','none','important');
-      (overlay||hit).style.setProperty('pointer-events','none','important');
-      document.body.style.removeProperty('overflow');
-      document.documentElement.style.removeProperty('overflow');
-      ['rankings-loading','loading','fhq-loading','account-loading','recovering'].forEach(function(c){document.body.classList.remove(c);document.documentElement.classList.remove(c);});
-      console.warn('[TURF V88.65] Stalled recovery UI released. Recovery data/process preserved.');
-      return true;
+        var target=overlay||hit;
+        target.style.setProperty('display','none','important');
+        target.style.setProperty('visibility','hidden','important');
+        target.style.setProperty('opacity','0','important');
+        target.style.setProperty('pointer-events','none','important');
+        target.setAttribute('aria-hidden','true');
+        released=true;
+      }
+      clearRecoveryState();
+      return released;
     }catch(e){console.warn('[TURF V88.65] unlock error',e);return false;}
   }
 
   function apply(){brand();installStyle();addTrials();}
+  function sweep(){apply();unlockRecovery();}
   function boot(){
-    apply();
-    [500,1500,3000,5000,8000,12000].forEach(function(ms){setTimeout(function(){apply();unlockRecovery();},ms);});
-    if(window.MutationObserver){new MutationObserver(function(){apply();}).observe(document.documentElement,{childList:true,subtree:true});}
+    sweep();
+    [0,30,80,160,300,550,900,1400,2200,3500,5500,8000,12000].forEach(function(ms){setTimeout(sweep,ms);});
+    window.addEventListener('turf:auth-ready',function(){[0,20,60,140,300,700,1400,2600].forEach(function(ms){setTimeout(unlockRecovery,ms);});});
+    if(window.MutationObserver){
+      var timer=null;
+      new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(sweep,16);}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','aria-hidden']});
+    }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
