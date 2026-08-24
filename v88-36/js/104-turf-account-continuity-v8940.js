@@ -134,6 +134,10 @@ function addCss(){
   (document.head||document.documentElement).appendChild(st);
 }
 function maybeReloadForIdentity(){
+  /* Worker proxy login already persists the authoritative account in-place.
+     Never reload the proxied TURF document: on the custom domain that can turn
+     a legacy Apps Script navigation into a Worker route and replace the UI. */
+  try{if(window.__TURF_APP_PROXY__||workerProfile)return}catch(e){}
   var p=chooseProfile();if(!p||!p.token)return;
   var legacy='';try{legacy=String(localStorage.getItem(LEGACY_TOKEN_KEY)||'')}catch(e){}
   if(legacy&&legacy!==String(p.token)){
@@ -165,7 +169,7 @@ window.addEventListener('message',function(e){
   if(p&&d.token&&!p.token)p.token=String(d.token);
   acceptWorkerProfile(p);
 },true);
-window.addEventListener('turf:auth-ready',function(){setTimeout(function(){run();maybeReloadForIdentity()},0)});
+window.addEventListener('turf:auth-ready',function(e){setTimeout(function(){run();if(!(e&&e.detail&&e.detail.source==='worker'))maybeReloadForIdentity()},0)});
 document.addEventListener('click',function(e){var t=e.target&&e.target.closest?e.target.closest('#turfProfileBtn,#fhqProfileButton,[data-fhq-nav="leaderboard"],[data-fhq-nav="home"]'):null;if(t)[20,100,300,700].forEach(function(ms){setTimeout(run,ms)})},true);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 [0,100,350,900,1800,3500].forEach(function(ms){setTimeout(function(){announceWorkerReceiver();run()},ms)});
