@@ -12,9 +12,9 @@
   <link rel="shortcut icon" type="image/png" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=8967" />
   <link rel="apple-touch-icon" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=8967" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="/turf-static/js/turf-api.js?v=worker-auth-8"></script>
-  <script src="/turf-static/js/turf-config.js?v=worker-auth-8"></script>
-  <script src="/turf-static/js/turf-auth.js?v=worker-auth-8"></script>
+  <script src="/turf-static/js/turf-api.js?v=worker-auth-9"></script>
+  <script src="/turf-static/js/turf-config.js?v=worker-auth-9"></script>
+  <script src="/turf-static/js/turf-auth.js?v=worker-auth-9"></script>
   <style>
     :root{color-scheme:dark}
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
@@ -53,7 +53,7 @@
     'use strict';
     var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
     /* Existing TURF app remains the app. Only auth is handled by the Worker wrapper. */
-    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.62&bridge=worker-auth-8';
+    var APP_SRC='https://script.google.com/macros/s/AKfycbwEEff6PG1QLNEcNE5nyr0qcn53iB-pAia8AR5MLpiouZVYeUnUGoEISGL_Z3j1gkhM2A/exec?turfv=89.62&bridge=worker-auth-9';
     var EXACT_T='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=8967';
     var app=document.getElementById('turfApp'),guestButton=document.getElementById('guestButton'),googleButton=document.getElementById('googleButton'),status=document.getElementById('authStatus'),layer=document.getElementById('turfTrialsLayer'),frame=document.getElementById('turfTrialsFrame');
     var authStarted=false,googleRendered=false,pendingProfile=null,profileTimer=null,appStarted=false,appLoaded=false;
@@ -61,19 +61,16 @@
     function setStatus(message,isError){status.textContent=message||'';status.classList.toggle('error',!!isError)}
     function norm(p){p=String(p||'/trials/');return p.indexOf('/trials/')===0?p:'/trials/'}
     function openTrials(p){var t=norm(p);if(frame.getAttribute('src')!==t)frame.setAttribute('src',t);layer.classList.add('open');layer.setAttribute('aria-hidden','false');document.title='TURF — Trials'}
-    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'worker-auth-8'},'*')}catch(e){}}
+    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'worker-auth-9'},'*')}catch(e){}}
     function setFavicon(){document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"]').forEach(function(x){x.href=EXACT_T})}
     function remember(profile){try{sessionStorage.setItem('turfStaticBootProfileV1',JSON.stringify(profile||{}));localStorage.setItem('turfAuthCachedProfileV1',JSON.stringify(profile||{}));if(profile&&profile.token)localStorage.setItem('turfAuthAccountTokenV1',profile.token)}catch(e){}window.__TURF_AUTH_PROFILE__=profile||{};window.__TURF_AUTH_TOKEN__=profile&&profile.token||''}
     function startApp(){if(appStarted)return;appStarted=true;app.src=APP_SRC+'&ts='+Date.now()}
-    function pushProfile(){if(!pendingProfile||!app.contentWindow||!appStarted)return;try{app.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:pendingProfile,token:pendingProfile.token,version:'worker-auth-8'},'*')}catch(e){}}
+    function pushProfile(){if(!pendingProfile||!app.contentWindow||!appStarted)return;try{app.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:pendingProfile,token:pendingProfile.token,version:'worker-auth-9'},'*')}catch(e){}}
     function schedulePushes(){[0,80,180,350,650,1100,1800,3000,4800,7000,10000,13000].forEach(function(ms){setTimeout(pushProfile,ms)})}
     function finish(profile){
       if(!profile||!profile.token)throw new Error('No TURF profile returned.');
       remember(profile);pendingProfile=profile;setStatus('Opening your TURF account…',false);startApp();schedulePushes();
       clearTimeout(profileTimer);profileTimer=setTimeout(function(){
-        /* Do not strand the user on the login card. The existing TURF app is still
-           revealed; a deployed account-continuity receiver can accept the profile
-           on any of the repeated postMessage attempts above. */
         if(!pendingProfile)return;
         document.body.classList.add('turf-authenticated');
         setStatus('',false);
