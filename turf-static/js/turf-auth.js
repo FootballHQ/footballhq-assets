@@ -56,30 +56,9 @@
     catch(err){if(err&&err.code==='SESSION_INVALID')clearSessionToken();throw err}
   }
 
+  /* Deliberately no root "reveal on iframe load" fallback here.
+     The live wrapper reveals TURF only after the existing app acknowledges the
+     exact Worker token/profile with turf-auth-ready. This prevents stale/wrong
+     account UI from flashing or becoming interactive. */
   global.TurfAuth={googleSignIn,guestSignIn,resume,signOut(){clearSessionToken()},getSessionToken,getGuestToken,getCachedProfile};
-
-  /* Root-only login safety. Worker auth is authoritative; the existing TURF app
-     remains untouched. If the Worker profile exists and the current TURF iframe
-     has loaded, do not leave the outer sign-in shell stuck waiting forever for
-     an optional inner acknowledgement. */
-  function installRootRevealFallback(){
-    var frame=document.getElementById('turfApp'),status=document.getElementById('authStatus');
-    if(!frame||!status||window.__TURF_ROOT_WORKER_REVEAL_V2__)return;
-    window.__TURF_ROOT_WORKER_REVEAL_V2__=true;
-    var loaded=false,timer=null;
-    function signedIn(){return /^(?:Signed in|Account loaded)\.\s*Opening TURF/i.test(String(status.textContent||'').trim())}
-    function hasProfile(){var p=getCachedProfile();return !!(p&&p.token)}
-    function reveal(){
-      if(!loaded||!signedIn()||!hasProfile()||document.body.classList.contains('turf-authenticated'))return;
-      clearTimeout(timer);timer=setTimeout(function(){
-        if(!loaded||!signedIn()||!hasProfile()||document.body.classList.contains('turf-authenticated'))return;
-        document.body.classList.add('turf-authenticated');
-        try{status.textContent=''}catch(_){}
-      },700);
-    }
-    frame.addEventListener('load',function(){loaded=true;reveal()});
-    try{new MutationObserver(reveal).observe(status,{childList:true,subtree:true,characterData:true})}catch(_){}
-    [400,800,1400,2200,3500,5500,8000,12000].forEach(function(ms){setTimeout(reveal,ms)});
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installRootRevealFallback,{once:true});else installRootRevealFallback();
 })(window);
