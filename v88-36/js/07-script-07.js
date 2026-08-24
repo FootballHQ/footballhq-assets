@@ -9,7 +9,7 @@
 /* TURF Worker auth handoff.
    Worker auth is authoritative. The existing TURF runtime stays visually intact;
    this receiver only injects the verified account and prevents obsolete identity
-   recovery from ever becoming part of the post-login user flow. */
+   recovery/auth overlays from ever becoming part of the post-login user flow. */
 (function(){
   'use strict';
   if(window.__TURF_WORKER_PROFILE_RECEIVER_V3__)return;
@@ -45,8 +45,35 @@
       html.turf-parent-auth body:before,
       html.turf-parent-auth body:after{display:none!important;content:none!important;opacity:0!important;pointer-events:none!important}
       html.turf-parent-auth body{filter:none!important;opacity:1!important}
+      html.turf-parent-auth #turfAuthGate,
+      html.turf-parent-auth #turfGoogleButton{
+        display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;
+      }
     `;
     (document.head||document.documentElement).appendChild(s);
+  }
+
+  function hideLegacyAuthGate(){
+    try{
+      if(!document.documentElement.classList.contains('turf-parent-auth'))return;
+      var gate=document.getElementById('turfAuthGate');
+      if(gate){
+        gate.classList.add('turf-auth-hidden');
+        gate.setAttribute('aria-hidden','true');
+        gate.style.setProperty('display','none','important');
+        gate.style.setProperty('visibility','hidden','important');
+        gate.style.setProperty('opacity','0','important');
+        gate.style.setProperty('pointer-events','none','important');
+      }
+      var btn=document.getElementById('turfGoogleButton');
+      if(btn){
+        btn.setAttribute('aria-hidden','true');
+        btn.style.setProperty('display','none','important');
+        btn.style.setProperty('visibility','hidden','important');
+        btn.style.setProperty('opacity','0','important');
+        btn.style.setProperty('pointer-events','none','important');
+      }
+    }catch(e){}
   }
 
   function recoveryText(el){
@@ -59,6 +86,7 @@
 
   function releaseLegacyRecovery(){
     try{window.__fhqIdentityResolving=false}catch(e){}
+    hideLegacyAuthGate();
     [document.documentElement,document.body].forEach(function(el){
       if(!el)return;
       ['fhq-identity-recovering','rankings-loading','account-loading','recovering','fhq-loading','is-loading','modal-open'].forEach(function(c){el.classList.remove(c)});
@@ -106,14 +134,14 @@
     installRecoveryKillCss();releaseLegacyRecovery();forceHome();
     [20,60,120,220,400,700,1100,1800,2800,4500,7000].forEach(function(ms){
       setTimeout(function(){
-        releaseLegacyRecovery();forceHome();
+        hideLegacyAuthGate();releaseLegacyRecovery();forceHome();
         try{window.__fhqIdentityResolving=false}catch(e){}
         call('fhqUpdateAccountUI',[profile]);
       },ms);
     });
     if(!recoveryObserver&&window.MutationObserver){
       var timer=null;
-      recoveryObserver=new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(function(){releaseLegacyRecovery();forceHome()},12)});
+      recoveryObserver=new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(function(){hideLegacyAuthGate();releaseLegacyRecovery();forceHome()},12)});
       try{recoveryObserver.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','aria-hidden']})}catch(e){}
     }
     clearTimeout(recoveryStopTimer);
@@ -127,9 +155,9 @@
     try{window.__TURF_AUTH_PROFILE__=profile}catch(e){}
     try{localStorage.setItem('turfAuthenticatedProfileV8921',JSON.stringify(profile))}catch(e){}
     try{document.documentElement.classList.add('turf-parent-auth');document.documentElement.classList.remove('turf-auth-locked')}catch(e){}
-    try{var gate=document.getElementById('turfAuthGate');if(gate){gate.classList.add('turf-auth-hidden');gate.setAttribute('aria-hidden','true');gate.style.setProperty('display','none','important')}}catch(e){}
 
     installRecoveryKillCss();
+    hideLegacyAuthGate();
     try{window.__fhqIdentityResolving=false}catch(e){}
     releaseLegacyRecovery();
 
@@ -147,10 +175,8 @@
     try{window.dispatchEvent(new CustomEvent('turf:auth-ready',{detail:{profile:profile,source:'worker'}}))}
     catch(e){try{window.dispatchEvent(new Event('turf:auth-ready'))}catch(_){}}
 
-    /* Delay acknowledgement just enough for Home/recovery cleanup to settle.
-       Parent keeps this iframe invisible until this message arrives. */
     setTimeout(function(){
-      releaseLegacyRecovery();forceHome();
+      hideLegacyAuthGate();releaseLegacyRecovery();forceHome();
       post({type:'turf-auth-ready',version:'worker-profile-v3',token:token,username:String(profile.username||''),page:'home'});
     },120);
     return true;
