@@ -110,3 +110,5 @@ jobs:
           fi
           git commit -m 'Use exact TURF app through Worker login bridge [skip ci]'
           git push
+
+# trigger: 2026-08-24 guarded login-only cutover
