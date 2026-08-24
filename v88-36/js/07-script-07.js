@@ -8,12 +8,12 @@
 
 /* TURF Worker auth handoff.
    Worker auth is authoritative. The existing TURF runtime stays visually intact.
-   IMPORTANT: once auth succeeds this receiver must release the page completely;
-   it never scans/hides arbitrary app containers and never keeps forcing Home. */
+   IMPORTANT: auth only supplies identity/account state and releases stale auth locks.
+   It NEVER changes TURF navigation or forces a page after login. */
 (function(){
   'use strict';
-  if(window.__TURF_WORKER_PROFILE_RECEIVER_V4__)return;
-  window.__TURF_WORKER_PROFILE_RECEIVER_V4__=true;
+  if(window.__TURF_WORKER_PROFILE_RECEIVER_V5__)return;
+  window.__TURF_WORKER_PROFILE_RECEIVER_V5__=true;
 
   var PARENT_ORIGIN='https://turftrials.com';
   var TOKEN_KEY='turfAuthAccountTokenV1';
@@ -65,11 +65,18 @@
     });
   }
 
+  function unlockElement(el){
+    if(!el)return;
+    try{el.removeAttribute('inert')}catch(e){}
+    try{el.style.removeProperty('pointer-events')}catch(e){}
+  }
+
   function releaseInteraction(){
     try{window.__fhqIdentityResolving=false}catch(e){}
     [document.documentElement,document.body].forEach(function(el){
       if(!el)return;
       ['fhq-identity-recovering','rankings-loading','account-loading','recovering','fhq-loading','is-loading','modal-open','turf-auth-locked'].forEach(function(c){el.classList.remove(c)});
+      try{el.removeAttribute('inert')}catch(e){}
       try{
         el.style.removeProperty('pointer-events');
         el.style.removeProperty('overflow');
@@ -77,29 +84,40 @@
         el.style.removeProperty('opacity');
       }catch(e){}
     });
-    ['fhqSidebar','fhqMain','fhqHome','turfTopbar'].forEach(function(id){
-      var el=document.getElementById(id);if(!el)return;
-      try{el.style.removeProperty('pointer-events')}catch(e){}
-    });
-    hideKnownLegacyAuth();
-  }
 
-  function openHomeOnce(){
-    try{
-      var rankings=document.getElementById('rankingsStandalone');
-      if(rankings)rankings.style.setProperty('display','none','important');
-      var home=document.getElementById('fhqHome');
-      if(home){home.classList.remove('hidden');home.style.removeProperty('display');home.style.removeProperty('visibility');home.style.removeProperty('opacity')}
-      var homeBtn=document.querySelector('#fhqSidebar [data-fhq-nav="home"],.fhq-nav [data-fhq-nav="home"]');
-      if(homeBtn&&!homeBtn.classList.contains('active'))homeBtn.click();
-    }catch(e){}
+    [
+      '#fhqSidebar','#fhqMain','#fhqHome','#turfTopbar','.fhq-main','.fhq-main-content','.fhq-nav',
+      '#rankingsStandalone','#footballGameOverlay','#fhqShopOverlay','#fhqLockerOverlay','#fhqAlbumOverlay'
+    ].forEach(function(sel){
+      try{Array.prototype.forEach.call(document.querySelectorAll(sel),unlockElement)}catch(e){}
+    });
+
+    /* Remove stale invisible blockers left by old loading/recovery states, but only
+       when they are explicitly marked as loading/recovery/auth UI. Never inspect or
+       hide normal TURF containers by size/text. */
+    [
+      '#turfAuthGate','.fhq-identity-recovery','.fhq-recovery-overlay','.account-loading-overlay',
+      '.fhq-loading-overlay','.turf-loading-overlay','[data-auth-overlay="true"]'
+    ].forEach(function(sel){
+      try{Array.prototype.forEach.call(document.querySelectorAll(sel),function(el){
+        if(el.id==='turfAuthGate'){hideKnownLegacyAuth();return}
+        var cs=getComputedStyle(el);
+        if(cs.position==='fixed'||cs.position==='absolute'){
+          el.style.setProperty('display','none','important');
+          el.style.setProperty('pointer-events','none','important');
+          el.setAttribute('aria-hidden','true');
+        }
+      })}catch(e){}
+    });
+
+    hideKnownLegacyAuth();
   }
 
   function settle(profile){
     installRecoveryCss();
     hideKnownLegacyAuth();
     releaseInteraction();
-    [80,220,500,1000].forEach(function(ms){setTimeout(function(){
+    [80,220,500,1000,1800].forEach(function(ms){setTimeout(function(){
       hideKnownLegacyAuth();releaseInteraction();call('fhqUpdateAccountUI',[profile]);
     },ms)});
   }
@@ -125,7 +143,8 @@
     call('refreshFootballHQScoreDisplays');
     call('refreshFootballHQDashboard');
 
-    openHomeOnce();
+    /* Critical: do NOT click Home, hide Rankings, or alter the current page here.
+       Let TURF's own navigation state remain authoritative. */
     settle(profile);
 
     try{window.dispatchEvent(new CustomEvent('turf:auth-ready',{detail:{profile:profile,source:'worker'}}))}
@@ -133,8 +152,7 @@
 
     setTimeout(function(){
       releaseInteraction();
-      /* Keep the established wrapper protocol name. Internal receiver revision is V4. */
-      post({type:'turf-auth-ready',version:'worker-profile-v3',token:token,username:String(profile.username||''),page:'home'});
+      post({type:'turf-auth-ready',version:'worker-profile-v5',token:token,username:String(profile.username||''),page:'current'});
     },120);
     return true;
   }
@@ -145,7 +163,7 @@
     if(applyProfile(d.profile||{})){try{e.stopImmediatePropagation();e.stopPropagation()}catch(_){}}
   },true);
 
-  function ready(){post({type:'turf-worker-profile-receiver-ready',version:'worker-profile-v3'})}
+  function ready(){post({type:'turf-worker-profile-receiver-ready',version:'worker-profile-v5'})}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){installRecoveryCss();ready()},{once:true});
   else{installRecoveryCss();ready()}
   [80,220,600,1400,3000].forEach(function(ms){setTimeout(ready,ms)});
