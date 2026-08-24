@@ -8,13 +8,13 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-22" />
-  <link rel="shortcut icon" type="image/png" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-22" />
-  <link rel="apple-touch-icon" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-22" />
+  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-23" />
+  <link rel="shortcut icon" type="image/png" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-23" />
+  <link rel="apple-touch-icon" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-23" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="/turf-static/js/turf-api.js?v=worker-auth-22"></script>
-  <script src="/turf-static/js/turf-config.js?v=worker-auth-22"></script>
-  <script src="/turf-static/js/turf-auth.js?v=worker-auth-22"></script>
+  <script src="/turf-static/js/turf-api.js?v=worker-auth-23"></script>
+  <script src="/turf-static/js/turf-config.js?v=worker-auth-23"></script>
+  <script src="/turf-static/js/turf-auth.js?v=worker-auth-23"></script>
   <style>
     :root{color-scheme:dark}
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
@@ -39,10 +39,10 @@
     #turfTrialsLayer{position:fixed;inset:0;z-index:999999;background:#07111c;display:none}#turfTrialsLayer.open{display:block}#turfTrialsFrame{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0}
   </style>
 </head>
-<body data-turf-build="worker-auth-22">
+<body data-turf-build="worker-auth-23">
   <div class="shell"><iframe id="turfApp" title="TURF" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
   <main id="turfAuthShell" aria-label="Sign in to TURF"><section class="auth-card">
-    <img class="auth-logo" src="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-22" alt="TURF" />
+    <img class="auth-logo" src="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-23" alt="TURF" />
     <h1 class="auth-title">TURF</h1><p class="auth-subtitle">Choose how you want to continue.</p>
     <div class="auth-options"><div id="googleButton" aria-label="Continue with Google"></div><button id="guestButton" class="auth-btn guest-btn" type="button">Continue as Guest</button><button class="auth-btn apple-btn" type="button" disabled>Continue with Apple <span class="coming">COMING SOON</span></button></div>
     <div id="authStatus" role="status" aria-live="polite"></div><p class="auth-note">Your sign-in choice determines which TURF account is loaded.</p>
@@ -51,13 +51,13 @@
   <script>
   (function(){
     'use strict';
-    var BUILD='worker-auth-22';
+    var BUILD='worker-auth-23';
     var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
     /* Existing TURF app stays exactly where it is. Worker auth replaces only the outer sign-in path. */
     var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.62&bridge='+BUILD;
     var EXACT_T='/v88-36/brand/turf-app-icon-v8953.png?v='+BUILD;
     var app=document.getElementById('turfApp'),guestButton=document.getElementById('guestButton'),googleButton=document.getElementById('googleButton'),status=document.getElementById('authStatus'),layer=document.getElementById('turfTrialsLayer'),frame=document.getElementById('turfTrialsFrame');
-    var authStarted=false,googleRendered=false,pendingProfile=null,pendingLegacyAuth=null,appStarted=false,appRevealed=false,lastGoogleReset=0;
+    var authStarted=false,googleRendered=false,pendingProfile=null,pendingLegacyAuth=null,appStarted=false,appRevealed=false;
 
     function setStatus(message,isError){status.textContent=message||'';status.classList.toggle('error',!!isError)}
     function norm(p){p=String(p||'/trials/');return p.indexOf('/trials/')===0?p:'/trials/'}
@@ -71,9 +71,8 @@
     function schedulePushes(){[0,60,150,300,600,1000,1800,3000,5000,8000].forEach(function(ms){setTimeout(pushAuth,ms)})}
     function finish(profile,legacyAuth){if(!profile||!profile.token)throw new Error('No TURF profile returned.');remember(profile);pendingProfile=profile;pendingLegacyAuth=legacyAuth||null;reveal();pushAuth();schedulePushes()}
     async function chooseGuest(){if(authStarted)return;authStarted=true;guestButton.disabled=true;try{setStatus('Loading your TURF account…',false);var gt=TurfAuth.getGuestToken();var p=await TurfAuth.guestSignIn();finish(p,{type:'turf-auth-guest',guestToken:gt,version:BUILD})}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true)}}
-    async function onGoogleCredential(response){if(authStarted)return;var credential=response&&response.credential?String(response.credential):'';if(!credential){setStatus('Google sign-in did not return an account. Please try again.',true);return}authStarted=true;guestButton.disabled=true;try{setStatus('Loading your TURF account…',false);var p=await TurfAuth.googleSignIn(credential);finish(p,{type:'turf-auth-google',credential:credential,version:BUILD})}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true);setTimeout(resetGoogle,250)}}
-    function renderGoogle(){if(googleRendered)return true;if(!(window.google&&google.accounts&&google.accounts.id))return false;try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogleCredential,auto_select:false,cancel_on_tap_outside:true,ux_mode:'popup',itp_support:true,use_fedcm_for_button:false});googleButton.innerHTML='';google.accounts.id.renderButton(googleButton,{type:'standard',theme:'outline',size:'large',text:'signin_with',shape:'rectangular',logo_alignment:'left',width:360});googleRendered=true;return true}catch(e){setStatus('Google sign-in could not initialize. Please refresh and try again.',true);return false}}
-    function resetGoogle(){if(appRevealed||authStarted)return;var now=Date.now();if(now-lastGoogleReset<500)return;lastGoogleReset=now;try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.cancel()}catch(e){}googleRendered=false;googleButton.innerHTML='';renderGoogle()}
+    async function onGoogleCredential(response){if(authStarted)return;var credential=response&&response.credential?String(response.credential):'';if(!credential){setStatus('Google sign-in did not return an account. Please try again.',true);return}authStarted=true;guestButton.disabled=true;try{setStatus('Loading your TURF account…',false);var p=await TurfAuth.googleSignIn(credential);finish(p,{type:'turf-auth-google',credential:credential,version:BUILD})}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true)}}
+    function renderGoogle(){if(googleRendered)return true;if(!(window.google&&google.accounts&&google.accounts.id))return false;try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogleCredential,auto_select:false,cancel_on_tap_outside:false});googleButton.innerHTML='';google.accounts.id.renderButton(googleButton,{theme:'outline',size:'large',text:'signin_with',shape:'rectangular'});googleRendered=true;return true}catch(e){setStatus('Google sign-in could not initialize. Please refresh and try again.',true);return false}}
     function startGoogleRenderer(){if(appRevealed)return;var googleAttempts=0,googleTimer=setInterval(function(){googleAttempts++;if(renderGoogle()||googleAttempts>60)clearInterval(googleTimer)},125)}
 
     window.addEventListener('message',function(e){
@@ -87,8 +86,6 @@
 
     app.onload=function(){pushAuth();if(pendingProfile)schedulePushes()};
     guestButton.addEventListener('click',chooseGuest);
-    window.addEventListener('focus',function(){if(!appRevealed)setTimeout(resetGoogle,300)});
-    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&!appRevealed)setTimeout(resetGoogle,350)});
     setFavicon();setStatus('',false);
     startApp(); /* preload the real TURF behind the sign-in screen */
     startGoogleRenderer();
