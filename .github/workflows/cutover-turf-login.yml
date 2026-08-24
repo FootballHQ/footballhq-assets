@@ -35,62 +35,46 @@ jobs:
           npm install --no-audit --no-fund
           npm run check
 
-      - name: Deploy Worker V2 first
+      - name: Deploy Worker V2
         working-directory: turf-static/worker
         run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Confirm new Worker login bridge is actually live
+      - name: Confirm exact-app Worker bridge is live
         run: |
           set -euo pipefail
-          for i in $(seq 1 20); do
+          for i in $(seq 1 24); do
             BODY="$(curl -fsS --max-time 10 'https://turftest-api.turftrials.workers.dev/health' || true)"
             echo "$BODY"
-            if echo "$BODY" | grep -q '"loginBridge":2'; then
+            if echo "$BODY" | grep -q '"loginBridge":3' && echo "$BODY" | grep -q '"appProxy":true'; then
               exit 0
             fi
             sleep 3
           done
-          echo 'Worker loginBridge 2 was not confirmed; leaving turftrials.com unchanged.' >&2
+          echo 'Worker loginBridge 3 / appProxy was not confirmed; leaving turftrials.com unchanged.' >&2
           exit 1
 
-      - name: Capture the actual current TURF app from Apps Script
+      - name: Verify Worker serves the actual current TURF app
         run: |
           set -euo pipefail
-          mkdir -p turf-current
-          SOURCE='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967'
-          curl -fL --retry 4 --retry-delay 2 --max-time 45 "${SOURCE}&capture=$(date +%s)" -o /tmp/turf-current.html
-          grep -qi '<html' /tmp/turf-current.html
-          grep -q 'id="fhqHome"' /tmp/turf-current.html
-          grep -q 'id="turfTopbar"' /tmp/turf-current.html
-          grep -q 'TURF_EXACT_BRAND_V8940' /tmp/turf-current.html
-          if grep -qi 'Sorry, unable to open the file' /tmp/turf-current.html; then
-            echo 'Apps Script returned its error page; leaving turftrials.com unchanged.' >&2
+          curl -fL --retry 4 --retry-delay 2 --max-time 45 \
+            'https://turftest-api.turftrials.workers.dev/app?proof=cutover' \
+            -o /tmp/turf-worker-app.html
+          grep -qi '<html' /tmp/turf-worker-app.html
+          grep -q 'id="fhqHome"' /tmp/turf-worker-app.html
+          grep -q 'id="turfTopbar"' /tmp/turf-worker-app.html
+          grep -q 'id="fhqAlbumPage"' /tmp/turf-worker-app.html
+          grep -q 'id="fhqGamesHub"' /tmp/turf-worker-app.html
+          grep -q 'TURF_EXACT_BRAND_V8940' /tmp/turf-worker-app.html
+          grep -q 'worker-gas-bridge.js?v=worker-login-3' /tmp/turf-worker-app.html
+          if grep -qi 'Sorry, unable to open the file' /tmp/turf-worker-app.html; then
+            echo 'Worker proxy received an Apps Script error page; leaving .com unchanged.' >&2
             exit 1
           fi
 
-      - name: Inject only the Worker RPC bridge into the exact current TURF HTML
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('/tmp/turf-current.html')
-          s=p.read_text(encoding='utf-8')
-          bridge='''<script src="/turf-static/js/worker-gas-bridge.js?v=worker-login-3"></script>\n<script>window.__TURF_STATIC_EXACT_APP__=true;window.__TURF_STATIC_EXACT_VERSION__="current-worker-login-3";</script>\n'''
-          low=s.lower()
-          i=low.find('<head')
-          if i < 0:
-              raise SystemExit('No <head> in current TURF HTML')
-          end=s.find('>',i)
-          if end < 0:
-              raise SystemExit('Malformed <head> in current TURF HTML')
-          s=s[:end+1]+'\n'+bridge+s[end+1:]
-          Path('turf-current/index.html').write_text(s,encoding='utf-8')
-          print('Captured exact TURF bytes:',len(s.encode('utf-8')))
-          PY
-
-      - name: Point the existing sign-in wrapper at the exact captured TURF app
+      - name: Point existing TURF wrapper at exact Worker-proxied app
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -100,34 +84,29 @@ jobs:
           old=re.search(r"var APP_SRC='[^']+';",s)
           if not old:
               raise SystemExit('APP_SRC not found in root wrapper')
-          new="var APP_SRC='/turf-current/index.html?v=current-worker-login-3';"
+          new="var APP_SRC='https://turftest-api.turftrials.workers.dev/app?build=worker-login-3';"
           s=s[:old.start()]+new+s[old.end():]
           p.write_text(s,encoding='utf-8')
           print('Old:',old.group(0))
           print('New:',new)
           PY
 
-      - name: Verify the cutover contains the full current TURF, not a prototype
+      - name: Verify login-only cutover
         run: |
           set -euo pipefail
-          test -s turf-current/index.html
-          grep -q 'id="fhqHome"' turf-current/index.html
-          grep -q 'id="turfTopbar"' turf-current/index.html
-          grep -q 'id="fhqAlbumPage"' turf-current/index.html
-          grep -q 'id="fhqGamesHub"' turf-current/index.html
-          grep -q 'TURF_EXACT_BRAND_V8940' turf-current/index.html
-          grep -q 'worker-gas-bridge.js?v=worker-login-3' turf-current/index.html
-          grep -q "APP_SRC='/turf-current/index.html?v=current-worker-login-3'" index.html
+          grep -q "APP_SRC='https://turftest-api.turftrials.workers.dev/app?build=worker-login-3'" index.html
+          # Guardrail: this workflow is allowed to change only the iframe source.
+          git diff -- index.html
 
-      - name: Commit exact current TURF + login-only cutover atomically
+      - name: Commit login-only cutover
         run: |
           set -euo pipefail
           git config user.name 'TURF Login Cutover'
           git config user.email 'actions@users.noreply.github.com'
-          git add turf-current/index.html index.html
+          git add index.html
           if git diff --cached --quiet; then
             echo 'No cutover changes needed.'
             exit 0
           fi
-          git commit -m 'Use exact current TURF with Worker login bridge'
+          git commit -m 'Use exact TURF app through Worker login bridge [skip ci]'
           git push
