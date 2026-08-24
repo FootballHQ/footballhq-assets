@@ -8,8 +8,8 @@ import {handleTrialsGridRpc,handleTrialsHttp,handleGridAdmin} from './trials-gri
 
 const TRIAL_GRID_RPC=new Set(['turfV8905TrialInventory','turfV8944GridSearch','turfV8944GridIndexStatus']);
 const TURF_APP_SOURCE='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967';
-const TURF_BRIDGE_SRC='https://turftrials.com/turf-static/js/worker-gas-bridge.js?v=worker-login-6';
-const BUILD='exact-turf-worker-v6-transport-only';
+const TURF_BRIDGE_SRC='https://footballhq.github.io/footballhq-assets/turf-static/js/worker-gas-bridge.js?v=worker-login-7';
+const BUILD='exact-turf-worker-v7-root-app';
 
 export default {
   async fetch(request,env){
@@ -18,10 +18,11 @@ export default {
     const url=new URL(request.url);
 
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
-    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2,appProxy:true,loginBridge:6,build:BUILD},200,cors);
+    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2,appProxy:true,loginBridge:7,build:BUILD},200,cors);
 
     try{
-      if(url.pathname==='/app'&&request.method==='GET')return await proxyCurrentTurfApp();
+      /* The custom domain now serves the EXISTING TURF application at /. */
+      if((url.pathname==='/'||url.pathname==='/app')&&request.method==='GET')return await proxyCurrentTurfApp();
       if(url.pathname.startsWith('/trials/')){
         requireOrigin(origin,env);
         requireEnv(env);
@@ -60,17 +61,16 @@ export default {
 
 async function proxyCurrentTurfApp(){
   const sourceUrl=TURF_APP_SOURCE+'&proxyts='+Date.now();
-  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/6.0'}});
+  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/7.0'}});
   const html=await upstream.text();
   if(!upstream.ok)throw new HttpError(502,'Current TURF app source returned HTTP '+upstream.status+'.');
   if(!/<html|<!doctype/i.test(html)||/Sorry, unable to open the file/i.test(html))throw new HttpError(502,'Current TURF app source is temporarily unavailable.');
 
-  /* Preserve the current TURF application byte-for-byte except for one injected
-     transport shim. The shim replaces google.script.run with Worker RPC calls.
-     No visual, layout, navigation, auth-recovery, Home, logo, or interaction
-     patch is injected here. */
+  /* Preserve the current TURF application exactly. The ONLY injected code is
+     a transport shim that replaces google.script.run with Worker RPC calls.
+     No Home/logo/topbar/sidebar/game/collection presentation code is changed. */
   const bridge='<script src="'+TURF_BRIDGE_SRC+'"></script>'+
-    '<script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-login-6";}catch(e){}</script>';
+    '<script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-login-7";}catch(e){}</script>';
   let out=html;
   if(/<head[^>]*>/i.test(out))out=out.replace(/<head([^>]*)>/i,'<head$1>'+bridge);
   else if(/<body[^>]*>/i.test(out))out=out.replace(/<body([^>]*)>/i,'<body$1>'+bridge);
