@@ -56,9 +56,35 @@
     catch(err){if(err&&err.code==='SESSION_INVALID')clearSessionToken();throw err}
   }
 
-  /* Deliberately no root "reveal on iframe load" fallback here.
-     The live wrapper reveals TURF only after the existing app acknowledges the
-     exact Worker token/profile with turf-auth-ready. This prevents stale/wrong
-     account UI from flashing or becoming interactive. */
+  /* Production wrapper handoff.
+     Authentication is already complete at this point. Once the EXISTING TURF
+     iframe has loaded, reveal that exact app immediately and keep handing it
+     the verified Worker profile. Do not wait on the old Apps Script auth RPC. */
+  function installExistingTurfHandoff(){
+    function wire(){
+      var app=document.getElementById('turfApp');
+      var body=document.body;
+      if(!app||!body||!String(body.getAttribute('data-turf-build')||'').startsWith('worker-auth-'))return;
+      if(app.dataset.workerAuthLoadWired==='1')return;
+      app.dataset.workerAuthLoadWired='1';
+      app.addEventListener('load',function(){
+        var profile=getCachedProfile(),token=getSessionToken();
+        if(!profile||!token||String(profile.token||'')!==token)return;
+        /* The iframe that just loaded is the real current TURF app. Show it. */
+        body.classList.add('turf-authenticated');
+        try{
+          var status=document.getElementById('authStatus');
+          if(status){status.textContent='';status.classList.remove('error')}
+        }catch(_){ }
+        var payload={type:'turf-auth-worker-profile',profile:profile,version:String(body.getAttribute('data-turf-build')||'worker-auth')};
+        [0,80,180,350,700,1200,2200,4000,7000].forEach(function(ms){
+          setTimeout(function(){try{app.contentWindow.postMessage(payload,'*')}catch(_){ }},ms);
+        });
+      });
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
+  }
+  installExistingTurfHandoff();
+
   global.TurfAuth={googleSignIn,guestSignIn,resume,signOut(){clearSessionToken()},getSessionToken,getGuestToken,getCachedProfile};
 })(window);
