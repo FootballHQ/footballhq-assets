@@ -22,6 +22,7 @@ var LEGACY_USERNAME_KEY='footballHQSharedUsernameV1';
 var LEGACY_PROFILE_KEY='footballHQAccountProfileV2';
 var RELOAD_KEY='turf8940ContinuityReload';
 var busy=false;
+var workerProfile=null;
 
 function q(s,r){try{return (r||document).querySelector(s)}catch(e){return null}}
 function readJSON(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
@@ -45,12 +46,14 @@ function legacyProfile(){
   return p&&p.token&&!isGuest(p)?p:null;
 }
 function authProfile(){
+  if(workerProfile&&workerProfile.token)return workerProfile;
   var p=readJSON(AUTH_PROFILE_KEY);
   if(p&&p.token)return p;
   try{if(window.__TURF_AUTH_PROFILE__&&window.__TURF_AUTH_PROFILE__.token)return window.__TURF_AUTH_PROFILE__}catch(e){}
   return null;
 }
 function chooseProfile(){
+  if(workerProfile&&workerProfile.token)return workerProfile;
   var a=authProfile(),l=legacyProfile();
   if(!l)return a;
   if(!a)return l;
@@ -87,7 +90,7 @@ function persistEverywhere(p){
   }catch(e){}
   try{window.__TURF_AUTH_TOKEN__=token;window.__TURF_AUTH_PROFILE__=copy;window.__FHQ_PROFILE__=copy;window.fhqCurrentAccount=copy}catch(e){}
   try{window.__fhqCosmetics={inventory:Array.isArray(copy.inventory)?copy.inventory:[],collection:Array.isArray(copy.collection)?copy.collection:[],ring:String(copy.equippedRing||''),banner:String(copy.equippedBanner||''),coins:Number(copy.hqCoins||0),dailyWins:Number(copy.dailyWins||copy.totalDailies||0)}}catch(e){}
-  try{window.parent.postMessage({type:'turf-auth-ready',token:token,profile:copy,version:'8940'},'*')}catch(e){}
+  try{window.parent.postMessage({type:'turf-auth-ready',token:token,profile:copy,version:'8940-worker'},'*')}catch(e){}
 }
 function applySurfaces(p){
   if(!p)return;
@@ -96,15 +99,17 @@ function applySurfaces(p){
   var vals={fhqProfileName:p.username||'PLAYER',fhqProfileLifetimePoints:Number(p.points||0),fhqProfileDailyWins:Number(p.dailyWins||0),fhqProfileDailies:Number(p.totalDailies||0),fhqProfileStreak:Number(p.streakDays||0),fhqAccountName:p.username||'PLAYER'};
   Object.keys(vals).forEach(function(id){var el=q('#'+id);if(el)el.textContent=String(vals[id])});
   var sub=q('#fhqProfileSub');if(sub)sub.textContent=(p.equippedTitle?String(p.equippedTitle)+' • ':'')+'Level '+Number(p.level||1)+' • TURF account';
-  var n=Math.max(0,Number(p.hqCoins)||0);['fhqGlobalCoins','fhqShopCoins','fhqPassCoins','fhqLockerCoins'].forEach(function(id){var el=q('#'+id);if(el)el.textContent=String(n)});
+  var n=Math.max(0,Number(p.hqCoins)||0);['fhqGlobalCoins','fhqShopCoins','fhqPassCoins','fhqLockerCoins','turfTopCoins'].forEach(function(id){var el=q('#'+id);if(el)el.textContent=String(n)});
 }
 function fetchChosen(){
   var p=chooseProfile();if(!p||!p.token||busy||!window.google||!google.script||!google.script.run){if(p){persistEverywhere(p);applySurfaces(p)}return}
+  /* A Worker-authenticated profile is authoritative. Do not block sign-in on
+     an Apps Script account lookup; keep existing Apps Script calls available
+     for the rest of the current app while the backend migration continues. */
+  if(workerProfile&&workerProfile.token){persistEverywhere(workerProfile);applySurfaces(workerProfile);return}
   busy=true;
   try{google.script.run.withSuccessHandler(function(server){busy=false;
     var local=legacyProfile();
-    /* If server lookup for the currently chosen token returns a valid named
-       profile, use it. Never downgrade to Guest/empty when richer local history exists. */
     var chosen=server&&server.token?server:p;
     if(local&&!isGuest(local)&&activity(local)>0&&(isGuest(chosen)||activity(chosen)===0))chosen=local;
     persistEverywhere(chosen);applySurfaces(chosen);
@@ -137,11 +142,32 @@ function maybeReloadForIdentity(){
     if(mark!==String(p.token)){try{sessionStorage.setItem(RELOAD_KEY,String(p.token))}catch(e){};setTimeout(function(){location.reload()},100)}
   }
 }
+function acceptWorkerProfile(p){
+  if(!p||!p.token)return false;
+  var copy={};try{Object.keys(p).forEach(function(k){copy[k]=p[k]})}catch(e){copy=p}
+  copy.token=String(copy.token);
+  workerProfile=copy;
+  busy=false;
+  persistEverywhere(copy);
+  patchRuntime();
+  applySurfaces(copy);
+  try{window.dispatchEvent(new CustomEvent('turf:auth-ready',{detail:{profile:copy,source:'worker'}}))}catch(e){}
+  [40,140,350,800,1600].forEach(function(ms){setTimeout(function(){patchRuntime();applySurfaces(copy)},ms)});
+  return true;
+}
+function announceWorkerReceiver(){try{window.parent.postMessage({type:'turf-worker-profile-receiver-ready',version:'8940-worker'},'*')}catch(e){}}
 function run(){addCss();patchRuntime();var p=chooseProfile();if(p){persistEverywhere(p);applySurfaces(p)}fetchChosen()}
 
+window.addEventListener('message',function(e){
+  if(e.source!==window.parent)return;
+  var d=e&&e.data;if(!d||typeof d!=='object'||d.type!=='turf-auth-worker-profile')return;
+  var p=d.profile&&typeof d.profile==='object'?d.profile:null;
+  if(p&&d.token&&!p.token)p.token=String(d.token);
+  acceptWorkerProfile(p);
+},true);
 window.addEventListener('turf:auth-ready',function(){setTimeout(function(){run();maybeReloadForIdentity()},0)});
 document.addEventListener('click',function(e){var t=e.target&&e.target.closest?e.target.closest('#turfProfileBtn,#fhqProfileButton,[data-fhq-nav="leaderboard"],[data-fhq-nav="home"]'):null;if(t)[20,100,300,700].forEach(function(ms){setTimeout(run,ms)})},true);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
-[100,350,900,1800,3500].forEach(function(ms){setTimeout(run,ms)});
+[0,100,350,900,1800,3500].forEach(function(ms){setTimeout(function(){announceWorkerReceiver();run()},ms)});
 setInterval(function(){patchRuntime();var p=chooseProfile();if(p)applySurfaces(p)},900);
 })();
