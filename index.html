@@ -12,9 +12,9 @@
   <link rel="shortcut icon" type="image/png" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=8967" />
   <link rel="apple-touch-icon" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=8967" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="/turf-static/js/turf-api.js?v=worker-auth-2"></script>
-  <script src="/turf-static/js/turf-config.js?v=worker-auth-2"></script>
-  <script src="/turf-static/js/turf-auth.js?v=worker-auth-2"></script>
+  <script src="/turf-static/js/turf-api.js?v=worker-auth-3"></script>
+  <script src="/turf-static/js/turf-config.js?v=worker-auth-3"></script>
+  <script src="/turf-static/js/turf-auth.js?v=worker-auth-3"></script>
   <style>
     :root{color-scheme:dark}
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
@@ -52,36 +52,41 @@
   (function(){
     'use strict';
     var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
-    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.62&bridge=worker-auth-2';
+    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.62&bridge=worker-auth-3';
     var EXACT_T='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=8967';
     var app=document.getElementById('turfApp'),guestButton=document.getElementById('guestButton'),googleButton=document.getElementById('googleButton'),status=document.getElementById('authStatus'),layer=document.getElementById('turfTrialsLayer'),frame=document.getElementById('turfTrialsFrame');
-    var authStarted=false,googleRendered=false,pendingProfile=null,profileTimer=null,receiverReady=false,appLoaded=false;
+    var authStarted=false,googleRendered=false,pendingProfile=null,profileTimer=null;
 
     function setStatus(message,isError){status.textContent=message||'';status.classList.toggle('error',!!isError)}
     function norm(p){p=String(p||'/trials/');return p.indexOf('/trials/')===0?p:'/trials/'}
     function openTrials(p){var t=norm(p);if(frame.getAttribute('src')!==t)frame.setAttribute('src',t);layer.classList.add('open');layer.setAttribute('aria-hidden','false');document.title='TURF — Trials'}
-    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'worker-auth-2'},'*')}catch(e){}}
+    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'worker-auth-3'},'*')}catch(e){}}
     function setFavicon(){document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"]').forEach(function(x){x.href=EXACT_T})}
     function remember(profile){try{sessionStorage.setItem('turfStaticBootProfileV1',JSON.stringify(profile||{}));localStorage.setItem('turfAuthCachedProfileV1',JSON.stringify(profile||{}));if(profile&&profile.token)localStorage.setItem('turfAuthAccountTokenV1',profile.token)}catch(e){}window.__TURF_AUTH_PROFILE__=profile||{};window.__TURF_AUTH_TOKEN__=profile&&profile.token||''}
-    function pushProfile(){if(!pendingProfile||!app.contentWindow)return;try{app.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:pendingProfile,version:'worker-auth-2'},'*')}catch(e){}}
+    function pushProfile(){if(!pendingProfile||!app.contentWindow)return;try{app.contentWindow.postMessage({type:'turf-worker-auth-profile',profile:pendingProfile,token:pendingProfile.token,version:'worker-auth-3'},'*')}catch(e){}}
     function schedulePushes(){[0,80,180,350,650,1100,1800,3000,4800,7000].forEach(function(ms){setTimeout(pushProfile,ms)})}
     function finish(profile){
       if(!profile||!profile.token)throw new Error('No TURF profile returned.');
       remember(profile);pendingProfile=profile;setStatus('Opening your TURF account…',false);pushProfile();schedulePushes();
       clearTimeout(profileTimer);profileTimer=setTimeout(function(){if(!pendingProfile)return;setStatus('TURF loaded, but the account handoff did not finish. Refresh once and try again.',true);authStarted=false;guestButton.disabled=false},12000);
     }
-    function unlock(){
-      clearTimeout(profileTimer);pendingProfile=null;document.body.classList.add('turf-authenticated');setStatus('',false);authStarted=false;guestButton.disabled=false;
-    }
+    function unlock(){clearTimeout(profileTimer);pendingProfile=null;document.body.classList.add('turf-authenticated');setStatus('',false);authStarted=false;guestButton.disabled=false}
     async function chooseGuest(){if(authStarted)return;authStarted=true;guestButton.disabled=true;try{setStatus('Opening guest account…',false);var p=await TurfAuth.guestSignIn();finish(p)}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true)}}
     async function onGoogleCredential(response){if(authStarted)return;var credential=response&&response.credential?String(response.credential):'';if(!credential){setStatus('Google sign-in did not return an account. Please try again.',true);return}authStarted=true;guestButton.disabled=true;try{setStatus('Signing in with Google…',false);var p=await TurfAuth.googleSignIn(credential);finish(p)}catch(e){authStarted=false;guestButton.disabled=false;setStatus(e&&e.message||String(e),true)}}
-    function renderGoogle(){if(googleRendered)return true;if(!(window.google&&google.accounts&&google.accounts.id))return false;try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogleCredential,auto_select:false,cancel_on_tap_outside:true,use_fedcm_for_prompt:false});google.accounts.id.renderButton(googleButton,{type:'standard',theme:'filled_black',size:'large',text:'continue_with',shape:'rectangular',logo_alignment:'left',width:360});googleRendered=true;return true}catch(e){setStatus('Google sign-in could not initialize. Please refresh and try again.',true);return false}}
+    function renderGoogle(){
+      if(googleRendered)return true;if(!(window.google&&google.accounts&&google.accounts.id))return false;
+      try{
+        google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogleCredential,auto_select:false,cancel_on_tap_outside:true,use_fedcm_for_prompt:false,itp_support:true,ux_mode:'popup',context:'signin'});
+        google.accounts.id.renderButton(googleButton,{type:'standard',theme:'filled_black',size:'large',text:'continue_with',shape:'rectangular',logo_alignment:'left',width:360});
+        googleRendered=true;return true;
+      }catch(e){setStatus('Google sign-in could not initialize. Please refresh and try again.',true);return false}
+    }
 
     window.addEventListener('message',function(e){
       var d=e&&e.data;
       if(typeof d==='string'){if(d==='turf-open-trials')openTrials('/trials/');if(d==='turf-close-trials')closeTrials();return}
       if(!d||typeof d!=='object')return;
-      if(e.source===app.contentWindow&&(d.type==='turf-worker-profile-receiver-ready'||d.type==='turf-auth-bridge-ready')){receiverReady=true;if(pendingProfile){pushProfile();schedulePushes()}return}
+      if(e.source===app.contentWindow&&(d.type==='turf-worker-auth-bridge-ready'||d.type==='turf-auth-bridge-ready')){if(pendingProfile){pushProfile();schedulePushes()}return}
       if(e.source===app.contentWindow&&d.type==='turf-auth-ready'&&pendingProfile){unlock();return}
       if(d.type==='turf-open-trials')openTrials(d.path||'/trials/');
       if(d.type==='turf-close-trials')closeTrials();
@@ -89,7 +94,7 @@
       if(d.type==='turf-favicon'){setFavicon();if(d.title&&!layer.classList.contains('open'))document.title=String(d.title).slice(0,80)}
     },true);
 
-    app.onload=function(){appLoaded=true;if(pendingProfile){pushProfile();schedulePushes()}};
+    app.onload=function(){if(pendingProfile){pushProfile();schedulePushes()}};
     app.src=APP_SRC+'&ts='+Date.now();
     guestButton.addEventListener('click',chooseGuest);
     var googleAttempts=0,googleTimer=setInterval(function(){googleAttempts++;if(renderGoogle()||googleAttempts>60)clearInterval(googleTimer)},125);
