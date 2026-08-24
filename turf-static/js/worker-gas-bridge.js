@@ -49,8 +49,18 @@ function runner(ok,bad){
   });
 }
 
-window.google=window.google||{};
-window.google.script=window.google.script||{};
-window.google.script.run=runner();
-window.TurfWorkerBridge={rpc:rpc,apiBaseUrl:API};
+function install(){
+  window.google=window.google||{};
+  window.google.script=window.google.script||{};
+  window.google.script.run=runner();
+  window.TurfWorkerBridge={rpc:rpc,apiBaseUrl:API};
+}
+
+/* Apps Script may install its native google.script.run later in the page boot.
+   Reassert the Worker transport after those scripts initialize so the existing
+   TURF UI can remain completely unchanged. */
+install();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
+[0,40,120,300,700,1500,3000,6000].forEach(function(ms){setTimeout(install,ms)});
+window.addEventListener('load',install,{once:true});
 })();
