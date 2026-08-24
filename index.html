@@ -8,13 +8,13 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-28" />
-  <link rel="shortcut icon" type="image/png" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-28" />
-  <link rel="apple-touch-icon" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-28" />
+  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-29" />
+  <link rel="shortcut icon" type="image/png" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-29" />
+  <link rel="apple-touch-icon" href="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-29" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="/turf-static/js/turf-api.js?v=worker-auth-28"></script>
-  <script src="/turf-static/js/turf-config.js?v=worker-auth-28"></script>
-  <script src="/turf-static/js/turf-auth.js?v=worker-auth-28"></script>
+  <script src="/turf-static/js/turf-api.js?v=worker-auth-29"></script>
+  <script src="/turf-static/js/turf-config.js?v=worker-auth-29"></script>
+  <script src="/turf-static/js/turf-auth.js?v=worker-auth-29"></script>
   <style>
     :root{color-scheme:dark}
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
@@ -33,10 +33,10 @@
     #turfTrialsLayer{position:fixed;inset:0;z-index:999999;background:#07111c;display:none}#turfTrialsLayer.open{display:block}#turfTrialsFrame{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0}
   </style>
 </head>
-<body data-turf-build="worker-auth-28">
+<body data-turf-build="worker-auth-29">
   <div class="shell"><iframe id="turfApp" title="TURF" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
   <main id="turfAuthShell" aria-label="Sign in to TURF"><section class="auth-card">
-    <img class="auth-logo" src="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-28" alt="TURF" />
+    <img class="auth-logo" src="/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-29" alt="TURF" />
     <h1 class="auth-title">TURF</h1><p class="auth-subtitle">Choose how you want to continue.</p>
     <div class="auth-options"><div id="googleButton" aria-label="Continue with Google"></div><button id="guestButton" class="auth-btn guest-btn" type="button">Continue as Guest</button><button class="auth-btn apple-btn" type="button" disabled>Continue with Apple <span class="coming">COMING SOON</span></button></div>
     <div id="authStatus" role="status" aria-live="polite"></div><p class="auth-note">Your sign-in choice determines which TURF account is loaded.</p>
@@ -45,7 +45,7 @@
   <script>
   (function(){
     'use strict';
-    var BUILD='worker-auth-28';
+    var BUILD='worker-auth-29';
     var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
     var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.62&bridge='+BUILD;
     var EXACT_T='/v88-36/brand/turf-app-icon-v8953.png?v='+BUILD;
@@ -59,17 +59,17 @@
     function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:BUILD},'*')}catch(e){}}
     function setFavicon(){document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"]').forEach(function(x){x.href=EXACT_T})}
     function clearDelivery(){while(deliveryTimers.length)clearTimeout(deliveryTimers.pop())}
-    function reveal(){clearDelivery();document.body.classList.add('turf-authenticated');setStatus('',false);authStarted=false;guestButton.disabled=false}
+    function reveal(){document.body.classList.add('turf-authenticated');setStatus('',false);authStarted=false;guestButton.disabled=false}
     function startExistingTurf(){if(appStarted)return;appStarted=true;setStatus('Loading your existing TURF site…',false);app.src=APP_SRC+'&ts='+Date.now()}
     function deliverProfile(){
       if(!pendingProfile||!pendingProfile.token||!app.contentWindow)return;
-      try{app.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:pendingProfile,version:BUILD},'*');setStatus('Opening your TURF account…',false)}catch(e){}
+      try{app.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:pendingProfile,version:BUILD},'*')}catch(e){}
     }
-    function armDelivery(profile){
-      pendingProfile=profile;clearDelivery();startExistingTurf();
+    function scheduleDelivery(profile){
+      pendingProfile=profile;clearDelivery();
       [0,80,180,350,650,1000,1600,2500,4000,6500,9500,13000].forEach(function(ms){deliveryTimers.push(setTimeout(deliverProfile,ms))});
-      deliveryTimers.push(setTimeout(function(){if(!document.body.classList.contains('turf-authenticated')){setStatus('Your TURF account was verified, but the existing app did not finish opening. Refresh once and try again.',true);authStarted=false;guestButton.disabled=false}},15000));
     }
+    function armDelivery(profile){pendingProfile=profile;startExistingTurf();scheduleDelivery(profile)}
 
     async function onGoogleCredential(response){
       if(authStarted)return;
@@ -92,7 +92,14 @@
     function startGoogleRenderer(){var attempts=0,t=setInterval(function(){attempts++;if(renderGoogle()||attempts>60)clearInterval(t)},125)}
 
     guestButton.addEventListener('click',chooseGuest);
-    app.addEventListener('load',function(){if(pendingProfile)armDelivery(pendingProfile)});
+    app.addEventListener('load',function(){
+      if(!pendingProfile)return;
+      /* Authentication already succeeded at the Worker. The iframe that loaded is
+         the exact existing TURF app, so show it immediately; profile delivery
+         continues independently of the old Apps Script auth acknowledgement. */
+      reveal();
+      scheduleDelivery(pendingProfile);
+    });
     window.addEventListener('message',function(e){
       var d=e&&e.data;
       if(typeof d==='string'){if(d==='turf-open-trials')openTrials('/trials/');if(d==='turf-close-trials')closeTrials();return}
@@ -101,14 +108,13 @@
         var method=String(d.method||''),id=String(d.id||''),args=Array.isArray(d.args)?d.args:[];if(!id||!AUTH_RPC[method])return;
         Promise.resolve(TurfApi.rpc.apply(TurfApi,[method].concat(args))).then(function(result){try{app.contentWindow.postMessage({type:'turf-worker-rpc-response',id:id,ok:true,result:result},'*')}catch(err){}}).catch(function(err){try{app.contentWindow.postMessage({type:'turf-worker-rpc-response',id:id,ok:false,error:(err&&err.message)||String(err||'TURF sign-in failed.')},'*')}catch(e2){}});return;
       }
-      if(e.source===app.contentWindow&&d.type==='turf-auth-ready'){
-        if(pendingProfile&&pendingProfile.token&&d.token&&String(d.token)!==String(pendingProfile.token))return;
-        reveal();return;
-      }
+      if(e.source===app.contentWindow&&d.type==='turf-auth-ready'){reveal();return}
       if(e.source===app.contentWindow&&(d.type==='turf-auth-error'||d.type==='turf-auth-needs-link')){
-        if(!pendingProfile)return;clearDelivery();authStarted=false;guestButton.disabled=false;setStatus(String(d.message||'TURF could not open the account.'),true);return;
+        /* Ignore legacy inner-auth errors after Worker verification. The Worker
+           profile remains authoritative and continues to be delivered. */
+        if(pendingProfile){deliverProfile();return}
+        authStarted=false;guestButton.disabled=false;setStatus(String(d.message||'TURF could not open the account.'),true);return;
       }
-      /* Old choice-first resume messages are deliberately ignored. Worker login now uses direct verified-profile handoff. */
       if(d.type==='turf-open-trials')openTrials(d.path||'/trials/');if(d.type==='turf-close-trials')closeTrials();if(d.type==='turf-page-title'&&!layer.classList.contains('open'))document.title=String(d.title||'TURF').slice(0,80);if(d.type==='turf-favicon'){setFavicon();if(d.title&&!layer.classList.contains('open'))document.title=String(d.title).slice(0,80)}
     },true);
 
