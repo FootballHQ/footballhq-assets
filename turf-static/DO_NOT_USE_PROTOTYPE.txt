@@ -1,0 +1,1 @@
+Do not use the turf-static prototype as the production TURF visual source. Production must keep the existing v89.62 app unchanged and replace only authentication/backend plumbing.
