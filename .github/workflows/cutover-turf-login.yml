@@ -48,12 +48,12 @@ jobs:
           for i in $(seq 1 24); do
             BODY="$(curl -fsS --max-time 10 'https://turftest-api.turftrials.workers.dev/health' || true)"
             echo "$BODY"
-            if echo "$BODY" | grep -q '"loginBridge":3' && echo "$BODY" | grep -q '"appProxy":true'; then
+            if echo "$BODY" | grep -q '"loginBridge":6' && echo "$BODY" | grep -q '"appProxy":true'; then
               exit 0
             fi
             sleep 3
           done
-          echo 'Worker loginBridge 3 / appProxy was not confirmed; leaving turftrials.com unchanged.' >&2
+          echo 'Worker loginBridge 6 / appProxy was not confirmed; leaving turftrials.com unchanged.' >&2
           exit 1
 
       - name: Verify Worker serves the actual current TURF app
@@ -68,7 +68,7 @@ jobs:
           grep -q 'id="fhqAlbumPage"' /tmp/turf-worker-app.html
           grep -q 'id="fhqGamesHub"' /tmp/turf-worker-app.html
           grep -q 'TURF_EXACT_BRAND_V8940' /tmp/turf-worker-app.html
-          grep -q 'worker-gas-bridge.js?v=worker-login-3' /tmp/turf-worker-app.html
+          grep -q 'worker-gas-bridge.js?v=worker-login-6' /tmp/turf-worker-app.html
           if grep -qi 'Sorry, unable to open the file' /tmp/turf-worker-app.html; then
             echo 'Worker proxy received an Apps Script error page; leaving .com unchanged.' >&2
             exit 1
@@ -84,7 +84,7 @@ jobs:
           old=re.search(r"var APP_SRC='[^']+';",s)
           if not old:
               raise SystemExit('APP_SRC not found in root wrapper')
-          new="var APP_SRC='https://turftest-api.turftrials.workers.dev/app?build=worker-login-3';"
+          new="var APP_SRC='https://turftest-api.turftrials.workers.dev/app?build=worker-login-6';"
           s=s[:old.start()]+new+s[old.end():]
           p.write_text(s,encoding='utf-8')
           print('Old:',old.group(0))
@@ -94,7 +94,7 @@ jobs:
       - name: Verify login-only cutover
         run: |
           set -euo pipefail
-          grep -q "APP_SRC='https://turftest-api.turftrials.workers.dev/app?build=worker-login-3'" index.html
+          grep -q "APP_SRC='https://turftest-api.turftrials.workers.dev/app?build=worker-login-6'" index.html
           # Guardrail: this workflow is allowed to change only the iframe source.
           git diff -- index.html
 
@@ -111,4 +111,4 @@ jobs:
           git commit -m 'Use exact TURF app through Worker login bridge [skip ci]'
           git push
 
-# trigger: 2026-08-24 guarded login-only cutover
+# trigger: 2026-08-24 guarded login-only cutover v6
