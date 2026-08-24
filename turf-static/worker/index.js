@@ -8,7 +8,8 @@ import {handleTrialsGridRpc,handleTrialsHttp,handleGridAdmin} from './trials-gri
 
 const TRIAL_GRID_RPC=new Set(['turfV8905TrialInventory','turfV8944GridSearch','turfV8944GridIndexStatus']);
 const TURF_APP_SOURCE='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967';
-const TURF_BRIDGE_SRC='https://turftrials.com/turf-static/js/worker-gas-bridge.js?v=worker-login-2';
+const TURF_BRIDGE_SRC='https://turftrials.com/turf-static/js/worker-gas-bridge.js?v=worker-login-3';
+const BUILD='inplace-turf-worker-v3';
 
 export default {
   async fetch(request,env){
@@ -17,7 +18,7 @@ export default {
     const url=new URL(request.url);
 
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
-    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2,appProxy:true,loginBridge:2},200,cors);
+    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:false,rpcVersion:2,appProxy:true,loginBridge:3,build:BUILD},200,cors);
 
     try{
       if(url.pathname==='/app'&&request.method==='GET')return await proxyCurrentTurfApp();
@@ -59,16 +60,15 @@ export default {
 
 async function proxyCurrentTurfApp(){
   const sourceUrl=TURF_APP_SOURCE+'&proxyts='+Date.now();
-  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/2.0'}});
+  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/3.0'}});
   const html=await upstream.text();
   if(!upstream.ok)throw new HttpError(502,'Current TURF app source returned HTTP '+upstream.status+'.');
   if(!/<html|<!doctype/i.test(html)||/Sorry, unable to open the file/i.test(html))throw new HttpError(502,'Current TURF app source is temporarily unavailable.');
 
-  /* Critical ordering: the Worker google.script.run replacement must exist BEFORE
-     TURF's embedded auth bridge announces ready, otherwise the first login can race
-     into the old Apps Script RPC path and hang on "Opening TURF…". */
+  /* Inject only the backend bridge before the existing TURF code boots.
+     The upstream HTML remains the real current TURF app: no visual reconstruction. */
   const bridge='<script src="'+TURF_BRIDGE_SRC+'"></script>'+
-    '<script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-login-2";}catch(e){}</script>';
+    '<script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-login-3";}catch(e){}</script>';
   let out=html;
   if(/<head[^>]*>/i.test(out))out=out.replace(/<head([^>]*)>/i,'<head$1>'+bridge);
   else if(/<body[^>]*>/i.test(out))out=out.replace(/<body([^>]*)>/i,'<body$1>'+bridge);
