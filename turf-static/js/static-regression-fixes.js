@@ -1,6 +1,7 @@
 /* TURF static migration regression guard.
    IMPORTANT: never rewrite approved 8962 branding/home presentation.
-   This file only guarantees Set 002 remains available and loads the 8962 visual lock. */
+   This file only guarantees Set 002 remains available, loads the 8962 visual lock,
+   and loads the game-overlay-only Batch 4 final UX layer. */
 (function(){
 'use strict';
 if(window.__TURF_STATIC_REGRESSION_FIXES_V2__)return;
@@ -38,7 +39,11 @@ function loadApprovedLock(){
   if(window.__TURF_STATIC_APPROVED_8962_LOCK__||q('script[data-turf-approved-8962]'))return;
   var s=document.createElement('script');s.src='/turf-static/js/static-approved-8962-lock.js?v=8962-lock-1';s.async=false;s.setAttribute('data-turf-approved-8962','1');(document.head||document.documentElement).appendChild(s);
 }
-function run(){loadApprovedLock();ensureCollections()}
+function loadBatch4Final(){
+  if(window.__TURF_STATIC_BATCH4_FINAL__||q('script[data-turf-batch4-final]'))return;
+  var s=document.createElement('script');s.src='/turf-static/js/static-batch4-final.js?v=batch4-final-1';s.async=false;s.setAttribute('data-turf-batch4-final','1');(document.head||document.documentElement).appendChild(s);
+}
+function run(){loadApprovedLock();loadBatch4Final();ensureCollections()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 [100,300,700,1400,2600,5000,8000].forEach(function(ms){setTimeout(run,ms)});
 if(window.MutationObserver){var timer;new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,80)}).observe(document.documentElement,{subtree:true,childList:true})}
