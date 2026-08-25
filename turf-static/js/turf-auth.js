@@ -7,6 +7,7 @@
   const SESSION_KEY='turfAuthAccountTokenV1';
   const GUEST_KEY='turfStableGuestTokenV1';
   const PROFILE_KEY='turfAuthCachedProfileV1';
+  const WORKER_APP='https://turftest-api.turftrials.workers.dev/app?v=worker-auth-39';
 
   function getSessionToken(){try{return String(localStorage.getItem(SESSION_KEY)||'').trim()}catch(_){return ''}}
   function saveSessionToken(token){token=String(token||'').trim();if(!token)return;try{localStorage.setItem(SESSION_KEY,token)}catch(_){}}
@@ -55,6 +56,30 @@
     try{const profile=normalizeProfileResponse(await global.TurfApi.resolveAccountToken(token),'resume');saveSessionToken(profile.token||token);cacheProfile(profile);return profile}
     catch(err){if(err&&err.code==='SESSION_INVALID')clearSessionToken();throw err}
   }
+
+  /* Transport-only production cutover.
+     The existing wrapper still assigns the old Apps Script URL to #turfApp.
+     Redirect only that iframe navigation to the Worker /app proxy, which
+     returns the CURRENT TURF app with the Worker google.script.run bridge
+     injected. No visual/Home/logo/navigation code is touched here. */
+  function installExistingAppTransport(){
+    function wire(){
+      var app=document.getElementById('turfApp');
+      if(!app||app.dataset.workerAppTransport==='1')return;
+      app.dataset.workerAppTransport='1';
+      function redirect(){
+        var src=String(app.getAttribute('src')||'');
+        if(!/^https:\/\/script\.google\.com\/macros\/s\//i.test(src))return;
+        var next=WORKER_APP+'&ts='+Date.now();
+        if(app.getAttribute('src')!==next)app.setAttribute('src',next);
+      }
+      var obs=new MutationObserver(function(muts){for(var i=0;i<muts.length;i++){if(muts[i].type==='attributes'&&muts[i].attributeName==='src'){redirect();break}}});
+      obs.observe(app,{attributes:true,attributeFilter:['src']});
+      redirect();
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
+  }
+  installExistingAppTransport();
 
   /* Production wrapper handoff.
      Authentication is already complete at this point. Once the EXISTING TURF
