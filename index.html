@@ -8,11 +8,11 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-1" />
-  <link rel="shortcut icon" type="image/png" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-1" />
-  <link rel="apple-touch-icon" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-1" />
+  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-2" />
+  <link rel="shortcut icon" type="image/png" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-2" />
+  <link rel="apple-touch-icon" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-2" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="/turf-live-worker-parent.js?v=live-auth-1"></script>
+  <script src="/turf-live-worker-parent.js?v=live-auth-2"></script>
   <style>
     :root{color-scheme:dark}
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
@@ -43,13 +43,13 @@
     #turfTrialsFrame{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0}
   </style>
 </head>
-<body data-turf-build="live-auth-1">
+<body data-turf-build="live-auth-2">
   <div class="shell">
     <iframe id="turfApp" title="TURF" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   <main id="turfAuthShell" aria-label="Sign in to TURF">
     <section class="auth-card">
-      <img class="auth-logo" src="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-1" alt="TURF" />
+      <img class="auth-logo" src="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-2" alt="TURF" />
       <h1 class="auth-title">TURF</h1>
       <p class="auth-subtitle">Choose how you want to continue.</p>
       <div class="auth-options">
@@ -68,8 +68,8 @@
   (function(){
     'use strict';
     var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
-    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=live-auth-1';
-    var EXACT_T='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-1';
+    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.90&bridge=live-auth-2';
+    var EXACT_T='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-2';
     var app=document.getElementById('turfApp');
     var guestButton=document.getElementById('guestButton');
     var googleButton=document.getElementById('googleButton');
@@ -86,7 +86,7 @@
     function setStatus(message,isError){status.textContent=message||'';status.classList.toggle('error',!!isError)}
     function norm(p){p=String(p||'/trials/');return p.indexOf('/trials/')===0?p:'/trials/'}
     function openTrials(p){var t=norm(p);if(frame.getAttribute('src')!==t)frame.setAttribute('src',t);layer.classList.add('open');layer.setAttribute('aria-hidden','false');document.title='TURF — Trials'}
-    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'live-auth-1'},'*')}catch(e){}}
+    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'live-auth-2'},'*')}catch(e){}}
     function setFavicon(){var links=document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"]');for(var i=0;i<links.length;i++)links[i].href=EXACT_T}
 
     function makeGuestToken(){
@@ -104,7 +104,7 @@
       clearBridgeTimeout();
       bridgeTimeout=setTimeout(function(){
         if(bridgeReady)return;
-        setStatus('TURF could not reach its sign-in bridge. Refresh once and try again.',true);
+        setStatus('TURF could not reach its legacy sign-in bridge. Refresh once and try again.',true);
         authStarted=false;
         guestButton.disabled=false;
       },15000);
@@ -124,8 +124,8 @@
       catch(e){setStatus('Could not contact TURF. Please refresh and try again.',true);authStarted=false;guestButton.disabled=false}
     }
 
-    function chooseGuest(){if(authStarted)return;authStarted=true;guestButton.disabled=true;sendToBridge({type:'turf-auth-guest',guestToken:makeGuestToken(),version:'wrapper-live-auth-1'})}
-    function onGoogleCredential(response){var credential=response&&response.credential?String(response.credential):'';if(!credential){setStatus('Google sign-in did not return an account. Please try again.',true);return}authStarted=true;guestButton.disabled=true;sendToBridge({type:'turf-auth-google',credential:credential,version:'wrapper-live-auth-1'})}
+    function chooseGuest(){if(authStarted)return;authStarted=true;guestButton.disabled=true;sendToBridge({type:'turf-auth-guest',guestToken:makeGuestToken(),version:'wrapper-live-auth-2'})}
+    function onGoogleCredential(response){var credential=response&&response.credential?String(response.credential):'';if(!credential){setStatus('Google sign-in did not return an account. Please try again.',true);return}authStarted=true;guestButton.disabled=true;sendToBridge({type:'turf-auth-google',credential:credential,version:'wrapper-live-auth-2'})}
 
     function renderGoogle(){
       if(googleRendered)return true;
@@ -177,7 +177,8 @@
     },true);
 
     guestButton.addEventListener('click',chooseGuest);
-    app.src=APP_SRC;
+    /* Worker-first auth: the existing TURF app is NOT loaded until the parent Worker bridge verifies an account. */
+    window.__TURF_EXISTING_APP_SRC__=APP_SRC;
     var googleAttempts=0,googleTimer=setInterval(function(){googleAttempts++;if(renderGoogle()||googleAttempts>40)clearInterval(googleTimer)},125);
     setFavicon();
   })();
