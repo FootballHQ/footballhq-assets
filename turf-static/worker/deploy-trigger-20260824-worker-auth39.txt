@@ -1,0 +1,4 @@
+Force deploy TURF Worker for existing-site auth cutover.
+Target wrapper build: worker-auth-39
+Worker app proxy: /app
+No visual reconstruction; current TURF app remains source of truth.
