@@ -8,11 +8,11 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-5" />
-  <link rel="shortcut icon" type="image/png" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-5" />
-  <link rel="apple-touch-icon" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-5" />
+  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-7" />
+  <link rel="shortcut icon" type="image/png" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-7" />
+  <link rel="apple-touch-icon" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-7" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="/turf-live-worker-parent.js?v=live-auth-5"></script>
+  <script src="/turf-live-worker-parent.js?v=live-auth-7"></script>
   <style>
     :root{color-scheme:dark}
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
@@ -43,13 +43,13 @@
     #turfTrialsFrame{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0}
   </style>
 </head>
-<body data-turf-build="live-auth-5">
+<body data-turf-build="live-auth-7">
   <div class="shell">
     <iframe id="turfApp" title="TURF" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   <main id="turfAuthShell" aria-label="Sign in to TURF">
     <section class="auth-card">
-      <img class="auth-logo" src="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-5" alt="TURF" />
+      <img class="auth-logo" src="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-7" alt="TURF" />
       <h1 class="auth-title">TURF</h1>
       <p class="auth-subtitle">Choose how you want to continue.</p>
       <div class="auth-options">
@@ -67,119 +67,28 @@
   <script>
   (function(){
     'use strict';
-    var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
-    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.90&bridge=live-auth-5';
-    var EXACT_T='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-5';
+    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.90&bridge=live-auth-7';
+    var EXACT_T='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=live-auth-7';
     var app=document.getElementById('turfApp');
-    var guestButton=document.getElementById('guestButton');
-    var googleButton=document.getElementById('googleButton');
-    var status=document.getElementById('authStatus');
     var layer=document.getElementById('turfTrialsLayer');
     var frame=document.getElementById('turfTrialsFrame');
-    var bridgeWindow=null;
-    var bridgeReady=false;
-    var pendingMessage=null;
-    var authStarted=false;
-    var googleRendered=false;
-    var bridgeTimeout=null;
 
-    function setStatus(message,isError){status.textContent=message||'';status.classList.toggle('error',!!isError)}
+    window.__TURF_EXISTING_APP_SRC__=APP_SRC;
+
     function norm(p){p=String(p||'/trials/');return p.indexOf('/trials/')===0?p:'/trials/'}
     function openTrials(p){var t=norm(p);if(frame.getAttribute('src')!==t)frame.setAttribute('src',t);layer.classList.add('open');layer.setAttribute('aria-hidden','false');document.title='TURF — Trials'}
-    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'live-auth-5'},'*')}catch(e){}}
+    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'live-auth-7'},'*')}catch(e){}}
     function setFavicon(){var links=document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"]');for(var i=0;i<links.length;i++)links[i].href=EXACT_T}
-
-    function makeGuestToken(){
-      var key='turfGuestTokenV1',token='';
-      try{token=String(localStorage.getItem(key)||'')}catch(e){}
-      if(token)return token;
-      try{var bytes=new Uint8Array(18);crypto.getRandomValues(bytes);token='turf-guest-'+Array.prototype.map.call(bytes,function(b){return b.toString(16).padStart(2,'0')}).join('')}
-      catch(e){token='turf-guest-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
-      try{localStorage.setItem(key,token)}catch(e){}
-      return token;
-    }
-
-    function clearBridgeTimeout(){if(bridgeTimeout){clearTimeout(bridgeTimeout);bridgeTimeout=null}}
-    function armBridgeTimeout(){
-      clearBridgeTimeout();
-      bridgeTimeout=setTimeout(function(){
-        if(bridgeReady)return;
-        setStatus('TURF could not reach its legacy sign-in bridge. Refresh once and try again.',true);
-        authStarted=false;
-        guestButton.disabled=false;
-      },15000);
-    }
-
-    function isBridgeReadyMessage(e,d){
-      if(!d||d.type!=='turf-auth-bridge-ready')return false;
-      if(!e.source||e.source===window)return false;
-      var v=String(d.version||'');
-      return v==='1B'||v==='1B-handshake'||v==='early-bridge-8962'||v.indexOf('early-bridge-')===0;
-    }
-
-    function sendToBridge(message){
-      pendingMessage=message;
-      if(!bridgeReady||!bridgeWindow){setStatus('Getting TURF ready…',false);armBridgeTimeout();return}
-      try{bridgeWindow.postMessage(message,'*');setStatus('Opening your TURF account…',false)}
-      catch(e){setStatus('Could not contact TURF. Please refresh and try again.',true);authStarted=false;guestButton.disabled=false}
-    }
-
-    function chooseGuest(){if(authStarted)return;authStarted=true;guestButton.disabled=true;sendToBridge({type:'turf-auth-guest',guestToken:makeGuestToken(),version:'wrapper-live-auth-5'})}
-    function onGoogleCredential(response){var credential=response&&response.credential?String(response.credential):'';if(!credential){setStatus('Google sign-in did not return an account. Please try again.',true);return}authStarted=true;guestButton.disabled=true;sendToBridge({type:'turf-auth-google',credential:credential,version:'wrapper-live-auth-5'})}
-
-    function renderGoogle(){
-      if(googleRendered)return true;
-      if(!(window.google&&google.accounts&&google.accounts.id))return false;
-      try{
-        google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogleCredential,auto_select:false,cancel_on_tap_outside:true});
-        google.accounts.id.renderButton(googleButton,{type:'standard',theme:'filled_black',size:'large',text:'continue_with',shape:'rectangular',logo_alignment:'left',width:360});
-        googleRendered=true;return true;
-      }catch(e){setStatus('Google sign-in could not initialize. Please refresh and try again.',true);return false}
-    }
-
-    function unlockWrapper(){clearBridgeTimeout();pendingMessage=null;document.body.classList.add('turf-authenticated');setStatus('',false);authStarted=false;guestButton.disabled=false}
 
     window.addEventListener('message',function(e){
       var d=e&&e.data;
       if(typeof d==='string'){if(d==='turf-open-trials')openTrials('/trials/');if(d==='turf-close-trials')closeTrials();return}
       if(!d||typeof d!=='object')return;
-
-      if(isBridgeReadyMessage(e,d)){
-        bridgeWindow=e.source;
-        bridgeReady=true;
-        clearBridgeTimeout();
-        if(pendingMessage){try{bridgeWindow.postMessage(pendingMessage,'*');setStatus('Opening your TURF account…',false)}catch(err){setStatus('Could not contact TURF. Please refresh and try again.',true)}}
-        else setStatus('',false);
-        return;
-      }
-
-      if(d.type==='turf-auth-ready'){
-        if(!bridgeWindow||e.source!==bridgeWindow)return;
-        unlockWrapper();
-        return;
-      }
-
-      if(d.type==='turf-auth-error'||d.type==='turf-auth-needs-link'){
-        if(!bridgeWindow||e.source!==bridgeWindow)return;
-        clearBridgeTimeout();
-        pendingMessage=null;
-        setStatus(String(d.message||'TURF sign-in failed.'),true);
-        authStarted=false;
-        guestButton.disabled=false;
-        return;
-      }
-
-      if(d.type==='turf-auth-resume'||d.type==='turf-auth-resume-invalid')return;
       if(d.type==='turf-open-trials')openTrials(d.path||'/trials/');
       if(d.type==='turf-close-trials')closeTrials();
       if(d.type==='turf-page-title'&&!layer.classList.contains('open'))document.title=String(d.title||'TURF').slice(0,80);
       if(d.type==='turf-favicon'){setFavicon();if(d.title&&!layer.classList.contains('open'))document.title=String(d.title).slice(0,80)}
     },true);
-
-    guestButton.addEventListener('click',chooseGuest);
-    /* Worker-first auth: the existing TURF app is NOT loaded until the parent Worker bridge verifies an account. */
-    window.__TURF_EXISTING_APP_SRC__=APP_SRC;
-    var googleAttempts=0,googleTimer=setInterval(function(){googleAttempts++;if(renderGoogle()||googleAttempts>40)clearInterval(googleTimer)},125);
     setFavicon();
   })();
   </script>
