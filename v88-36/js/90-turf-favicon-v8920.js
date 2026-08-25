@@ -15,6 +15,19 @@ function apply(){
   try{window.top.postMessage({type:'turf-favicon',href:ICON,title:'TURF',version:'8920'},'*')}catch(e){}
 }
 
+function goHome(){
+  try{
+    var b=document.querySelector('#fhqSidebar [data-fhq-nav="home"],.fhq-nav [data-fhq-nav="home"]');
+    if(b&&typeof b.click==='function'){b.click();return true}
+  }catch(e){}
+  try{
+    document.body&&document.body.classList.remove('rankings-page','rankings-loading','draft-page','games-page');
+    var h=document.getElementById('fhqHome');
+    if(h){h.classList.remove('hidden');h.style.removeProperty('display');h.style.removeProperty('visibility');h.style.removeProperty('opacity');return true}
+  }catch(e){}
+  return false;
+}
+
 function applyWorkerProfile(profile){
   if(!profile||typeof profile!=='object')return false;
   var token=String(profile.token||'').trim();
@@ -56,6 +69,7 @@ function applyWorkerProfile(profile){
 
   sync();
   [80,220,500,1000,1800,3000,5000].forEach(function(ms){setTimeout(sync,ms)});
+  [120,420,900].forEach(function(ms){setTimeout(goHome,ms)});
   try{window.dispatchEvent(new CustomEvent('turf:auth-ready',{detail:{profile:profile}}))}catch(e){}
   try{window.top.postMessage({type:'turf-auth-ready',version:'worker-profile-1',token:token,username:String(profile.username||'')},TRUSTED_TOP)}catch(e){}
   return true;
