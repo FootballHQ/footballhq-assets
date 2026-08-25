@@ -87,15 +87,15 @@ function saveProfile(p){
   try{localStorage.setItem(TOKEN_KEY,String(p.token))}catch(e){}
   try{localStorage.setItem(PROFILE_KEY,JSON.stringify(p))}catch(e){}
 }
-function sendProfile(){
-  var a=app();if(!a||!a.contentWindow||!activeProfile)return;
-  try{a.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'live-worker-auth-5'},'*')}catch(e){}
+function sendProfile(target){
+  var a=app(),w=target||(a&&a.contentWindow);if(!w||!activeProfile)return;
+  try{w.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'live-worker-auth-6'},'*')}catch(e){}
 }
 function showExistingTurf(){
   document.body.classList.add('turf-authenticated');
   status('',false);busy=false;
   var guest=document.getElementById('guestButton');if(guest)guest.disabled=false;
-  [0,40,100,220,450,850,1500,2600,4200,7000].forEach(function(ms){setTimeout(sendProfile,ms)});
+  [0,25,60,120,220,450,850,1500,2600,4200,7000].forEach(function(ms){setTimeout(function(){sendProfile()},ms)});
 }
 function startExistingTurf(){
   var a=app();if(!a)throw new Error('TURF app frame is unavailable.');
@@ -170,8 +170,15 @@ async function resume(){
 }
 
 window.addEventListener('message',function(e){
-  var d=e&&e.data;if(!d||d.type!=='turf-worker-rpc-request'||!d.id)return;
+  var d=e&&e.data;if(!d||typeof d!=='object')return;
   var a=app();if(!a||e.source!==a.contentWindow)return;
+
+  if(d.type==='turf-worker-profile-request'){
+    if(activeProfile)sendProfile(e.source);
+    return;
+  }
+
+  if(d.type!=='turf-worker-rpc-request'||!d.id)return;
   var method=String(d.method||'');
   if(!ALLOWED[method]){
     try{e.source.postMessage({type:'turf-worker-rpc-response',id:String(d.id),ok:false,error:'Unsupported TURF auth method.'},'*')}catch(_e){}
@@ -188,7 +195,7 @@ installGuestCapture();
 var tries=0,timer=setInterval(function(){tries++;if(patchGsi()||tries>500)clearInterval(timer)},10);
 document.addEventListener('DOMContentLoaded',function(){
   var a=app();
-  if(a)a.addEventListener('load',function(){appLoaded=true;showExistingTurf()});
+  if(a)a.addEventListener('load',function(){appLoaded=true;sendProfile();showExistingTurf()});
   resume();
 },{once:true});
 })();
