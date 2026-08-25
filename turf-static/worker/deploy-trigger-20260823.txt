@@ -1,7 +1,7 @@
-Trigger TURF Worker V2 deployment after push-based workflow enablement.
-Timestamp: 2026-08-24T14:55:00-07:00
-Build: exact-turf-worker-v11-login-handoff.
-Purpose: deploy the current Worker root route so turftrials.com/ serves the existing TURF app and only replaces google.script.run transport with Worker RPC.
+Trigger TURF Worker deployment for login-only architecture.
+Timestamp: 2026-08-24T23:34:00-07:00
+Build: exact-turf-worker-v12-wrapper-app-split.
+Purpose: deploy the current Worker root route so turftrials.com/ serves the existing TURF wrapper and /app proxies the existing TURF application, replacing only the broken Apps Script auth/backend transport with Worker RPC.
 Visual policy: preserve the existing TURF application exactly; no Home/logo/topbar/sidebar/game/collection reconstruction.
-Expected health after deploy: appProxy=true, loginBridge=11, build=exact-turf-worker-v11-login-handoff.
-Expected root after deploy: HTML TURF application, not {"ok":false,"error":"Not found."}.
+Expected health after deploy: appProxy=true, loginBridge=12, build=exact-turf-worker-v12-wrapper-app-split.
+Expected root after deploy: HTML TURF login wrapper, not {"ok":false,"error":"Not found."}.
