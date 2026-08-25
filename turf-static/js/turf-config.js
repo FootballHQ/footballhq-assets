@@ -1,11 +1,12 @@
-/* TURF static-host migration configuration.
- * SAFE DEFAULTS: this branch is isolated and does not replace the live site by itself.
+/* TURF production authentication configuration.
+ * The existing TURF application remains the visual/runtime source of truth.
+ * Only authentication/API transport is cut over to the Worker backend.
  */
 (function(global){
   'use strict';
   global.TURF_STATIC_CONFIG={
-    migrationMode:true,
-    productionCutover:false,
+    migrationMode:false,
+    productionCutover:true,
     apiBaseUrl:'https://turftest-api.turftrials.workers.dev',
     apiTransport:'http',
     googleClientId:'981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com'
