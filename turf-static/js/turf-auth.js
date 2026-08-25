@@ -1,5 +1,6 @@
-/* TURF auth controller for static hosting.
- * UI code calls TurfAuth; TurfAuth calls TurfApi. No direct google.script.run calls here.
+/* TURF auth controller.
+ * Authentication uses the Worker backend. The existing TURF app remains the
+ * visual/runtime source of truth; this file never redirects or replaces it.
  */
 (function(global){
   'use strict';
@@ -7,7 +8,6 @@
   const SESSION_KEY='turfAuthAccountTokenV1';
   const GUEST_KEY='turfStableGuestTokenV1';
   const PROFILE_KEY='turfAuthCachedProfileV1';
-  const WORKER_APP='https://turftest-api.turftrials.workers.dev/app?v=worker-auth-39';
 
   function getSessionToken(){try{return String(localStorage.getItem(SESSION_KEY)||'').trim()}catch(_){return ''}}
   function saveSessionToken(token){token=String(token||'').trim();if(!token)return;try{localStorage.setItem(SESSION_KEY,token)}catch(_){}}
@@ -57,34 +57,10 @@
     catch(err){if(err&&err.code==='SESSION_INVALID')clearSessionToken();throw err}
   }
 
-  /* Transport-only production cutover.
-     The existing wrapper still assigns the old Apps Script URL to #turfApp.
-     Redirect only that iframe navigation to the Worker /app proxy, which
-     returns the CURRENT TURF app with the Worker google.script.run bridge
-     injected. No visual/Home/logo/navigation code is touched here. */
-  function installExistingAppTransport(){
-    function wire(){
-      var app=document.getElementById('turfApp');
-      if(!app||app.dataset.workerAppTransport==='1')return;
-      app.dataset.workerAppTransport='1';
-      function redirect(){
-        var src=String(app.getAttribute('src')||'');
-        if(!/^https:\/\/script\.google\.com\/macros\/s\//i.test(src))return;
-        var next=WORKER_APP+'&ts='+Date.now();
-        if(app.getAttribute('src')!==next)app.setAttribute('src',next);
-      }
-      var obs=new MutationObserver(function(muts){for(var i=0;i<muts.length;i++){if(muts[i].type==='attributes'&&muts[i].attributeName==='src'){redirect();break}}});
-      obs.observe(app,{attributes:true,attributeFilter:['src']});
-      redirect();
-    }
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
-  }
-  installExistingAppTransport();
-
   /* Production wrapper handoff.
-     Authentication is already complete at this point. Once the EXISTING TURF
-     iframe has loaded, reveal that exact app immediately and keep handing it
-     the verified Worker profile. Do not wait on the old Apps Script auth RPC. */
+     Authentication is complete in the outer turftrials.com wrapper. The exact
+     existing TURF iframe stays on its original Apps Script URL and receives the
+     verified Worker profile through postMessage. No visual/runtime replacement. */
   function installExistingTurfHandoff(){
     function wire(){
       var app=document.getElementById('turfApp');
@@ -95,12 +71,6 @@
       app.addEventListener('load',function(){
         var profile=getCachedProfile(),token=getSessionToken();
         if(!profile||!token||String(profile.token||'')!==token)return;
-        /* The iframe that just loaded is the real current TURF app. Show it. */
-        body.classList.add('turf-authenticated');
-        try{
-          var status=document.getElementById('authStatus');
-          if(status){status.textContent='';status.classList.remove('error')}
-        }catch(_){ }
         var payload={type:'turf-auth-worker-profile',profile:profile,version:String(body.getAttribute('data-turf-build')||'worker-auth')};
         [0,80,180,350,700,1200,2200,4000,7000].forEach(function(ms){
           setTimeout(function(){try{app.contentWindow.postMessage(payload,'*')}catch(_){ }},ms);
