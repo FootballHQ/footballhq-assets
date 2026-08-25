@@ -32,6 +32,18 @@ function status(message,isError){
   el.textContent=message||'';el.classList.toggle('error',!!isError);
 }
 function app(){return document.getElementById('turfApp')}
+function profileFromResult(result){
+  if(!result)return null;
+  if(result.profile&&result.profile.token)return result.profile;
+  if(result.token)return result;
+  return null;
+}
+function requiredProfile(result){
+  if(result&&result.needsLink)throw new Error('This Google account is not linked to a TURF account yet.');
+  var p=profileFromResult(result);
+  if(!p||!p.token)throw new Error('TURF did not return an account profile.');
+  return p;
+}
 function saveProfile(p){
   if(!p||!p.token)return;
   activeProfile=p;
@@ -40,7 +52,7 @@ function saveProfile(p){
 }
 function sendProfile(){
   var a=app();if(!a||!a.contentWindow||!activeProfile)return;
-  try{a.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'live-worker-auth-3'},'*')}catch(e){}
+  try{a.contentWindow.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'live-worker-auth-4'},'*')}catch(e){}
 }
 function showExistingTurf(){
   document.body.classList.add('turf-authenticated');
@@ -83,13 +95,13 @@ async function directGoogle(response){
   if(!credential){status('Google sign-in did not return an account. Please try again.',true);return}
   busy=true;var guest=document.getElementById('guestButton');if(guest)guest.disabled=true;
   status('Checking your TURF account…',false);
-  try{acceptProfile(await rpc('turfBatch1GoogleSignIn',[credential]))}catch(e){fail(e)}
+  try{acceptProfile(requiredProfile(await rpc('turfBatch1GoogleSignIn',[credential])))}catch(e){fail(e)}
 }
 async function directGuest(){
   if(busy)return;busy=true;
   var guest=document.getElementById('guestButton');if(guest)guest.disabled=true;
   status('Checking your TURF account…',false);
-  try{acceptProfile(await rpc('turfBatch1BContinueAsGuest',[makeGuestToken()]))}catch(e){fail(e)}
+  try{acceptProfile(requiredProfile(await rpc('turfBatch1BContinueAsGuest',[makeGuestToken()])))}catch(e){fail(e)}
 }
 function patchGsi(){
   try{
@@ -108,7 +120,11 @@ function installGuestCapture(){
 async function resume(){
   var token='';try{token=String(localStorage.getItem(TOKEN_KEY)||'')}catch(e){}
   if(!token)return;
-  try{var p=await rpc('turfBatch1BResolveAccountToken',[token]);if(p&&p.token){status('Restoring your TURF account…',false);acceptProfile(p)}}catch(e){try{localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(PROFILE_KEY)}catch(_e){}}
+  try{
+    var result=await rpc('turfBatch1BResolveAccountToken',[token]);
+    var p=profileFromResult(result);
+    if(p&&p.token){status('Restoring your TURF account…',false);acceptProfile(p)}
+  }catch(e){try{localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(PROFILE_KEY)}catch(_e){}}
 }
 
 window.addEventListener('message',function(e){
