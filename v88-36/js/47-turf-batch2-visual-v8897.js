@@ -11,8 +11,8 @@
 if(window.__TURF_V8897_ENTRY_8948__)return;
 window.__TURF_V8897_ENTRY_8948__=true;
 
-try{localStorage.removeItem('turfAuthAccountTokenV1')}catch(e){}
-try{sessionStorage.removeItem('turfAuthAccountTokenV1')}catch(e){}
+/* Worker-auth v12: never clear the verified account token here.
+   This visual entrypoint must remain presentation-only. */
 
 function suppressOldRecovery(){
   try{
@@ -49,7 +49,7 @@ function load(src,key,next){
 var B='https://footballhq.github.io/footballhq-assets/v88-36/js/';
 load(B+'88-turf-home2-v8918.js?v=8960','8918',function(){
   load(B+'89-turf-home2b-v8919.js?v=8960','8919',function(){
-    load(B+'90-turf-favicon-v8920.js?v=8960','8920',function(){
+    load(B+'90-turf-favicon-v8920.js?v=worker-auth-12','8920',function(){
       load(B+'96-turf-coin-ui-cleanup-v8928.js?v=8960','8928',function(){
         load(B+'97-turf-visual-polish-v8929.js?v=8960','8929',function(){
           load(B+'98-turf-visual-polish-v8930.js?v=8960','8930',function(){
