@@ -3,12 +3,11 @@
    AUTH ONLY: does not alter TURF presentation, layout, logos, games or navigation. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V17__)return;
-window.__TURF_LIVE_WORKER_PARENT_V17__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V18__)return;
+window.__TURF_LIVE_WORKER_PARENT_V18__=true;
 
 var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null,profileConfirmed=false,retryCount=0;
 var PROFILE_ORIGINS=['https://script.google.com','https://script.googleusercontent.com'];
-var VISUAL_ENTRY='https://footballhq.github.io/footballhq-assets/v88-36/js/47-turf-batch2-visual-v8897.js?v=8937';
 
 function status(message,isError){var el=document.getElementById('authStatus');if(!el)return;el.textContent=message||'';el.classList.toggle('error',!!isError)}
 function app(){return document.getElementById('turfApp')}
@@ -17,6 +16,7 @@ function setBusy(v){busy=!!v;var g=guestButton();if(g)g.disabled=busy}
 function saveActive(profile){activeProfile=profile||null;profileConfirmed=false;retryCount=0}
 function clearConfirm(){if(confirmTimer){clearTimeout(confirmTimer);confirmTimer=null}}
 function freshSrc(){var src=String(window.__TURF_EXISTING_APP_SRC__||'');if(!src)return '';return src+(src.indexOf('?')>=0?'&':'?')+'authRetry='+Date.now()}
+function launchExisting(src,a){a.src=src}
 function retryExistingTurf(){
   var a=app(),src=freshSrc();if(!a||!src)return false;
   retryCount++;appLoaded=false;bridgeWindow=null;lastProfileSentAt=0;
@@ -35,13 +35,12 @@ function armConfirm(){
 function sendProfile(target,force){
   var a=app(),w=target||bridgeWindow||(a&&a.contentWindow);if(!w||!activeProfile)return false;
   var now=Date.now();if(!force&&now-lastProfileSentAt<200)return false;lastProfileSentAt=now;
-  var msg={type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-17'},sent=false;
+  var msg={type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-18'},sent=false;
   PROFILE_ORIGINS.forEach(function(origin){try{w.postMessage(msg,origin);sent=true}catch(e){}});
   return sent;
 }
 function revealExistingTurf(){profileConfirmed=true;clearConfirm();document.body.classList.add('turf-authenticated');status('',false);setBusy(false)}
 function queueProfileSends(){[0,80,180,350,650,1100,1800,3000,5000,8000,12000,16000].forEach(function(ms){setTimeout(function(){if(!profileConfirmed)sendProfile(null,true)},ms)})}
-function launchExisting(src,a){try{fetch(VISUAL_ENTRY,{mode:'no-cors',cache:'reload'}).catch(function(){}).finally(function(){a.src=src})}catch(e){a.src=src}}
 function startExistingTurf(profile){
   if(!profile||!profile.token)throw new Error('TURF did not return a verified account profile.');
   saveActive(profile);var a=app();if(!a)throw new Error('TURF app frame is unavailable.');
