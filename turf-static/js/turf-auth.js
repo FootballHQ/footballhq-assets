@@ -57,29 +57,5 @@
     catch(err){if(err&&err.code==='SESSION_INVALID')clearSessionToken();throw err}
   }
 
-  /* Production wrapper handoff.
-     Authentication is complete in the outer turftrials.com wrapper. The exact
-     existing TURF iframe stays on its original Apps Script URL and receives the
-     verified Worker profile through postMessage. No visual/runtime replacement. */
-  function installExistingTurfHandoff(){
-    function wire(){
-      var app=document.getElementById('turfApp');
-      var body=document.body;
-      if(!app||!body||!String(body.getAttribute('data-turf-build')||'').startsWith('worker-auth-'))return;
-      if(app.dataset.workerAuthLoadWired==='1')return;
-      app.dataset.workerAuthLoadWired='1';
-      app.addEventListener('load',function(){
-        var profile=getCachedProfile(),token=getSessionToken();
-        if(!profile||!token||String(profile.token||'')!==token)return;
-        var payload={type:'turf-auth-worker-profile',profile:profile,version:String(body.getAttribute('data-turf-build')||'worker-auth')};
-        [0,80,180,350,700,1200,2200,4000,7000].forEach(function(ms){
-          setTimeout(function(){try{app.contentWindow.postMessage(payload,'*')}catch(_){ }},ms);
-        });
-      });
-    }
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
-  }
-  installExistingTurfHandoff();
-
   global.TurfAuth={googleSignIn,guestSignIn,resume,signOut(){clearSessionToken()},getSessionToken,getGuestToken,getCachedProfile};
 })(window);
