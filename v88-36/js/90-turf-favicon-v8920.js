@@ -1,11 +1,12 @@
 /* TURF V89.20 — authoritative favicon bridge + Worker-auth handoff */
 (function(){
 'use strict';
-if(window.__TURF_V8920_FAVICON_WORKER2__)return;
-window.__TURF_V8920_FAVICON_WORKER2__=true;
+if(window.__TURF_V8920_FAVICON_WORKER3__)return;
+window.__TURF_V8920_FAVICON_WORKER3__=true;
 var ICON='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-mark.svg?v=8920';
 var TRUSTED_TOP='https://turftrials.com';
 var appliedToken='';
+var appliedProfile=null;
 
 function apply(){
   try{
@@ -13,11 +14,11 @@ function apply(){
     var l=document.createElement('link');l.rel='icon';l.type='image/svg+xml';l.href=ICON;document.head.appendChild(l);
     document.title='TURF';
   }catch(e){}
-  try{window.top.postMessage({type:'turf-favicon',href:ICON,title:'TURF',version:'8920-worker2'},TRUSTED_TOP)}catch(e){}
+  try{window.top.postMessage({type:'turf-favicon',href:ICON,title:'TURF',version:'8920-worker3'},TRUSTED_TOP)}catch(e){}
 }
 
 function announceReady(){
-  try{window.top.postMessage({type:'turf-worker-profile-receiver-ready',version:'worker-profile-2'},TRUSTED_TOP)}catch(e){}
+  try{window.top.postMessage({type:'turf-worker-profile-receiver-ready',version:'worker-profile-3'},TRUSTED_TOP)}catch(e){}
 }
 
 function goHome(){
@@ -44,24 +45,28 @@ function clearLegacyAuthState(){
   }catch(e){}
 }
 
+function assertWorkerSession(){
+  if(!appliedToken||!appliedProfile)return;
+  try{localStorage.setItem('turfAuthAccountTokenV1',appliedToken)}catch(e){}
+  try{sessionStorage.setItem('turfAuthAccountTokenV1',appliedToken)}catch(e){}
+  try{localStorage.setItem('footballHQAccountTokenV80',appliedToken)}catch(e){}
+  try{localStorage.setItem('turfAuthCachedProfileV1',JSON.stringify(appliedProfile))}catch(e){}
+  window.__TURF_AUTH_TOKEN__=appliedToken;
+  window.__TURF_AUTH_PROFILE__=appliedProfile;
+  try{window.fhqGetToken=function(){return String(window.__TURF_AUTH_TOKEN__||'')}}catch(e){}
+  clearLegacyAuthState();
+}
+
 function applyWorkerProfile(profile){
   if(!profile||typeof profile!=='object')return false;
   var token=String(profile.token||'').trim();
   if(!token)return false;
   appliedToken=token;
-
-  try{localStorage.setItem('turfAuthAccountTokenV1',token)}catch(e){}
-  try{sessionStorage.setItem('turfAuthAccountTokenV1',token)}catch(e){}
-  try{localStorage.setItem('footballHQAccountTokenV80',token)}catch(e){}
-  try{localStorage.setItem('turfAuthCachedProfileV1',JSON.stringify(profile))}catch(e){}
-
-  window.__TURF_AUTH_TOKEN__=token;
-  window.__TURF_AUTH_PROFILE__=profile;
-  try{window.fhqGetToken=function(){return String(window.__TURF_AUTH_TOKEN__||'')}}catch(e){}
-  clearLegacyAuthState();
+  appliedProfile=profile;
+  assertWorkerSession();
 
   function sync(){
-    clearLegacyAuthState();
+    assertWorkerSession();
     try{if(typeof window.fhqSetRuntimeIdentity==='function')window.fhqSetRuntimeIdentity(profile)}catch(e){}
     try{if(typeof window.fhqWriteLastConfirmedAccount==='function')window.fhqWriteLastConfirmedAccount(profile)}catch(e){}
     try{if(typeof window.fhqSyncLocalProfileFromServer==='function')window.fhqSyncLocalProfileFromServer(profile)}catch(e){}
@@ -77,10 +82,10 @@ function applyWorkerProfile(profile){
   }
 
   sync();
-  [60,150,320,650,1100,1800,3000,5000,8000].forEach(function(ms){setTimeout(sync,ms)});
+  [60,150,320,650,1100,1800,3000,5000,8000,12000,16000,20000].forEach(function(ms){setTimeout(sync,ms)});
   [100,280,650,1200].forEach(function(ms){setTimeout(goHome,ms)});
   try{window.dispatchEvent(new CustomEvent('turf:auth-ready',{detail:{profile:profile}}))}catch(e){}
-  try{window.top.postMessage({type:'turf-auth-ready',version:'worker-profile-2',token:token,username:String(profile.username||'')},TRUSTED_TOP)}catch(e){}
+  try{window.top.postMessage({type:'turf-auth-ready',version:'worker-profile-3',token:token,username:String(profile.username||'')},TRUSTED_TOP)}catch(e){}
   return true;
 }
 
