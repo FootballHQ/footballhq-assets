@@ -3,8 +3,8 @@
    AUTH ONLY: does not alter TURF presentation, layout, logos, games or navigation. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V18__)return;
-window.__TURF_LIVE_WORKER_PARENT_V18__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V19__)return;
+window.__TURF_LIVE_WORKER_PARENT_V19__=true;
 
 var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null,profileConfirmed=false,retryCount=0;
 var PROFILE_ORIGINS=['https://script.google.com','https://script.googleusercontent.com'];
@@ -35,7 +35,7 @@ function armConfirm(){
 function sendProfile(target,force){
   var a=app(),w=target||bridgeWindow||(a&&a.contentWindow);if(!w||!activeProfile)return false;
   var now=Date.now();if(!force&&now-lastProfileSentAt<200)return false;lastProfileSentAt=now;
-  var msg={type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-18'},sent=false;
+  var msg={type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-19'},sent=false;
   PROFILE_ORIGINS.forEach(function(origin){try{w.postMessage(msg,origin);sent=true}catch(e){}});
   return sent;
 }
