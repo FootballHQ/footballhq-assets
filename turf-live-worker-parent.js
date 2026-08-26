@@ -3,10 +3,12 @@
    AUTH ONLY: does not alter TURF presentation, layout, logos, games or navigation. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V15__)return;
-window.__TURF_LIVE_WORKER_PARENT_V15__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V16__)return;
+window.__TURF_LIVE_WORKER_PARENT_V16__=true;
 
 var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null,profileConfirmed=false;
+var PROFILE_ORIGINS=['https://script.google.com','https://script.googleusercontent.com'];
+var VISUAL_ENTRY='https://footballhq.github.io/footballhq-assets/v88-36/js/47-turf-batch2-visual-v8897.js?v=8937';
 
 function status(message,isError){var el=document.getElementById('authStatus');if(!el)return;el.textContent=message||'';el.classList.toggle('error',!!isError)}
 function app(){return document.getElementById('turfApp')}
@@ -25,9 +27,9 @@ function armConfirm(){
 function sendProfile(target,force){
   var a=app(),w=target||bridgeWindow||(a&&a.contentWindow);if(!w||!activeProfile)return false;
   var now=Date.now();if(!force&&now-lastProfileSentAt<200)return false;lastProfileSentAt=now;
-  /* Apps Script redirects between google.com/googleusercontent.com origins.
-     Use the exact iframe window as the security boundary and '*' only for targetOrigin. */
-  try{w.postMessage({type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-15'},'*');return true}catch(e){return false}
+  var msg={type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-16'},sent=false;
+  PROFILE_ORIGINS.forEach(function(origin){try{w.postMessage(msg,origin);sent=true}catch(e){}});
+  return sent;
 }
 function revealExistingTurf(){
   profileConfirmed=true;clearConfirm();document.body.classList.add('turf-authenticated');status('',false);setBusy(false)
@@ -37,6 +39,13 @@ function queueProfileSends(){
     setTimeout(function(){if(!profileConfirmed)sendProfile(null,true)},ms)
   })
 }
+function launchExisting(src,a){
+  /* Refresh the exact live visual entry before Apps Script requests it.
+     no-cors + reload forces a network revalidation without executing it here. */
+  try{
+    fetch(VISUAL_ENTRY,{mode:'no-cors',cache:'reload'}).catch(function(){}).finally(function(){a.src=src});
+  }catch(e){a.src=src}
+}
 function startExistingTurf(profile){
   if(!profile||!profile.token)throw new Error('TURF did not return a verified account profile.');
   saveActive(profile);var a=app();if(!a)throw new Error('TURF app frame is unavailable.');
@@ -44,7 +53,7 @@ function startExistingTurf(profile){
   if(appLoaded){sendProfile(null,true);queueProfileSends();return}
   if(appStarted)return;
   var src=String(window.__TURF_EXISTING_APP_SRC__||'');if(!src)throw new Error('TURF app source is not configured.');
-  appStarted=true;a.src=src;
+  appStarted=true;launchExisting(src,a);
 }
 function fail(e){clearConfirm();setBusy(false);status(String(e&&e.message||e||'TURF sign-in failed.'),true)}
 
