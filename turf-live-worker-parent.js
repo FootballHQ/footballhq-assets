@@ -3,8 +3,8 @@
    AUTH ONLY: does not alter TURF presentation, layout, logos, games or navigation. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V20__)return;
-window.__TURF_LIVE_WORKER_PARENT_V20__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V21__)return;
+window.__TURF_LIVE_WORKER_PARENT_V21__=true;
 
 var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null,profileConfirmed=false,retryCount=0;
 
@@ -21,7 +21,12 @@ function trustedAppOrigin(origin){
     var u=new URL(String(origin||''));
     if(u.protocol!=='https:')return false;
     var h=String(u.hostname||'').toLowerCase();
-    return h==='script.google.com'||h==='script.googleusercontent.com'||h.endsWith('.googleusercontent.com');
+    if(h==='script.google.com'||h==='script.googleusercontent.com'||h.endsWith('.googleusercontent.com'))return true;
+    try{
+      var api=window.TURF_STATIC_CONFIG&&window.TURF_STATIC_CONFIG.apiBaseUrl?new URL(window.TURF_STATIC_CONFIG.apiBaseUrl):null;
+      if(api&&u.origin===api.origin)return true;
+    }catch(e){}
+    return false;
   }catch(e){return false}
 }
 function retryExistingTurf(){
@@ -42,7 +47,7 @@ function armConfirm(){
 function sendProfile(target,force){
   var a=app(),w=target||bridgeWindow||(a&&a.contentWindow);if(!w||!activeProfile)return false;
   var now=Date.now();if(!force&&now-lastProfileSentAt<200)return false;lastProfileSentAt=now;
-  var msg={type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-20'};
+  var msg={type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-21'};
   try{w.postMessage(msg,'*');return true}catch(e){return false}
 }
 function revealExistingTurf(){profileConfirmed=true;clearConfirm();document.body.classList.add('turf-authenticated');status('',false);setBusy(false)}
