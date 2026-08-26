@@ -1,0 +1,81 @@
+<!-- ============================================================
+ TURF WORKER AUTH PROFILE BRIDGE v1
+ Place BEFORE the existing inner auth/auto-restore block in Apps Script Index.html.
+ This does NOT change any TURF visual code. It only lets turftrials.com pass
+ an already-verified Worker profile into the existing TURF app.
+============================================================ -->
+<script id="turf-worker-auth-profile-bridge-v1">
+(function(){
+  'use strict';
+  if(window.__TURF_WORKER_PROFILE_BRIDGE_V1__)return;
+  window.__TURF_WORKER_PROFILE_BRIDGE_V1__=true;
+
+  var TRUSTED_TOP='https://turftrials.com';
+  var SESSION_KEY='turfAuthAccountTokenV1';
+
+  if(window.parent===window)return;
+
+  document.documentElement.classList.add('turf-parent-auth');
+  document.documentElement.classList.add('turf-auth-locked');
+  window.__TURF_WORKER_AUTH_OWNS_SESSION__=true;
+  try{localStorage.removeItem(SESSION_KEY)}catch(e){}
+
+  function topPost(data){try{window.top.postMessage(data,TRUSTED_TOP)}catch(e){}}
+
+  function applyRuntime(profile){
+    if(!profile||!profile.token)throw new Error('Verified TURF profile is missing its account token.');
+
+    var token=String(profile.token);
+    window.__TURF_AUTH_TOKEN__=token;
+    window.__TURF_AUTH_PROFILE__=profile;
+    try{localStorage.setItem(SESSION_KEY,token)}catch(e){}
+    try{window.fhqGetToken=function(){return String(window.__TURF_AUTH_TOKEN__||'')}}catch(e){}
+
+    function paint(){
+      try{if(typeof window.fhqSetRuntimeIdentity==='function')window.fhqSetRuntimeIdentity(profile)}catch(e){}
+      try{if(typeof window.fhqWriteLastConfirmedAccount==='function')window.fhqWriteLastConfirmedAccount(profile)}catch(e){}
+      try{if(typeof window.fhqSyncLocalProfileFromServer==='function')window.fhqSyncLocalProfileFromServer(profile)}catch(e){}
+      try{if(typeof window.fhqRememberLifetimePoints==='function')window.fhqRememberLifetimePoints(Number(profile.points)||0)}catch(e){}
+      try{if(typeof window.fhqRememberCoins==='function')window.fhqRememberCoins(Number(profile.hqCoins||profile.coins)||0)}catch(e){}
+      try{if(typeof window.fhqUpdateAccountUI==='function')window.fhqUpdateAccountUI(profile)}catch(e){}
+      try{if(typeof window.refreshFootballHQScoreDisplays==='function')window.refreshFootballHQScoreDisplays()}catch(e){}
+      try{if(typeof window.refreshFootballHQDashboard==='function')window.refreshFootballHQDashboard()}catch(e){}
+
+      try{
+        var values={
+          fhqAccountName:profile.username||'TURF account',
+          fhqPoints:String(Number(profile.points)||0),
+          fhqDashLifetime:String(Number(profile.points)||0),
+          fhqDashStreak:String(Number(profile.streakDays)||0),
+          fhqGlobalCoins:String(Number(profile.hqCoins||profile.coins)||0),
+          turfTopCoins:String(Number(profile.hqCoins||profile.coins)||0)
+        };
+        Object.keys(values).forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=values[id]});
+      }catch(e){}
+    }
+
+    document.documentElement.classList.remove('turf-auth-locked');
+    document.documentElement.classList.remove('fhq-identity-recovering');
+    var gate=document.getElementById('turfAuthGate');if(gate)gate.classList.add('turf-auth-hidden');
+
+    paint();
+    [80,250,600,1200,2200,4000,7000].forEach(function(ms){setTimeout(paint,ms)});
+
+    try{window.dispatchEvent(new CustomEvent('turf:auth-ready',{detail:{profile:profile}}))}catch(e){}
+    topPost({type:'turf-auth-ready',token:token,username:profile.username||'',version:'worker-profile-1'});
+  }
+
+  window.addEventListener('message',function(e){
+    if(e.origin!==TRUSTED_TOP||e.source!==window.top)return;
+    var d=e&&e.data;if(!d||typeof d!=='object')return;
+    if(d.type!=='turf-auth-worker-profile'||!d.profile)return;
+    try{applyRuntime(d.profile)}catch(err){topPost({type:'turf-auth-error',message:String(err&&err.message||err||'Could not apply TURF profile.'),version:'worker-profile-1'})}
+  },true);
+
+  function announce(){
+    topPost({type:'turf-auth-bridge-ready',version:'worker-profile-1'});
+    topPost({type:'turf-worker-profile-request',version:'worker-profile-1'});
+  }
+  announce();setTimeout(announce,250);setTimeout(announce,800);setTimeout(announce,1800);
+})();
+</script>
