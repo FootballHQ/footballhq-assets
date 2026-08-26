@@ -14,6 +14,7 @@ var TOKEN_KEY='turfAuthAccountTokenV1';
 var GUEST_KEY='turfStableGuestTokenV1';
 var LEGACY_GUEST_KEY='turfGuestTokenV1';
 var activeProfile=null,busy=false,appStarted=false,appLoaded=false,googleRendered=false;
+var lastProfileSentAt=0;
 
 function status(message,isError){
   var el=document.getElementById('authStatus');if(!el)return;
@@ -61,14 +62,16 @@ function requiredProfile(result){
   var p=findProfile(result,0,[]);if(!p||!p.token)throw new Error('TURF did not return an account profile.');return p;
 }
 function saveProfile(p){activeProfile=p;try{localStorage.setItem(TOKEN_KEY,String(p.token))}catch(e){}try{localStorage.setItem(PROFILE_KEY,JSON.stringify(p))}catch(e){}}
-function sendProfile(target){
+function sendProfile(target,force){
   var a=app(),w=target||(a&&a.contentWindow);if(!w||!activeProfile)return;
-  try{w.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'live-worker-auth-7'},'*')}catch(e){}
+  var now=Date.now();if(!force&&now-lastProfileSentAt<250)return;lastProfileSentAt=now;
+  try{w.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'live-worker-auth-8'},'*')}catch(e){}
 }
 function showExistingTurf(){
   document.body.classList.add('turf-authenticated');status('',false);busy=false;
   var guest=document.getElementById('guestButton');if(guest)guest.disabled=false;
-  [0,25,60,120,220,450,850,1500,2600,4200,7000].forEach(function(ms){setTimeout(function(){sendProfile()},ms)});
+  sendProfile(null,true);
+  setTimeout(function(){sendProfile(null,true)},600);
 }
 function startExistingTurf(){
   var a=app();if(!a)throw new Error('TURF app frame is unavailable.');if(appLoaded){showExistingTurf();return}if(appStarted)return;
@@ -115,7 +118,7 @@ async function resume(){
 
 window.addEventListener('message',function(e){
   var d=e&&e.data;if(!d||typeof d!=='object')return;var a=app();if(!a||e.source!==a.contentWindow)return;
-  if(d.type==='turf-worker-profile-request'){if(activeProfile)sendProfile(e.source);return}
+  if(d.type==='turf-worker-profile-request'){if(activeProfile)sendProfile(e.source,true);return}
   if(d.type!=='turf-worker-rpc-request'||!d.id)return;
   var method=String(d.method||'');if(!ALLOWED[method]){try{e.source.postMessage({type:'turf-worker-rpc-response',id:String(d.id),ok:false,error:'Unsupported TURF auth method.'},'*')}catch(_e){}return}
   rpc(method,d.args).then(function(result){try{e.source.postMessage({type:'turf-worker-rpc-response',id:String(d.id),ok:true,result:result},'*')}catch(_e){}}).catch(function(err){try{e.source.postMessage({type:'turf-worker-rpc-response',id:String(d.id),ok:false,error:String(err&&err.message||err||'TURF sign-in failed.')},'*')}catch(_e){}});
@@ -123,7 +126,7 @@ window.addEventListener('message',function(e){
 
 window.TurfLiveAuth={google:directGoogle,guest:directGuest,resume:resume};
 document.addEventListener('DOMContentLoaded',function(){
-  var a=app();if(a)a.addEventListener('load',function(){appLoaded=true;sendProfile();showExistingTurf()});
+  var a=app();if(a)a.addEventListener('load',function(){appLoaded=true;sendProfile(null,true);showExistingTurf()});
   bindGuest();var tries=0,timer=setInterval(function(){tries++;if(renderGoogle()||tries>80)clearInterval(timer)},125);resume();
 },{once:true});
 })();
