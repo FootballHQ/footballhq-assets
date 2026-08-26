@@ -3,10 +3,10 @@
    AUTH ONLY: does not alter TURF presentation, layout, logos, games or navigation. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V10__)return;
-window.__TURF_LIVE_WORKER_PARENT_V10__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V11__)return;
+window.__TURF_LIVE_WORKER_PARENT_V11__=true;
 
-var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeReady=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null;
+var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null;
 
 function status(message,isError){var el=document.getElementById('authStatus');if(!el)return;el.textContent=message||'';el.classList.toggle('error',!!isError)}
 function app(){return document.getElementById('turfApp')}
@@ -14,16 +14,15 @@ function guestButton(){return document.getElementById('guestButton')}
 function setBusy(v){busy=!!v;var g=guestButton();if(g)g.disabled=busy}
 function saveActive(profile){activeProfile=profile||null}
 function clearConfirm(){if(confirmTimer){clearTimeout(confirmTimer);confirmTimer=null}}
-function armConfirm(){clearConfirm();confirmTimer=setTimeout(function(){if(document.body.classList.contains('turf-authenticated'))return;status('Your account is verified, but TURF is still waiting for the app auth bridge.','error');setBusy(false)},15000)}
+function armConfirm(){clearConfirm();confirmTimer=setTimeout(function(){if(document.body.classList.contains('turf-authenticated'))return;status('Your account is verified, but TURF is still waiting for the app auth handoff.','error');setBusy(false)},18000)}
 function sendProfile(target,force){
   var a=app(),w=target||bridgeWindow||(a&&a.contentWindow);if(!w||!activeProfile)return false;
-  var now=Date.now();if(!force&&now-lastProfileSentAt<250)return false;lastProfileSentAt=now;
-  try{w.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'worker-auth-10'},'*');return true}catch(e){return false}
+  var now=Date.now();if(!force&&now-lastProfileSentAt<200)return false;lastProfileSentAt=now;
+  try{w.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'worker-auth-11'},'*');return true}catch(e){return false}
 }
-function revealExistingTurf(){
-  clearConfirm();document.body.classList.add('turf-authenticated');status('',false);setBusy(false);
-}
+function revealExistingTurf(){clearConfirm();document.body.classList.add('turf-authenticated');status('',false);setBusy(false)}
 function startExistingTurf(profile){
+  if(!profile||!profile.token)throw new Error('TURF did not return a verified account profile.');
   saveActive(profile);var a=app();if(!a)throw new Error('TURF app frame is unavailable.');
   status('Account verified. Loading TURF…',false);armConfirm();
   if(appLoaded){sendProfile(null,true);return}
@@ -56,26 +55,26 @@ function bindGuest(){var g=guestButton();if(!g||g.dataset.workerAuthBound==='1')
 
 window.addEventListener('message',function(e){
   var d=e&&e.data,a=app();if(!d||typeof d!=='object'||!a||e.source!==a.contentWindow)return;
-  if(d.type==='turf-auth-bridge-ready'){
-    bridgeWindow=e.source;bridgeReady=true;
+  if(d.type==='turf-auth-bridge-ready'||d.type==='turf-worker-profile-request'){
+    bridgeWindow=e.source;
     if(activeProfile){status('Opening your TURF account…',false);sendProfile(e.source,true)}
     return;
   }
-  if(d.type==='turf-worker-profile-request'){
-    bridgeWindow=e.source;bridgeReady=true;sendProfile(e.source,true);return;
-  }
-  if(d.type==='turf-auth-ready'){
-    bridgeWindow=e.source;bridgeReady=true;revealExistingTurf();return;
-  }
-  if(d.type==='turf-auth-error'){
-    fail(new Error(String(d.message||'TURF could not apply the verified account.')));return;
-  }
+  if(d.type==='turf-auth-ready'){bridgeWindow=e.source;revealExistingTurf();return}
+  if(d.type==='turf-auth-error'){fail(new Error(String(d.message||'TURF could not apply the verified account.')));return}
 },true);
 
 document.addEventListener('DOMContentLoaded',function(){
-  if(!window.TurfAuth||!window.TurfApi){status('TURF authentication failed to load. Refresh once.',true);return}
-  var a=app();if(a)a.addEventListener('load',function(){appLoaded=true;if(activeProfile){status('Opening your TURF account…',false);sendProfile(null,true);[150,500,1200,2500,5000].forEach(function(ms){setTimeout(function(){if(!document.body.classList.contains('turf-authenticated'))sendProfile(null,true)},ms)})}});
+  if(!window.TurfAuth||!window.TurfApi||!window.TURF_STATIC_CONFIG){status('TURF authentication failed to load. Refresh once.',true);return}
+  var a=app();if(a)a.addEventListener('load',function(){
+    appLoaded=true;
+    if(activeProfile){
+      status('Opening your TURF account…',false);
+      sendProfile(null,true);
+      [100,300,700,1400,2600,4500,7000,10000].forEach(function(ms){setTimeout(function(){if(!document.body.classList.contains('turf-authenticated'))sendProfile(null,true)},ms)});
+    }
+  });
   bindGuest();var tries=0,timer=setInterval(function(){tries++;if(renderGoogle()||tries>80)clearInterval(timer)},125);
-  /* Choice-first by design: do not silently restore a saved session here. */
+  /* Choice-first by design: no silent session restore. */
 },{once:true});
 })();
