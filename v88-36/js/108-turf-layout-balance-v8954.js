@@ -4,6 +4,7 @@
    - LOCKS the approved hero sizing/alignment by leaving hero untouched.
    - Makes the top-left TURF banner ~9% smaller with balanced breathing room.
    - Refines the top-right profile control into a cleaner premium avatar.
+   - Releases stale legacy recovery interaction locks AFTER Worker auth only.
    ============================================================ */
 (function(){
 'use strict';
@@ -116,9 +117,66 @@ function polishProfile(){
   }
 }
 
+function releasePostLoginInteraction(){
+  var token='';
+  try{token=String(window.__TURF_AUTH_TOKEN__||(typeof window.fhqGetToken==='function'?window.fhqGetToken():'')||'').trim()}catch(e){}
+  if(!token)return;
+
+  try{
+    ['turf-auth-locked','fhq-identity-recovering','recovering','account-loading','is-loading','fhq-loading','loading'].forEach(function(c){
+      document.documentElement.classList.remove(c);
+      if(document.body)document.body.classList.remove(c);
+    });
+  }catch(e){}
+
+  try{
+    [document.documentElement,document.body].forEach(function(el){
+      if(!el)return;
+      el.removeAttribute('inert');
+      el.style.removeProperty('pointer-events');
+      el.style.removeProperty('filter');
+      el.style.removeProperty('opacity');
+    });
+  }catch(e){}
+
+  ['fhqSidebar','fhqMain','fhqHome','turfTopbar'].forEach(function(id){
+    var root=document.getElementById(id);if(!root)return;
+    try{
+      root.removeAttribute('inert');
+      root.style.removeProperty('pointer-events');
+      root.style.removeProperty('filter');
+      root.style.removeProperty('opacity');
+      root.querySelectorAll('[inert]').forEach(function(el){el.removeAttribute('inert')});
+      root.querySelectorAll('button,a,[role="button"]').forEach(function(el){el.style.removeProperty('pointer-events')});
+    }catch(e){}
+  });
+
+  try{
+    document.querySelectorAll('[id*="recover" i],[class*="recover" i],[id*="auth-loading" i],[class*="auth-loading" i]').forEach(function(el){
+      if(el.id==='fhqSidebar'||el.id==='fhqMain'||el.id==='fhqHome'||el.id==='turfTopbar')return;
+      var txt=String(el.textContent||'').toLowerCase();
+      var cs=null,r=null;try{cs=getComputedStyle(el);r=el.getBoundingClientRect()}catch(e){}
+      var recoveryText=txt.indexOf('recovering your football hq account')>=0||txt.indexOf('restoring your turf account')>=0;
+      var transparentBlocker=!!(cs&&r&&(cs.position==='fixed'||cs.position==='absolute')&&r.width>window.innerWidth*.60&&r.height>window.innerHeight*.50&&(Number(cs.opacity||1)<.05||cs.visibility==='hidden'));
+      if(recoveryText||transparentBlocker){
+        el.setAttribute('aria-hidden','true');
+        el.style.setProperty('pointer-events','none','important');
+        el.style.setProperty('display','none','important');
+      }
+    });
+  }catch(e){}
+}
+
+function postAuthUnlock(){
+  releasePostLoginInteraction();
+  [80,240,600,1200,2400,4800].forEach(function(ms){setTimeout(releasePostLoginInteraction,ms)});
+}
+
 function apply(){addCss();polishSidebar();polishProfile()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
 [80,220,500,1000,1800,3000].forEach(function(ms){setTimeout(apply,ms)});
-window.addEventListener('turf:auth-ready',function(){[0,120,400].forEach(function(ms){setTimeout(apply,ms)})});
+window.addEventListener('turf:auth-ready',function(){[0,120,400].forEach(function(ms){setTimeout(apply,ms)});postAuthUnlock()});
+window.addEventListener('message',function(e){var d=e&&e.data;if(d&&typeof d==='object'&&d.type==='turf-auth-worker-profile')postAuthUnlock()},true);
+[1200,2800,5200,9000].forEach(function(ms){setTimeout(function(){try{if(window.__TURF_AUTH_TOKEN__)releasePostLoginInteraction()}catch(e){}},ms)});
 if(window.MutationObserver){try{new MutationObserver(function(){apply()}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}}
 })();
