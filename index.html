@@ -8,14 +8,14 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-9" />
-  <link rel="shortcut icon" type="image/png" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-9" />
-  <link rel="apple-touch-icon" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-9" />
+  <link id="turfFavicon" rel="icon" type="image/png" sizes="32x32" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-10" />
+  <link rel="shortcut icon" type="image/png" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-10" />
+  <link rel="apple-touch-icon" href="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-10" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="/turf-static/js/turf-api.js?v=worker-auth-9"></script>
-  <script src="/turf-static/js/turf-config.js?v=worker-auth-9"></script>
-  <script src="/turf-static/js/turf-auth.js?v=worker-auth-9"></script>
-  <script src="/turf-live-worker-parent.js?v=worker-auth-9"></script>
+  <script src="/turf-static/js/turf-api.js?v=worker-auth-10"></script>
+  <script src="/turf-static/js/turf-config.js?v=worker-auth-10"></script>
+  <script src="/turf-static/js/turf-auth.js?v=worker-auth-10"></script>
+  <script src="/turf-live-worker-parent.js?v=worker-auth-10"></script>
   <style>
     :root{color-scheme:dark}
     html,body{margin:0;width:100%;height:100%;background:#07111c;overflow:hidden}
@@ -46,13 +46,13 @@
     #turfTrialsFrame{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0}
   </style>
 </head>
-<body data-turf-build="worker-auth-9">
+<body data-turf-build="worker-auth-10">
   <div class="shell">
     <iframe id="turfApp" title="TURF" allow="clipboard-read; clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   <main id="turfAuthShell" aria-label="Sign in to TURF">
     <section class="auth-card">
-      <img class="auth-logo" src="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-9" alt="TURF" />
+      <img class="auth-logo" src="https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-10" alt="TURF" />
       <h1 class="auth-title">TURF</h1>
       <p class="auth-subtitle">Choose how you want to continue.</p>
       <div class="auth-options">
@@ -70,15 +70,15 @@
   <script>
   (function(){
     'use strict';
-    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.90&bridge=worker-auth-9';
-    var EXACT_T='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-9';
+    var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.90&bridge=worker-auth-10';
+    var EXACT_T='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=worker-auth-10';
     var app=document.getElementById('turfApp');
     var layer=document.getElementById('turfTrialsLayer');
     var frame=document.getElementById('turfTrialsFrame');
     window.__TURF_EXISTING_APP_SRC__=APP_SRC;
     function norm(p){p=String(p||'/trials/');return p.indexOf('/trials/')===0?p:'/trials/'}
     function openTrials(p){var t=norm(p);if(frame.getAttribute('src')!==t)frame.setAttribute('src',t);layer.classList.add('open');layer.setAttribute('aria-hidden','false');document.title='TURF — Trials'}
-    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'worker-auth-9'},'*')}catch(e){}}
+    function closeTrials(){layer.classList.remove('open');layer.setAttribute('aria-hidden','true');document.title='TURF';try{app.contentWindow.postMessage({type:'turf-go-home',version:'worker-auth-10'},'*')}catch(e){}}
     function setFavicon(){var links=document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"],link[rel="apple-touch-icon"]');for(var i=0;i<links.length;i++)links[i].href=EXACT_T}
     window.addEventListener('message',function(e){var d=e&&e.data;if(typeof d==='string'){if(d==='turf-open-trials')openTrials('/trials/');if(d==='turf-close-trials')closeTrials();return}if(!d||typeof d!=='object')return;if(d.type==='turf-open-trials')openTrials(d.path||'/trials/');if(d.type==='turf-close-trials')closeTrials();if(d.type==='turf-page-title'&&!layer.classList.contains('open'))document.title=String(d.title||'TURF').slice(0,80);if(d.type==='turf-favicon'){setFavicon();if(d.title&&!layer.classList.contains('open'))document.title=String(d.title).slice(0,80)}},true);
     setFavicon();
