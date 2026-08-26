@@ -105,9 +105,26 @@ function cleanHomeLegacyCopy(){
 function apply(){addCss();markPanels();cleanHomeLegacyCopy()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
 [80,220,500,1000,1800,3000].forEach(function(ms){setTimeout(apply,ms)});
-window.addEventListener('resize',function(){setTimeout(apply,80)});
-window.addEventListener('turf:auth-ready',function(){[0,180,600].forEach(function(ms){setTimeout(apply,ms)})});
-if(window.MutationObserver){try{new MutationObserver(function(){apply()}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}}
+window.addEventListener('resize',function(){setTimeout(apply,100)});
+window.addEventListener('turf:auth-ready',function(){[0,220,700].forEach(function(ms){setTimeout(apply,ms)})});
+if(window.MutationObserver){
+  try{
+    var obs=null,bootObs=null,applyTimer=null;
+    function scheduleApply(){clearTimeout(applyTimer);applyTimer=setTimeout(apply,140)}
+    function armHome(){
+      var home=q('#fhqHome');if(!home)return false;
+      if(obs)obs.disconnect();
+      obs=new MutationObserver(scheduleApply);
+      obs.observe(home,{childList:true,subtree:true});
+      return true;
+    }
+    if(!armHome()){
+      bootObs=new MutationObserver(function(){if(armHome()){bootObs.disconnect();bootObs=null;scheduleApply()}});
+      bootObs.observe(document.documentElement,{childList:true,subtree:true});
+      setTimeout(function(){if(bootObs){bootObs.disconnect();bootObs=null}},6000);
+    }
+  }catch(e){}
+}
 })();
 
 /* ============================================================
@@ -121,6 +138,7 @@ window.__TURF_WORKER_AUTH_RECEIVER_8962__=true;
 if(window.parent===window)return;
 var TRUSTED='https://turftrials.com';
 var TOKEN_KEY='turfAuthAccountTokenV1';
+var lastUnlockedToken='';
 
 function post(data){try{window.parent.postMessage(data,TRUSTED)}catch(e){}}
 function saveProfile(profile){
@@ -157,15 +175,23 @@ function clearObsoleteLocks(){
   }catch(e){}
 }
 function unlock(profile){
+  var token=String(profile&&profile.token||'').trim();
+  if(!token){post({type:'turf-auth-error',message:'TURF Worker profile did not include a token.'});return}
+  if(token===lastUnlockedToken){
+    clearObsoleteLocks();
+    post({type:'turf-auth-ready',token:token,username:String(profile.username||''),version:'worker-runtime-8962-perf'});
+    return;
+  }
+  lastUnlockedToken=token;
   try{saveProfile(profile);clearObsoleteLocks()}catch(e){post({type:'turf-auth-error',message:e.message||String(e)});return}
   try{window.dispatchEvent(new CustomEvent('turf:auth-ready',{detail:{profile:profile}}))}catch(e){}
-  [0,80,220,500,1000,1800,3000].forEach(function(ms){setTimeout(function(){clearObsoleteLocks();try{if(typeof fhqUpdateAccountUI==='function')fhqUpdateAccountUI(profile)}catch(e){}},ms)});
-  post({type:'turf-auth-ready',token:String(profile.token||''),username:String(profile.username||''),version:'worker-runtime-8962'});
+  [0,180,700].forEach(function(ms){setTimeout(function(){clearObsoleteLocks();try{if(typeof fhqUpdateAccountUI==='function')fhqUpdateAccountUI(profile)}catch(e){}},ms)});
+  post({type:'turf-auth-ready',token:token,username:String(profile.username||''),version:'worker-runtime-8962-perf'});
 }
 window.addEventListener('message',function(e){
   if(e.origin!==TRUSTED||e.source!==window.parent)return;var d=e&&e.data;if(!d||typeof d!=='object')return;
   if(d.type==='turf-auth-worker-profile'&&d.profile&&d.profile.token){unlock(d.profile)}
 },true);
-post({type:'turf-worker-profile-receiver-ready',version:'worker-runtime-8962'});
-post({type:'turf-worker-auth-bridge-ready',version:'worker-runtime-8962'});
+post({type:'turf-worker-profile-receiver-ready',version:'worker-runtime-8962-perf'});
+post({type:'turf-worker-auth-bridge-ready',version:'worker-runtime-8962-perf'});
 })();
