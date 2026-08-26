@@ -3,29 +3,43 @@
    AUTH ONLY: does not alter TURF presentation, layout, logos, games or navigation. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V12__)return;
-window.__TURF_LIVE_WORKER_PARENT_V12__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V13__)return;
+window.__TURF_LIVE_WORKER_PARENT_V13__=true;
 
-var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null;
+var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null,profileConfirmed=false;
 
 function status(message,isError){var el=document.getElementById('authStatus');if(!el)return;el.textContent=message||'';el.classList.toggle('error',!!isError)}
 function app(){return document.getElementById('turfApp')}
 function guestButton(){return document.getElementById('guestButton')}
 function setBusy(v){busy=!!v;var g=guestButton();if(g)g.disabled=busy}
-function saveActive(profile){activeProfile=profile||null}
+function saveActive(profile){activeProfile=profile||null;profileConfirmed=false}
 function clearConfirm(){if(confirmTimer){clearTimeout(confirmTimer);confirmTimer=null}}
-function armConfirm(){clearConfirm();confirmTimer=setTimeout(function(){if(document.body.classList.contains('turf-authenticated'))return;status('Your account is verified. TURF is still applying the account profile…',false)},18000)}
+function armConfirm(){
+  clearConfirm();
+  confirmTimer=setTimeout(function(){
+    if(profileConfirmed||document.body.classList.contains('turf-authenticated'))return;
+    status('Your account is verified, but TURF did not finish applying it. Refresh once and try again.',true);
+    setBusy(false);
+  },20000);
+}
 function sendProfile(target,force){
   var a=app(),w=target||bridgeWindow||(a&&a.contentWindow);if(!w||!activeProfile)return false;
   var now=Date.now();if(!force&&now-lastProfileSentAt<200)return false;lastProfileSentAt=now;
-  try{w.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'worker-auth-12'},'*');return true}catch(e){return false}
+  try{w.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:'worker-auth-13'},'*');return true}catch(e){return false}
 }
-function revealExistingTurf(){clearConfirm();document.body.classList.add('turf-authenticated');status('',false);setBusy(false)}
+function revealExistingTurf(){
+  profileConfirmed=true;clearConfirm();document.body.classList.add('turf-authenticated');status('',false);setBusy(false)
+}
+function queueProfileSends(){
+  [0,80,180,350,650,1100,1800,3000,5000,8000,12000].forEach(function(ms){
+    setTimeout(function(){if(!profileConfirmed)sendProfile(null,true)},ms)
+  })
+}
 function startExistingTurf(profile){
   if(!profile||!profile.token)throw new Error('TURF did not return a verified account profile.');
   saveActive(profile);var a=app();if(!a)throw new Error('TURF app frame is unavailable.');
   status('Account verified. Loading TURF…',false);armConfirm();
-  if(appLoaded){revealExistingTurf();sendProfile(null,true);return}
+  if(appLoaded){sendProfile(null,true);queueProfileSends();return}
   if(appStarted)return;
   var src=String(window.__TURF_EXISTING_APP_SRC__||'');if(!src)throw new Error('TURF app source is not configured.');
   appStarted=true;a.src=src;
@@ -57,10 +71,15 @@ window.addEventListener('message',function(e){
   var d=e&&e.data,a=app();if(!d||typeof d!=='object'||!a||e.source!==a.contentWindow)return;
   if(d.type==='turf-auth-bridge-ready'||d.type==='turf-worker-profile-request'||d.type==='turf-worker-profile-receiver-ready'){
     bridgeWindow=e.source;
-    if(activeProfile){sendProfile(e.source,true)}
+    if(activeProfile&&!profileConfirmed)sendProfile(e.source,true);
     return;
   }
-  if(d.type==='turf-auth-ready'){bridgeWindow=e.source;revealExistingTurf();return}
+  if(d.type==='turf-auth-ready'){
+    bridgeWindow=e.source;
+    if(activeProfile&&d.token&&String(d.token)!==String(activeProfile.token))return;
+    revealExistingTurf();
+    return;
+  }
   if(d.type==='turf-auth-error'){fail(new Error(String(d.message||'TURF could not apply the verified account.')));return}
 },true);
 
@@ -68,10 +87,10 @@ document.addEventListener('DOMContentLoaded',function(){
   if(!window.TurfAuth||!window.TurfApi||!window.TURF_STATIC_CONFIG){status('TURF authentication failed to load. Refresh once.',true);return}
   var a=app();if(a)a.addEventListener('load',function(){
     appLoaded=true;
-    if(activeProfile){
-      revealExistingTurf();
+    if(activeProfile&&!profileConfirmed){
+      status('Account verified. Applying your TURF profile…',false);
       sendProfile(null,true);
-      [100,300,700,1400,2600,4500,7000,10000].forEach(function(ms){setTimeout(function(){sendProfile(null,true)},ms)});
+      queueProfileSends();
     }
   });
   bindGuest();var tries=0,timer=setInterval(function(){tries++;if(renderGoogle()||tries>80)clearInterval(timer)},125);
