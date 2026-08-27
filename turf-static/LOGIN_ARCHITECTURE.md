@@ -1,13 +1,32 @@
 # TURF login architecture
 
-The production TURF site remains the existing v89.62 application and visual stack. Do not reconstruct Home, logos, topbar, sidebar, Collections, Games, or other presentation in a parallel static app.
+## Production rule
 
-The GitHub Pages root `index.html` owns sign-in only:
+The production TURF site remains the existing TURF application and its exact visual stack. **Do not reconstruct, restyle, or replace the production Home, logos, topbar, sidebar, Collections, Games, Rankings, Draft Sim, or other presentation in a parallel static app.**
 
-1. Google or Guest authenticates against the Cloudflare Worker via `turf-api.js`, `turf-config.js`, and `turf-auth.js`.
-2. The returned TURF profile/token is cached by the wrapper.
-3. The existing TURF v89.62 app is loaded unchanged in the production iframe.
-4. The wrapper repeatedly sends `turf-auth-worker-profile` to the app so the existing account receiver can adopt the authenticated profile.
-5. The wrapper must never strand the user on `Opening your TURF account…`; once the real app iframe has loaded, it is revealed immediately while the profile handoff continues.
+The GitHub Pages root and Cloudflare Worker own authentication/backend transport only.
 
-Batch work must be applied to the existing TURF app after login is stable. The static prototype is not the production visual source of truth.
+## Login flow
+
+1. `turftrials.com/index.html` shows the Google / Guest login gate.
+2. Google or Guest authenticates against the Cloudflare Worker through `turf-api.js`, `turf-config.js`, and `turf-auth.js`.
+3. The Worker returns the verified TURF account profile/token.
+4. The wrapper loads the **existing current TURF app**, unchanged visually.
+5. The Worker app proxy may inject only auth/API bridge scripts (`worker-gas-bridge.js` and `110-turf-worker-auth-profile-v8968.js`). It must not rewrite TURF presentation.
+6. `turf-live-worker-parent.js` sends `turf-auth-worker-profile` to the existing app. For compatibility with an older inner auth bridge it may also send `turf-auth-resume` using the already Worker-verified token.
+7. The inner app adopts the profile and emits `turf-auth-ready`; the wrapper reveals the real TURF iframe.
+8. If acknowledgement is delayed after the verified app is loaded, the wrapper may reveal the real app rather than strand the user behind a loading screen. It must never substitute a reconstructed UI.
+
+## Visual preservation
+
+Production visual source of truth = the existing TURF app itself.
+
+- Exact existing logos remain owned by the existing app.
+- Exact existing topbar remains owned by the existing app.
+- Exact existing Home layout remains owned by the existing app.
+- Exact existing Collections, Games, competitive navigation, Rankings, Draft Sim and responsive behavior remain owned by the existing app.
+- Login/backend work must not load static parity, prototype, visual-authority, Batch 4 destination, or other reconstruction layers into production.
+
+## Batch work
+
+Batch 4 and later feature work resumes only after production login is stable. Batch changes must be applied to the existing TURF application, not to the old static prototype.
