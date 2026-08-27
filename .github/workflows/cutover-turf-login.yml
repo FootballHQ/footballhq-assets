@@ -29,15 +29,36 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validate Worker V2
+      - name: Validate Worker V2 source
         working-directory: turf-static/worker
         run: |
           npm install --no-audit --no-fund
           npm run check
 
-      - name: Deploy Worker V2
+      - name: Check live Worker before deploying
+        id: live_worker
+        run: |
+          set -euo pipefail
+          BODY="$(curl -fsS --max-time 12 'https://turftest-api.turftrials.workers.dev/health' || true)"
+          echo "$BODY"
+          if echo "$BODY" | grep -q '"loginBridge":16' && echo "$BODY" | grep -q '"appProxy":true'; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+            echo 'Existing live Worker already has the exact-app login bridge; no Cloudflare deploy needed.'
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Existing live Worker is not yet the required exact-app bridge.'
+          fi
+
+      - name: Deploy Worker V2 only when live Worker is not ready
+        if: steps.live_worker.outputs.ready != 'true'
         working-directory: turf-static/worker
-        run: npx wrangler deploy
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo 'Live Worker is not ready and GitHub Cloudflare secrets are not configured. Leaving turftrials.com unchanged.' >&2
+            exit 1
+          fi
+          npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -96,7 +117,6 @@ jobs:
         run: |
           set -euo pipefail
           grep -q "APP_SRC='https://turftest-api.turftrials.workers.dev/app?build=exact-current-turf-login-only-v16'" index.html
-          # Guardrail: this workflow is allowed to change only the iframe source.
           git diff -- index.html
 
       - name: Commit login-only cutover
@@ -112,4 +132,4 @@ jobs:
           git commit -m 'Use exact TURF app through Worker login bridge v16 [skip ci]'
           git push
 
-# trigger: 2026-08-26 guarded login-only cutover v16b after worker-auth-23
+# trigger: 2026-08-26 login-only cutover checks existing live Worker first
