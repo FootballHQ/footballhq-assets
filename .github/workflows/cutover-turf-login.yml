@@ -112,4 +112,4 @@ jobs:
           git commit -m 'Use exact TURF app through Worker login bridge v16 [skip ci]'
           git push
 
-# trigger: 2026-08-26 guarded login-only cutover v16
+# trigger: 2026-08-26 guarded login-only cutover v16b after worker-auth-23
