@@ -2,10 +2,10 @@
    AUTH ONLY. No presentation/layout/logo/game/navigation changes. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V38__)return;
-window.__TURF_LIVE_WORKER_PARENT_V38__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V39__)return;
+window.__TURF_LIVE_WORKER_PARENT_V39__=true;
 
-var VERSION='worker-auth-38';
+var VERSION='worker-auth-39';
 var EXISTING_TURF_APP='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967';
 var activeProfile=null,busy=false,googleRendered=false,confirmed=false,loaded=false,lastSend=0,receiverWindow=null,receiverOrigin='',ackTimer=null;
 
@@ -37,7 +37,7 @@ function sendProfile(force){
 }
 function queueHandoffs(){[0,40,100,220,450,800,1400,2400,4000,6500].forEach(function(ms){setTimeout(function(){if(activeProfile&&!confirmed)sendProfile(true)},ms)})}
 function reveal(){
-  if(!activeProfile)return;confirmed=true;if(ackTimer){clearTimeout(ackTimer);ackTimer=null}
+  if(!activeProfile||confirmed)return;confirmed=true;if(ackTimer){clearTimeout(ackTimer);ackTimer=null}
   document.body.classList.add('turf-authenticated');status('',false);setBusy(false);
   setTimeout(function(){try{if(receiverWindow&&receiverOrigin)receiverWindow.postMessage({type:'turf-go-home',version:VERSION},receiverOrigin)}catch(e){}},100);
 }
@@ -45,13 +45,13 @@ function armAckTimeout(){
   if(ackTimer)clearTimeout(ackTimer);
   ackTimer=setTimeout(function(){
     if(!activeProfile||confirmed)return;
-    status('Your account was verified, but TURF did not finish loading it. Refresh once and try again.',true);
+    status('Your account was verified, but the existing TURF app did not request the profile. Refresh once and try again.',true);
     setBusy(false);
-  },12000);
+  },15000);
 }
 function startExistingTurf(profile){
   saveActive(profile);var a=app();if(!a)throw new Error('TURF app frame is unavailable.');
-  status('Account verified. Loading the existing TURF site…',false);
+  status('Account verified. Loading TURF…',false);
   var src=existingAppSrc();src+=(src.indexOf('?')>=0?'&':'?')+'parentauth='+encodeURIComponent(VERSION)+'&ts='+Date.now();
   a.src=src;armAckTimeout();
 }
@@ -71,15 +71,26 @@ function renderGoogle(){
   if(!host||!(window.google&&google.accounts&&google.accounts.id)||!window.TURF_STATIC_CONFIG)return false;
   try{google.accounts.id.initialize({client_id:window.TURF_STATIC_CONFIG.googleClientId,callback:directGoogle,auto_select:false,cancel_on_tap_outside:false});google.accounts.id.renderButton(host,{type:'standard',theme:'filled_black',size:'large',text:'continue_with',shape:'rectangular',logo_alignment:'left',width:360});googleRendered=true;return true}catch(e){status('Google sign-in could not initialize. Please refresh and try again.',true);return false}
 }
-function bindGuest(){var g=guestButton();if(!g||g.dataset.workerAuthBound==='1')return;g.dataset.workerAuthBound='1';g.addEventListener('click',directGuest)}
 window.addEventListener('message',function(e){
   var d=e&&e.data;if(!d||typeof d!=='object'||!trustedAppOrigin(e.origin))return;
-  if(e.source!==app().contentWindow)return;
-  if(d.type==='turf-worker-profile-request'||d.type==='turf-worker-profile-receiver-ready'||d.type==='turf-worker-profile-bridge-ready'||d.type==='turf-auth-worker-receiver-ready'||d.type==='turf-auth-bridge-ready'){
+  var a=app();if(!a||e.source!==a.contentWindow)return;
+
+  /* These messages prove the existing TURF app has the Worker-profile receiver installed. */
+  if(d.type==='turf-worker-profile-request'||d.type==='turf-worker-profile-receiver-ready'||d.type==='turf-worker-profile-bridge-ready'||d.type==='turf-auth-worker-receiver-ready'){
     receiverWindow=e.source;receiverOrigin=e.origin;
-    if(activeProfile){status('Account verified. Applying your TURF profile…',false);sendProfile(true);queueHandoffs()}
+    if(activeProfile){
+      status('Account verified. Applying your TURF profile…',false);
+      sendProfile(true);queueHandoffs();
+      /* The v6 child receiver applies this synchronously but does not emit an ACK.
+         A genuine receiver request is therefore sufficient proof to reveal the existing site. */
+      setTimeout(function(){if(activeProfile&&!confirmed)reveal()},120);
+    }
     return;
   }
+
+  /* Legacy Apps Script bridge readiness alone is NOT treated as Worker receiver readiness. */
+  if(d.type==='turf-auth-bridge-ready')return;
+
   if(d.type==='turf-auth-worker-profile-applied'){
     if(activeProfile&&d.token&&String(d.token)!==String(activeProfile.token))return;reveal();return;
   }
@@ -91,8 +102,9 @@ window.addEventListener('message',function(e){
 },true);
 async function boot(){
   try{await ensureAuthStack()}catch(e){status(e.message||String(e),true);return}
-  var a=app();if(a)a.addEventListener('load',function(){if(!activeProfile)return;loaded=true;status('Account verified. Waiting for TURF…',false)});
+  var a=app();if(a)a.addEventListener('load',function(){if(!activeProfile)return;loaded=true;status('Account verified. Waiting for TURF profile receiver…',false)});
   bindGuest();var tries=0,timer=setInterval(function(){tries++;if(renderGoogle()||tries>80)clearInterval(timer)},125);
 }
+function bindGuest(){var g=guestButton();if(!g||g.dataset.workerAuthBound==='1')return;g.dataset.workerAuthBound='1';g.addEventListener('click',directGuest)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
