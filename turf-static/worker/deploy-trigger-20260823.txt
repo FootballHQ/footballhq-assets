@@ -1,7 +1,6 @@
-Trigger TURF Worker deployment for login-only architecture.
-Timestamp: 2026-08-26T20:24:00-07:00
-Build: exact-turf-worker-v15-current-app-auth-only.
-Purpose: deploy the current Worker V2 proxy that serves the existing TURF app unchanged and injects only the Worker-backed google.script.run/auth bridge.
-Visual policy: preserve the existing TURF application exactly; no Home/logo/topbar/sidebar/game/collection reconstruction.
-Expected health after deploy: productionCutover=true, rpcVersion=2, appProxy=true, loginBridge=15, build=exact-turf-worker-v15-current-app-auth-only.
-Production wrapper cutover after successful deploy: change only APP_SRC from direct Apps Script /exec to https://turftest-api.turftrials.workers.dev/app?v=worker15.
+Trigger TURF Worker deployment for existing-site login architecture.
+Timestamp: 2026-08-27T00:31:00-07:00
+Build: existing-turf-worker-login-v30-fullscreen-games-effects.
+Purpose: deploy Worker-backed Google/Guest login into the existing TURF application without reconstructing Home, logos, topbar, sidebar, Collections, or navigation.
+Game policy: native TURF game engine stays intact; game overlay becomes a full-screen destination like Trials with no sidebar/topbar while playing, a Back to Games control, full-screen native result overlay, and full-screen confetti/damage/feedback effects.
+Expected health after deploy: productionCutover=true, rpcVersion=2, appProxy=true, loginBridge=30, fullScreenGames=true, fullScreenGameEffects=true, build=existing-turf-worker-login-v30-fullscreen-games-effects.
