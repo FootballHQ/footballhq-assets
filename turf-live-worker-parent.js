@@ -5,11 +5,11 @@
    that same exact app HTML, never a reconstructed/static prototype. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V26__)return;
-window.__TURF_LIVE_WORKER_PARENT_V26__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V27__)return;
+window.__TURF_LIVE_WORKER_PARENT_V27__=true;
 
-var VERSION='worker-auth-26';
-var PROXY_APP='https://turftest-api.turftrials.workers.dev/app?authFallback=worker-auth-26';
+var VERSION='worker-auth-27';
+var PROXY_APP='https://turftest-api.turftrials.workers.dev/app?authFallback=worker-auth-27';
 var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,lastResumeSentAt=0,confirmTimer=null,profileConfirmed=false,fallbackUsed=false;
 function status(message,isError){var el=document.getElementById('authStatus');if(!el)return;el.textContent=message||'';el.classList.toggle('error',!!isError)}
 function app(){return document.getElementById('turfApp')}
