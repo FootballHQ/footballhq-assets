@@ -7,11 +7,13 @@ import {handlesH2HRpc,handleH2HRpc} from './h2h-rpc.js';
 import {handleTrialsGridRpc,handleTrialsHttp,handleGridAdmin} from './trials-grid-rpc.js';
 
 const TRIAL_GRID_RPC=new Set(['turfV8905TrialInventory','turfV8944GridSearch','turfV8944GridIndexStatus']);
-const TURF_APP_SOURCE='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=worker-auth-31';
+/* IMPORTANT: this is the existing/current TURF app. The Worker only proxies it
+   so login/backend calls can be replaced without rebuilding presentation. */
+const TURF_APP_SOURCE='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.90&bridge=worker-auth-32';
 const TURF_WRAPPER_SOURCE='https://footballhq.github.io/footballhq-assets/index.html';
-const TURF_BRIDGE_SRC='https://footballhq.github.io/footballhq-assets/turf-static/js/worker-gas-bridge.js?v=worker-auth-31';
-const TURF_PROFILE_SRC='https://footballhq.github.io/footballhq-assets/v88-36/js/110-turf-worker-auth-profile-v8968.js?v=worker-auth-31';
-const BUILD='existing-turf-worker-login-v31-auth-only';
+const TURF_BRIDGE_SRC='https://footballhq.github.io/footballhq-assets/turf-static/js/worker-gas-bridge.js?v=worker-auth-32';
+const TURF_PROFILE_SRC='https://footballhq.github.io/footballhq-assets/v88-36/js/110-turf-worker-auth-profile-v8968.js?v=worker-auth-32';
+const BUILD='existing-turf-v8990-worker-login-v32-auth-only';
 
 export default {
   async fetch(request,env){
@@ -20,7 +22,7 @@ export default {
     const url=new URL(request.url);
 
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
-    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:true,rpcVersion:2,appProxy:true,loginBridge:31,authOnly:true,build:BUILD},200,cors);
+    if(url.pathname==='/health')return json({ok:true,service:'turf-api-migration-v2',productionCutover:true,rpcVersion:2,appProxy:true,loginBridge:32,authOnly:true,appVersion:'89.90',build:BUILD},200,cors);
 
     try{
       if(url.pathname==='/'&&request.method==='GET')return await proxyExistingWrapper();
@@ -65,11 +67,11 @@ export default {
 };
 
 async function proxyExistingWrapper(){
-  const upstream=await fetch(TURF_WRAPPER_SOURCE+'?worker=31&ts='+Date.now(),{redirect:'follow',headers:{'User-Agent':'TURF-Worker-Wrapper-Proxy/31.0'}});
+  const upstream=await fetch(TURF_WRAPPER_SOURCE+'?worker=32&ts='+Date.now(),{redirect:'follow',headers:{'User-Agent':'TURF-Worker-Wrapper-Proxy/32.0'}});
   let html=await upstream.text();
   if(!upstream.ok)throw new HttpError(502,'TURF wrapper source returned HTTP '+upstream.status+'.');
   if(!/<html|<!doctype/i.test(html))throw new HttpError(502,'TURF wrapper source is unavailable.');
-  html=html.replace(/var APP_SRC='[^']*';/,"var APP_SRC='/app?v=worker31';");
+  html=html.replace(/var APP_SRC='[^']*';/,"var APP_SRC='/app?v=worker32';");
   return new Response(html,{status:200,headers:{
     'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store, no-cache, must-revalidate, max-age=0','Pragma':'no-cache','Expires':'0','Referrer-Policy':'strict-origin-when-cross-origin','X-Content-Type-Options':'nosniff'
   }});
@@ -95,15 +97,15 @@ function stripLegacyAuthScripts(html){
 
 async function proxyCurrentTurfApp(){
   const sourceUrl=TURF_APP_SOURCE+'&proxyts='+Date.now();
-  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/31.0'}});
+  const upstream=await fetch(sourceUrl,{redirect:'follow',headers:{'User-Agent':'TURF-Worker-App-Proxy/32.0'}});
   const html=await upstream.text();
   if(!upstream.ok)throw new HttpError(502,'Current TURF app source returned HTTP '+upstream.status+'.');
   if(!/<html|<!doctype/i.test(html)||/Sorry, unable to open the file/i.test(html))throw new HttpError(502,'Current TURF app source is temporarily unavailable.');
 
-  const earlyBridge='<script src="'+TURF_BRIDGE_SRC+'"></script><script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-auth-31";}catch(e){}</script>';
+  const earlyBridge='<script src="'+TURF_BRIDGE_SRC+'"></script><script>try{window.__TURF_APP_PROXY__=true;window.__TURF_APP_PROXY_VERSION__="worker-auth-32";}catch(e){}</script>';
   const lateProfile='<script src="'+TURF_PROFILE_SRC+'"></script>';
   let out=stripLegacyAuthScripts(html);
-  out=out.replace(/104-turf-account-continuity-v8940\.js(?:\?v=[^"'<>]*)?/g,'104-turf-account-continuity-v8940.js?v=8940-worker-auth-31');
+  out=out.replace(/104-turf-account-continuity-v8940\.js(?:\?v=[^"'<>]*)?/g,'104-turf-account-continuity-v8940.js?v=8940-worker-auth-32');
 
   if(/<head[^>]*>/i.test(out))out=out.replace(/<head([^>]*)>/i,'<head$1>'+earlyBridge);
   else if(/<body[^>]*>/i.test(out))out=out.replace(/<body([^>]*)>/i,'<body$1>'+earlyBridge);
