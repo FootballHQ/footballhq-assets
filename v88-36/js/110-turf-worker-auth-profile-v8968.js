@@ -48,7 +48,8 @@ window.addEventListener('message',function(e){
   if(e.origin!==TRUSTED)return;
   if(e.source!==window.top)return;
   var d=e&&e.data;if(!d||typeof d!=='object')return;
-  if(d.type==='turf-worker-auth-profile'&&d.profile){apply(d.profile)}
+  if((d.type==='turf-auth-worker-profile'||d.type==='turf-worker-auth-profile')&&d.profile){apply(d.profile)}
 },true);
 post({type:'turf-worker-profile-bridge-ready',version:'8968'});
+post({type:'turf-worker-profile-receiver-ready',version:'8968'});
 })();
