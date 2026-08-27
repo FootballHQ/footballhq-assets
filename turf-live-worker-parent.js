@@ -2,11 +2,11 @@
    AUTH ONLY. No presentation/layout/logo/game/navigation changes. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V40__)return;
-window.__TURF_LIVE_WORKER_PARENT_V40__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V41__)return;
+window.__TURF_LIVE_WORKER_PARENT_V41__=true;
 
-var VERSION='worker-auth-40';
-var EXISTING_TURF_APP='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967';
+var VERSION='worker-auth-41';
+var EXISTING_TURF_APP='https://turftest-api.turftrials.workers.dev/app?production=1&v=worker-auth-41';
 var activeProfile=null,busy=false,googleRendered=false,confirmed=false,loaded=false,lastSend=0,receiverWindow=null,receiverOrigin='',ackTimer=null;
 
 function status(message,isError){var el=document.getElementById('authStatus');if(!el)return;el.textContent=message||'';el.classList.toggle('error',!!isError)}
@@ -14,7 +14,13 @@ function app(){return document.getElementById('turfApp')}
 function guestButton(){return document.getElementById('guestButton')}
 function setBusy(v){busy=!!v;var g=guestButton();if(g)g.disabled=busy}
 function existingAppSrc(){return String(window.__TURF_EXISTING_APP_SRC__||EXISTING_TURF_APP)}
-function trustedAppOrigin(origin){try{var u=new URL(String(origin||''));if(u.protocol!=='https:')return false;var h=String(u.hostname||'').toLowerCase();return h==='script.google.com'||h==='script.googleusercontent.com'||h.endsWith('.googleusercontent.com')}catch(e){return false}}
+function trustedAppOrigin(origin){
+  try{
+    var u=new URL(String(origin||''));if(u.protocol!=='https:')return false;
+    var h=String(u.hostname||'').toLowerCase();
+    return h==='turftest-api.turftrials.workers.dev'||h==='turftrials.com'||h==='script.google.com'||h==='script.googleusercontent.com'||h.endsWith('.googleusercontent.com');
+  }catch(e){return false}
+}
 function loadScript(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.src=src;s.async=false;s.onload=resolve;s.onerror=function(){reject(new Error('Could not load TURF authentication.'))};document.head.appendChild(s)})}
 async function ensureAuthStack(){
   if(window.TurfApi&&window.TurfAuth&&window.TURF_STATIC_CONFIG)return;
@@ -80,15 +86,12 @@ window.addEventListener('message',function(e){
   var d=e&&e.data;if(!d||typeof d!=='object'||!trustedAppOrigin(e.origin))return;
   var a=app();if(!a||e.source!==a.contentWindow)return;
 
-  /* New Worker-aware receiver, if the deployed TURF app has it. */
   if(d.type==='turf-worker-profile-request'||d.type==='turf-worker-profile-receiver-ready'||d.type==='turf-worker-profile-bridge-ready'||d.type==='turf-auth-worker-receiver-ready'){
     receiverWindow=e.source;receiverOrigin=e.origin;
     if(activeProfile){status('Account verified. Applying your TURF profile…',false);sendProfile(true);queueHandoffs();setTimeout(function(){if(activeProfile&&!confirmed)reveal()},120)}
     return;
   }
 
-  /* Current deployed TURF uses the legacy bridge. Feed the Worker-verified token
-     into its existing resume path so the exact existing app unlocks itself. */
   if(d.type==='turf-auth-bridge-ready'){
     receiverWindow=e.source;receiverOrigin=e.origin;
     if(activeProfile){status('Account verified. Opening TURF…',false);sendLegacyResume();queueLegacyResume()}
