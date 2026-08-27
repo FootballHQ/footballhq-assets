@@ -59,3 +59,13 @@ function run(){addCss();patchRuntime();var p=current();if(p){persist(p);applySur
 window.addEventListener('turf:auth-ready',function(e){accept(e&&e.detail&&e.detail.profile?e.detail.profile:current())});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
+
+/* Load late visual authority patches without touching the auth/loading flow. */
+(function(){
+  if(window.__TURF_V8951_VISUAL_LOADER__)return;
+  window.__TURF_V8951_VISUAL_LOADER__=true;
+  var s=document.createElement('script');
+  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8951';
+  s.async=true;
+  (document.head||document.documentElement).appendChild(s);
+})();
