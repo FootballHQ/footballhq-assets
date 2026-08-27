@@ -180,3 +180,59 @@ document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.t
 window.addEventListener('resize',applyTheme);
 if(window.MutationObserver){var z;new MutationObserver(function(m){var r=m.some(function(x){return x.type==='childList'||x.attributeName==='class'||x.attributeName==='aria-hidden'||x.attributeName==='style'});if(!r)return;clearTimeout(z);z=setTimeout(applyTheme,50)}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','aria-hidden','style']})}
 })();
+
+/* ============================================================
+   V89.52 — APPROVED CURRENT PLAYERS CINEMATIC OVERRIDE
+   Directly extends the Batch 4 game destination that is visibly active live.
+   No auth/loading changes.
+   ============================================================ */
+(function(){
+'use strict';
+if(window.__TURF_PLAYERS_CINEMATIC_8952__)return;
+window.__TURF_PLAYERS_CINEMATIC_8952__=true;
+var BRAND='https://footballhq.github.io/footballhq-assets/v88-36/brand/turf-app-icon-v8953.png?v=8952';
+function q(s,r){return (r||document).querySelector(s)}
+function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function tx(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim()}
+function ov(){return q('#footballGameOverlay')||q('.fg-game-overlay')}
+function open(){var o=ov();if(!o)return false;var c=getComputedStyle(o);return o.getAttribute('aria-hidden')==='false'||o.classList.contains('open')||o.classList.contains('active')||(c.display!=='none'&&c.visibility!=='hidden'&&Number(c.opacity||1)>0)}
+function players(){var o=ov();if(!o||!open())return false;var b=q('.fg-mode.active[data-fg-mode]',o);if(b&&b.dataset.fgMode)return b.dataset.fgMode==='players';return /CURRENT PLAYERS|ACTIVE PLAYERS|\bPLAYERS\b/.test(tx(o).toUpperCase())}
+function css(){if(q('#turfPlayers8952Css'))return;var s=document.createElement('style');s.id='turfPlayers8952Css';s.textContent=`
+body.turf-players-8952 #fhqSidebar,body.turf-players-8952 #turfTopbar,body.turf-players-8952 #fhqMobileTopbar,body.turf-players-8952 #fhqWalletBar{display:none!important;visibility:hidden!important;pointer-events:none!important}
+body.turf-players-8952 #footballGameOverlay,body.turf-players-8952 .fg-game-overlay{left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;max-width:none!important;background:radial-gradient(circle at 50% 31%,rgba(0,147,255,.25),transparent 30%),radial-gradient(circle at 14% 22%,rgba(0,107,214,.28),transparent 24%),radial-gradient(circle at 86% 21%,rgba(0,126,225,.24),transparent 25%),repeating-linear-gradient(165deg,rgba(51,174,255,.032) 0 1px,transparent 1px 38px),linear-gradient(180deg,#020914 0%,#031323 50%,#02080f 100%)!important;overflow:auto!important}
+body.turf-players-8952 #footballGameOverlay .football-game-shell{min-height:100vh!important;padding:0 0 44px!important;background:transparent!important}
+body.turf-players-8952 #footballGameOverlay .fg-head{position:relative!important;min-height:82px!important;padding:0 30px!important;background:rgba(2,9,16,.62)!important;border-bottom:1px solid rgba(43,180,255,.22)!important;backdrop-filter:blur(12px)!important}
+body.turf-players-8952 #footballGameOverlay .fg-close{position:absolute!important;left:28px!important;top:21px!important;margin:0!important;min-width:148px!important;height:42px!important;background:rgba(4,21,34,.86)!important;border:1px solid rgba(53,188,255,.48)!important;box-shadow:0 0 22px rgba(0,150,255,.12)!important}
+body.turf-players-8952 #footballGameOverlay .fg-close:after{content:'←  BACK TO GAMES'!important;font:950 10px/1 system-ui!important;letter-spacing:.09em!important}
+body.turf-players-8952 #footballGameOverlay .fg-kicker,body.turf-players-8952 #footballGameOverlay .fg-title{display:none!important}
+body.turf-players-8952 #footballGameOverlay .fg-modes{display:none!important}
+body.turf-players-8952 #footballGameOverlay .fg-toolbar{position:absolute!important;z-index:8!important;top:394px!important;left:50%!important;transform:translateX(-50%)!important;padding:0!important;background:transparent!important;border:0!important;justify-content:center!important}
+body.turf-players-8952 #footballGameOverlay .fg-body{position:relative!important;width:min(1160px,calc(100% - 54px))!important;max-width:1160px!important;margin:0 auto!important;padding:300px 0 70px!important;background:transparent!important}
+body.turf-players-8952 #footballGameOverlay .fg-special-game{position:relative!important;z-index:3!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+body.turf-players-8952 #footballGameOverlay .fg-special-game:before{content:'ACTIVE';display:block;text-align:center;color:#f4f8fb;font:italic 1000 clamp(58px,7vw,104px)/.76 Impact,'Arial Black',system-ui;text-shadow:0 5px 0 #476f8f,0 0 28px rgba(151,220,255,.52);letter-spacing:-.025em}
+body.turf-players-8952 #footballGameOverlay .fg-special-game:after{content:'PLAYERS';display:block;margin-top:5px;text-align:center;color:#16baff;font:italic 1000 clamp(62px,7.6vw,116px)/.7 Impact,'Arial Black',system-ui;text-shadow:0 5px 0 #0069af,0 0 26px #00aaff,0 0 60px rgba(0,157,255,.56);letter-spacing:-.04em}
+body.turf-players-8952 #footballGameOverlay .fg-special-title,body.turf-players-8952 #footballGameOverlay .fg-game-title{font-size:0!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+body.turf-players-8952 #footballGameOverlay .fg-game-sub,body.turf-players-8952 #footballGameOverlay .fg-special-sub{position:absolute!important;top:214px!important;left:0!important;right:0!important;margin:0!important;text-align:center!important;color:#c5d3df!important;font-size:16px!important;font-weight:800!important}
+body.turf-players-8952 #footballGameOverlay .fg-input-row,body.turf-players-8952 #footballGameOverlay .fg-guess-row{width:min(860px,90vw)!important;margin:108px auto 18px!important;position:relative!important;z-index:9!important}
+body.turf-players-8952 #footballGameOverlay #fgInput{height:62px!important;border-radius:13px 0 0 13px!important;border:1px solid #1597df!important;background:rgba(2,19,31,.94)!important;color:white!important;font-size:18px!important;box-shadow:inset 0 0 24px rgba(0,126,202,.08),0 0 24px rgba(0,151,255,.15)!important}
+body.turf-players-8952 #footballGameOverlay #fgGuessBtn{height:62px!important;min-width:160px!important;border-radius:0 13px 13px 0!important;background:linear-gradient(180deg,#2ac8ff,#0878c9)!important;border:1px solid #72dcff!important;color:white!important;font-size:18px!important;font-weight:1000!important;box-shadow:0 0 28px rgba(0,177,255,.48)!important}
+body.turf-players-8952 #footballGameOverlay table,body.turf-players-8952 #footballGameOverlay .fg-history,body.turf-players-8952 #footballGameOverlay .fg-history-wrap{width:100%!important;max-width:1120px!important;margin:22px auto!important;background:rgba(3,14,24,.88)!important;border:1px solid rgba(88,162,205,.24)!important;border-radius:14px!important;box-shadow:0 28px 70px rgba(0,0,0,.32)!important}
+body.turf-players-8952 #turfPlayers8952Brand{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2147483100;display:flex;align-items:center;gap:11px;color:white;font:500 21px/1 system-ui;letter-spacing:.2em;pointer-events:none}
+body.turf-players-8952 #turfPlayers8952Brand img{width:34px;height:34px;object-fit:cover;border-radius:5px;filter:drop-shadow(0 0 12px rgba(43,171,255,.42))}
+body.turf-players-8952 #turfPlayers8952Atmos{position:fixed;inset:0;z-index:2147480001;pointer-events:none;overflow:hidden}
+body.turf-players-8952 #turfPlayers8952Atmos:before,body.turf-players-8952 #turfPlayers8952Atmos:after{content:'';position:absolute;top:118px;width:24vw;height:42vh;min-width:220px;min-height:320px;max-width:370px;max-height:490px;border-radius:48% 48% 35% 35%;background:radial-gradient(circle at 50% 18%,#071725 0 17%,transparent 17.5%),linear-gradient(108deg,transparent 12%,#06141f 13% 39%,#02080f 40% 72%,transparent 73%);filter:drop-shadow(0 0 22px rgba(0,139,255,.4));opacity:.76}
+body.turf-players-8952 #turfPlayers8952Atmos:before{left:6%;transform:scale(1.12) rotate(-4deg)}body.turf-players-8952 #turfPlayers8952Atmos:after{right:6%;transform:scale(.98) rotate(5deg);opacity:.62}
+@media(max-width:850px){body.turf-players-8952 #turfPlayers8952Atmos{opacity:.38}body.turf-players-8952 #footballGameOverlay .fg-body{width:calc(100% - 24px)!important;padding-top:270px!important}body.turf-players-8952 #footballGameOverlay .fg-toolbar{top:365px!important}}
+`;document.head.appendChild(s)}
+function decorate(){
+  css();var o=ov(),yes=players();document.body.classList.toggle('turf-players-8952',yes);if(!yes){var old=q('#turfPlayers8952Brand');if(old)old.remove();old=q('#turfPlayers8952Atmos');if(old)old.remove();return}
+  var sub=q('.fg-game-sub,.fg-special-sub',o);if(sub)sub.textContent='Guess the current NFL player in eight guesses.';
+  var close=q('.fg-close',o);if(close){close.setAttribute('aria-label','Back to Games');close.title='Back to Games'}
+  if(!q('#turfPlayers8952Brand')){var b=document.createElement('div');b.id='turfPlayers8952Brand';b.innerHTML='<img src="'+BRAND+'" alt=""><span>TURF</span>';document.body.appendChild(b)}
+  if(!q('#turfPlayers8952Atmos')){var a=document.createElement('div');a.id='turfPlayers8952Atmos';a.setAttribute('aria-hidden','true');document.body.appendChild(a)}
+}
+function schedule(){[0,40,100,220,500,900].forEach(function(ms){setTimeout(decorate,ms)})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',decorate,{once:true});else decorate();
+document.addEventListener('click',function(){schedule()},true);window.addEventListener('resize',decorate);
+if(window.MutationObserver){var z;new MutationObserver(function(){clearTimeout(z);z=setTimeout(decorate,35)}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','aria-hidden','style']})}
+})();
