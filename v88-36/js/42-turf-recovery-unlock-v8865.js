@@ -1,7 +1,7 @@
 /* ============================================================
-   TURF V88.65 — LEGACY RECOVERY COMPATIBILITY (WORKER-AUTH SAFE)
-   Worker auth is now authoritative. Keep only a tiny one-shot cleanup for
-   stale legacy auth classes; no page-wide MutationObserver and no navigation.
+   TURF V88.65 — LEGACY RECOVERY COMPATIBILITY
+   Development-safe cleanup for stale legacy identity/recovery UI.
+   No navigation, account creation, storage writes or game logic changes.
    ============================================================ */
 (function(){
 'use strict';
@@ -22,6 +22,9 @@ function cleanup(){
   });
 }
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanup,{once:true});else cleanup();
-window.addEventListener('turf:auth-ready',function(){cleanup();setTimeout(cleanup,120)});
+function schedule(){
+  [0,80,180,350,700,1200,2200,4000,6500,9000].forEach(function(ms){setTimeout(cleanup,ms)});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+window.addEventListener('turf:auth-ready',function(){cleanup();setTimeout(cleanup,120);setTimeout(cleanup,500)});
 })();
