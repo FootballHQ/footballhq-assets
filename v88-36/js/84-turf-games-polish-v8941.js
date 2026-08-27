@@ -43,7 +43,6 @@ function daily(){
   return /DAILY CHALLENGE/i.test(txt(host()))&&!/UNLIMITED SETUP|CHOOSE YOUR DIFFICULTY/i.test(txt(host()));
 }
 
-/* Universal dropdown close after selection. */
 document.addEventListener('click',function(e){
   var item=e.target.closest&&e.target.closest('.fg-suggestion,[data-name],[role="option"]');
   if(!item)return;
@@ -62,7 +61,6 @@ function fixHigherLower(){
   qa('button,[role="button"]',h).forEach(function(b){
     var t=txt(b).replace(/✓/g,'').trim().toUpperCase();
     if(t==='PLAY'){
-      /* Remove it from the DOM so an older renderer cannot reactivate it. */
       b.disabled=true;
       b.setAttribute('aria-hidden','true');
       b.style.setProperty('display','none','important');
@@ -79,7 +77,6 @@ function fixHigherLower(){
 function fixWhoAmI(){
   if(mode()!=='whoami')return;
   var h=host();
-  /* Give Up is not part of the approved Who Am I design. Remove every copy. */
   qa('button,[role="button"]',h).forEach(function(b){
     if(/^GIVE UP$/i.test(txt(b))){
       b.style.setProperty('display','none','important');
@@ -87,7 +84,6 @@ function fixWhoAmI(){
       if(b.parentNode)b.parentNode.removeChild(b);
     }
   });
-  /* Keep exactly one Reveal Next Hint button, regardless of which renderer created it. */
   var reveal=qa('button,[role="button"]',h).filter(function(b){return /REVEAL NEXT HINT/i.test(txt(b))});
   reveal.forEach(function(b,i){
     if(i===0){
@@ -204,6 +200,18 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 [0,30,80,150,300,600,1000,1600,2500,4000,6500,10000].forEach(function(ms){setTimeout(run,ms)});
 var timer=null;
 new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,12)}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,characterData:true,attributeFilter:['class','style','aria-hidden','disabled']});
-/* Native renderers can repaint after observers settle; keep a lightweight authority loop while a game modal is open. */
 setInterval(function(){if(q('#fgSpecialGame')||q('#fgGridGame')||q('#footballGameOverlay'))run()},250);
+})();
+
+/* V89.51 — load the approved Active Players full-screen visual skin.
+   This file is already part of the live Apps Script page, so use it as the
+   loader rather than relying on a newer script tag that the deployed HTML
+   does not yet know about. Auth/loading behavior is untouched. */
+(function(){
+  if(window.__TURF_V8951_LIVE_VISUAL_LOADER__)return;
+  window.__TURF_V8951_LIVE_VISUAL_LOADER__=true;
+  var s=document.createElement('script');
+  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8951b';
+  s.async=true;
+  (document.head||document.documentElement).appendChild(s);
 })();
