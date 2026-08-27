@@ -1,7 +1,7 @@
 Trigger TURF Worker deployment for login-only architecture.
-Timestamp: 2026-08-26T01:32:00-07:00
-Build: exact-turf-worker-v13-existing-app-login.
-Purpose: force a fresh deployment of the current Worker V2 auth/API backend used directly by turftrials.com login.
+Timestamp: 2026-08-26T20:24:00-07:00
+Build: exact-turf-worker-v15-current-app-auth-only.
+Purpose: deploy the current Worker V2 proxy that serves the existing TURF app unchanged and injects only the Worker-backed google.script.run/auth bridge.
 Visual policy: preserve the existing TURF application exactly; no Home/logo/topbar/sidebar/game/collection reconstruction.
-Expected health after deploy: productionCutover=true, rpcVersion=2, appProxy=true, loginBridge=13, build=exact-turf-worker-v13-existing-app-login.
-Expected auth: Google/Guest authenticate against Worker RPC first, then verified profile is handed into the existing TURF application.
+Expected health after deploy: productionCutover=true, rpcVersion=2, appProxy=true, loginBridge=15, build=exact-turf-worker-v15-current-app-auth-only.
+Production wrapper cutover after successful deploy: change only APP_SRC from direct Apps Script /exec to https://turftest-api.turftrials.workers.dev/app?v=worker15.
