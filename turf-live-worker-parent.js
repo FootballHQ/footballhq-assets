@@ -1,16 +1,16 @@
-/* TURF production login bridge v44.
+/* TURF production login bridge v45.
    Worker handles authentication ONLY. The existing Apps Script TURF app remains
    the visual/runtime source of truth and receives the verified account token
    through its existing turf-auth-resume bridge. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V44__)return;
-window.__TURF_LIVE_WORKER_PARENT_V44__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V45__)return;
+window.__TURF_LIVE_WORKER_PARENT_V45__=true;
 
-var VERSION='worker-auth-44';
+var VERSION='worker-auth-45';
 var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967';
 var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
-var activeProfile=null,bridgeWindow=null,bridgeOrigin='',appStarted=false,busy=false,googleRendered=false;
+var activeProfile=null,bridgeWindow=null,bridgeOrigin='',appStarted=false,busy=false,googleRendered=false,revealed=false;
 var TOKEN_KEY='turfAuthAccountTokenV1',PROFILE_KEY='turfAuthCachedProfileV1';
 
 function q(id){return document.getElementById(id)}
@@ -37,22 +37,30 @@ function savedToken(){
   if(!t){try{var p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null');if(p&&p.token)t=String(p.token).trim()}catch(e){}}
   return t;
 }
-function reveal(){document.body.classList.add('turf-authenticated');status('',false);setBusy(false)}
-function showChooser(message,isError){document.body.classList.remove('turf-authenticated');var c=q('authChoices');if(c)c.style.display='grid';var pulse=q('authPulse');if(pulse)pulse.style.display='none';status(message||'Choose how you want to continue.',!!isError);setBusy(false);renderGoogle()}
+function reveal(){if(revealed)return;revealed=true;document.body.classList.add('turf-authenticated');status('',false);setBusy(false)}
+function showChooser(message,isError){revealed=false;document.body.classList.remove('turf-authenticated');var c=q('authChoices');if(c)c.style.display='grid';var pulse=q('authPulse');if(pulse)pulse.style.display='none';status(message||'Choose how you want to continue.',!!isError);setBusy(false);renderGoogle()}
 function showLoading(message){var c=q('authChoices');if(c)c.style.display='none';var pulse=q('authPulse');if(pulse)pulse.style.display='block';status(message||'Opening TURF…',false)}
+
+/* v45: do not wait for turf-auth-bridge-ready before sending the verified token.
+   The existing app already owns the turf-auth-resume listener. Push directly to the
+   iframe as soon as its window exists, while still honoring bridge-ready when it arrives. */
 function handoff(){
-  if(!activeProfile||!activeProfile.token||!bridgeWindow)return false;
-  var target=bridgeOrigin||'*';
-  try{bridgeWindow.postMessage({type:'turf-auth-resume',token:String(activeProfile.token),version:VERSION},target);return true}catch(e){return false}
+  if(!activeProfile||!activeProfile.token)return false;
+  var a=app(),targetWindow=bridgeWindow||(a&&a.contentWindow);
+  if(!targetWindow)return false;
+  var target=bridgeWindow&&bridgeOrigin?bridgeOrigin:'*';
+  try{targetWindow.postMessage({type:'turf-auth-resume',token:String(activeProfile.token),profile:activeProfile,version:VERSION},target);return true}catch(e){return false}
 }
-function queueHandoff(){[0,80,180,350,700,1200,2200,4000,7000,11000].forEach(function(ms){setTimeout(handoff,ms)})}
+function queueHandoff(){[0,50,120,250,500,900,1500,2400,3800,6000,9000,13000].forEach(function(ms){setTimeout(handoff,ms)})}
 function startExistingTurf(profile){
   saveProfile(profile);showLoading('Account verified. Opening TURF…');
   var a=app();if(!a)throw new Error('TURF app frame is unavailable.');
   if(appStarted){handoff();queueHandoff();return}
   appStarted=true;
-  a.addEventListener('load',function(){status('Opening TURF…',false);queueHandoff()});
-  a.src=APP_SRC+(APP_SRC.indexOf('?')>=0?'&':'?')+'parentauth='+encodeURIComponent(VERSION)+'&ts='+Date.now();
+  a.addEventListener('load',function(){status('Opening TURF…',false);handoff();queueHandoff()});
+  a.src=APP_SRC+(APP_SRC.indexOf('?')>=0?'&':'?')+'parentauth='+encodeURIComponent(VERSION)+'&accountToken='+encodeURIComponent(String(profile.token))+'&ts='+Date.now();
+  /* Start posting immediately too; contentWindow exists before the load event. */
+  handoff();queueHandoff();
 }
 function profileFromResult(res){
   if(res&&res.profile&&res.profile.token)return res.profile;
