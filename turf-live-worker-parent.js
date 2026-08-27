@@ -3,8 +3,8 @@
    AUTH ONLY: does not alter TURF presentation, layout, logos, games or navigation. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V21__)return;
-window.__TURF_LIVE_WORKER_PARENT_V21__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V22__)return;
+window.__TURF_LIVE_WORKER_PARENT_V22__=true;
 
 var activeProfile=null,busy=false,appStarted=false,appLoaded=false,bridgeWindow=null,googleRendered=false,lastProfileSentAt=0,confirmTimer=null,profileConfirmed=false,retryCount=0;
 
@@ -47,7 +47,7 @@ function armConfirm(){
 function sendProfile(target,force){
   var a=app(),w=target||bridgeWindow||(a&&a.contentWindow);if(!w||!activeProfile)return false;
   var now=Date.now();if(!force&&now-lastProfileSentAt<200)return false;lastProfileSentAt=now;
-  var msg={type:'turf-worker-auth-profile',profile:activeProfile,version:'worker-auth-21'};
+  var msg={type:'turf-auth-worker-profile',profile:activeProfile,version:'worker-auth-22'};
   try{w.postMessage(msg,'*');return true}catch(e){return false}
 }
 function revealExistingTurf(){profileConfirmed=true;clearConfirm();document.body.classList.add('turf-authenticated');status('',false);setBusy(false)}
@@ -92,6 +92,5 @@ document.addEventListener('DOMContentLoaded',function(){
   if(!window.TurfAuth||!window.TurfApi||!window.TURF_STATIC_CONFIG){status('TURF authentication failed to load. Refresh once.',true);return}
   var a=app();if(a)a.addEventListener('load',function(){appLoaded=true;if(activeProfile&&!profileConfirmed){status('Account verified. Applying your TURF profile…',false);sendProfile(null,true);queueProfileSends()}});
   bindGuest();var tries=0,timer=setInterval(function(){tries++;if(renderGoogle()||tries>80)clearInterval(timer)},125);
-  /* Choice-first by design: no silent session restore. */
 },{once:true});
 })();
