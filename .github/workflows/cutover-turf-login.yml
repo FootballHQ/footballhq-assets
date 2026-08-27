@@ -41,21 +41,21 @@ jobs:
           set -euo pipefail
           BODY="$(curl -fsS --max-time 12 'https://turftest-api.turftrials.workers.dev/health' || true)"
           echo "$BODY"
-          if echo "$BODY" | grep -q '"loginBridge":27' && echo "$BODY" | grep -q '"appProxy":true'; then
+          if echo "$BODY" | grep -q '"loginBridge":32' && echo "$BODY" | grep -q '"appVersion":"89.90"' && echo "$BODY" | grep -q '"appProxy":true'; then
             echo 'ready=true' >> "$GITHUB_OUTPUT"
-            echo 'Existing live Worker already has the exact-app login bridge; no Cloudflare deploy needed.'
+            echo 'Live Worker already serves the current V89.90 TURF app with Worker login.'
           else
             echo 'ready=false' >> "$GITHUB_OUTPUT"
-            echo 'Existing live Worker is not yet the required exact-app bridge.'
+            echo 'Deploying login-only V89.90 proxy update.'
           fi
 
-      - name: Deploy Worker V2 only when live Worker is not ready
+      - name: Deploy Worker V2
         if: steps.live_worker.outputs.ready != 'true'
         working-directory: turf-static/worker
         run: |
           set -euo pipefail
           if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
-            echo 'Live Worker is not ready and GitHub Cloudflare secrets are not configured. Leaving turftrials.com unchanged.' >&2
+            echo 'GitHub Cloudflare secrets are not configured; cannot deploy Worker update.' >&2
             exit 1
           fi
           npx wrangler deploy
@@ -63,44 +63,45 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Confirm exact-app Worker bridge is live
+      - name: Confirm V89.90 Worker bridge is live
         run: |
           set -euo pipefail
-          for i in $(seq 1 24); do
+          for i in $(seq 1 30); do
             BODY="$(curl -fsS --max-time 10 'https://turftest-api.turftrials.workers.dev/health' || true)"
             echo "$BODY"
-            if echo "$BODY" | grep -q '"loginBridge":27' && echo "$BODY" | grep -q '"appProxy":true'; then
+            if echo "$BODY" | grep -q '"loginBridge":32' && echo "$BODY" | grep -q '"appVersion":"89.90"' && echo "$BODY" | grep -q '"appProxy":true'; then
               exit 0
             fi
             sleep 3
           done
-          echo 'Worker loginBridge 27 / appProxy was not confirmed; leaving turftrials.com unchanged.' >&2
+          echo 'V89.90 Worker login proxy was not confirmed.' >&2
           exit 1
 
-      - name: Verify Worker serves the actual current TURF app
+      - name: Verify Worker serves current TURF app, not a rebuilt prototype
         run: |
           set -euo pipefail
           curl -fL --retry 4 --retry-delay 2 --max-time 45 \
-            'https://turftest-api.turftrials.workers.dev/app?proof=cutover-v27' \
+            'https://turftest-api.turftrials.workers.dev/app?proof=v8990-login-only' \
             -o /tmp/turf-worker-app.html
           grep -qi '<html' /tmp/turf-worker-app.html
           grep -q 'id="fhqHome"' /tmp/turf-worker-app.html
           grep -q 'id="turfTopbar"' /tmp/turf-worker-app.html
           grep -q 'id="fhqAlbumPage"' /tmp/turf-worker-app.html
           grep -q 'id="fhqGamesHub"' /tmp/turf-worker-app.html
-          grep -q 'TURF_EXACT_BRAND_V8940' /tmp/turf-worker-app.html
-          grep -q 'worker-gas-bridge.js?v=worker-auth-27' /tmp/turf-worker-app.html
-          grep -q '110-turf-worker-auth-profile-v8968.js?v=worker-auth-27' /tmp/turf-worker-app.html
+          grep -q 'TURF V89.90' /tmp/turf-worker-app.html
+          grep -q 'turfHomeProHeroLogo' /tmp/turf-worker-app.html
+          grep -q 'worker-gas-bridge.js?v=worker-auth-32' /tmp/turf-worker-app.html
+          grep -q '110-turf-worker-auth-profile-v8968.js?v=worker-auth-32' /tmp/turf-worker-app.html
           if grep -qi 'Sorry, unable to open the file' /tmp/turf-worker-app.html; then
-            echo 'Worker proxy received an Apps Script error page; leaving .com unchanged.' >&2
+            echo 'Worker proxy received an Apps Script error page.' >&2
             exit 1
           fi
 
-      - name: Verify root wrapper already points to exact Worker-proxied app
+      - name: Verify root remains login wrapper only
         run: |
           set -euo pipefail
-          grep -q "var APP_SRC='https://turftest-api.turftrials.workers.dev/app?production=1&bridge=worker-auth-27';" index.html
-          grep -q '/turf-live-worker-parent.js?v=worker-auth-27' index.html
-          echo 'Root wrapper is already on Worker auth 27; no visual/app rewrite required.'
+          grep -q "var APP_SRC='https://turftest-api.turftrials.workers.dev/app?production=1" index.html
+          grep -q '/turf-live-worker-parent.js' index.html
+          echo 'Root stays a login wrapper; TURF presentation remains sourced from the current app.'
 
-# trigger: 2026-08-27 login-only cutover v27; existing TURF remains visual source of truth
+# trigger: 2026-08-27 V89.90 login-only proxy; do not rebuild TURF UI
