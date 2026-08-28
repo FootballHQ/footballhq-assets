@@ -203,34 +203,13 @@ new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,12)}).o
 setInterval(function(){if(q('#fgSpecialGame')||q('#fgGridGame')||q('#footballGameOverlay'))run()},250);
 })();
 
-/* V89.53 — force a fresh fetch of the approved Active Players cinematic page. */
+/* Active Players: one authoritative patch only. */
 (function(){
-  if(window.__TURF_V8953_LIVE_VISUAL_LOADER__)return;
-  window.__TURF_V8953_LIVE_VISUAL_LOADER__=true;
-  var old=document.querySelectorAll('script[src*="105-turf-active-players-cinematic-v8951.js"]');
-  old.forEach(function(n){try{n.remove()}catch(e){}});
+  if(window.__TURF_ACTIVE_PLAYERS_SINGLE_LOADER__)return;
+  window.__TURF_ACTIVE_PLAYERS_SINGLE_LOADER__=true;
+  document.querySelectorAll('script[src*="105-turf-active-players"],script[src*="106-turf-active-players"]').forEach(function(n){try{n.remove()}catch(e){}});
   var s=document.createElement('script');
-  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8955-'+Date.now();
-  s.async=true;
-  (document.head||document.documentElement).appendChild(s);
-})();
-
-/* V89.55 — apply the actual approved artwork file after the 89.54 game patch. */
-(function(){
-  if(window.__TURF_V8955_APPROVED_ASSET_LOADER__)return;
-  window.__TURF_V8955_APPROVED_ASSET_LOADER__=true;
-  var s=document.createElement('script');
-  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/106-turf-active-players-approved-asset-v8955.js?v=8955-'+Date.now();
-  s.async=true;
-  (document.head||document.documentElement).appendChild(s);
-})();
-
-/* V89.56 — use the full approved render captured from this conversation. */
-(function(){
-  if(window.__TURF_V8956_EXACT_ART_LOADER__)return;
-  window.__TURF_V8956_EXACT_ART_LOADER__=true;
-  var s=document.createElement('script');
-  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-art-v8956.js?v=8956-'+Date.now();
+  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-v8957.js?v=8957-'+Date.now();
   s.async=true;
   (document.head||document.documentElement).appendChild(s);
 })();
