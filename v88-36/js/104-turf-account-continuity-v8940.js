@@ -60,17 +60,16 @@ window.addEventListener('turf:auth-ready',function(e){accept(e&&e.detail&&e.deta
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 
-/* Load the single authoritative Active Players visual/game layer.
-   IMPORTANT: bump the query whenever that file changes so Safari/GitHub Pages
-   cannot keep serving an older cached prototype. */
+/* Active Players visual authority: pin the known exact-art interactive build.
+   This intentionally bypasses the current prototype file on main. */
 (function(){
-  if(window.__TURF_V8973_VISUAL_LOADER__)return;
-  window.__TURF_V8973_VISUAL_LOADER__=true;
+  if(window.__TURF_V8976_EXACT_VISUAL_LOADER__)return;
+  window.__TURF_V8976_EXACT_VISUAL_LOADER__=true;
   var old=document.querySelector('script[data-turf-active-players-loader]');
   if(old)try{old.remove()}catch(e){}
   var s=document.createElement('script');
-  s.setAttribute('data-turf-active-players-loader','8973');
-  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8973';
+  s.setAttribute('data-turf-active-players-loader','8976-exact');
+  s.src='https://raw.githubusercontent.com/FootballHQ/footballhq-assets/07bb270b5e977bc838d78aab774edbf05b3f103d/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8976';
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
