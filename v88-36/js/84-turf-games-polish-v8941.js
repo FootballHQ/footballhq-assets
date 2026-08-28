@@ -19,37 +19,59 @@ function run(){}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 
-/* v89.60 Active Players — use the approved screen embedded in 107 directly.
-   The 8959 chunk/canvas path was covering the page with a black canvas because
-   those chunk files did not begin with a valid WebP header. Do not load them.
-   107 already contains the complete approved artwork plus transparent live
-   controls wired to the real game. */
+/* v89.61 Active Players exact-screen loader.
+   107 contains the approved screenshot artwork and the real game wiring.
+   Safari was showing only the live rows/rank because the huge data: image was
+   not being painted reliably. Convert that embedded image to an origin-owned
+   blob: URL and force it visible. No canvas, no placeholder renderer. */
 (function(){
-  if(window.__TURF_AP_8960_LOADER__)return;
-  window.__TURF_AP_8960_LOADER__=true;
-
-  function removeBrokenPainter(){
-    ['ap8959canvas','ap8958canvas'].forEach(function(id){var n=document.getElementById(id);if(n)try{n.remove()}catch(e){}});
-    ['ap8959css','ap8958canvasCss'].forEach(function(id){var n=document.getElementById(id);if(n)try{n.remove()}catch(e){}});
-    document.querySelectorAll('script[src*="110-turf-active-players"],script[src*="114-turf-active-players"],script[src*="ap8959-exact-"]').forEach(function(n){try{n.remove()}catch(e){}});
-    var im=document.getElementById('ap8957img');
-    if(im){
-      im.style.setProperty('display','block','important');
-      im.style.setProperty('visibility','visible','important');
-      im.style.setProperty('opacity','1','important');
-      im.style.setProperty('z-index','2','important');
-    }
-  }
-
-  removeBrokenPainter();
-  var existing=document.querySelector('script[src*="107-turf-active-players-exact-v8957.js"]');
-  if(!existing){
-    var s=document.createElement('script');
-    s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-v8957.js?v=8960-'+Date.now();
-    s.async=false;
-    s.onload=function(){removeBrokenPainter();[0,60,180,500,1200].forEach(function(ms){setTimeout(removeBrokenPainter,ms)})};
-    (document.head||document.documentElement).appendChild(s);
-  }else{
-    [0,60,180,500,1200].forEach(function(ms){setTimeout(removeBrokenPainter,ms)});
-  }
+'use strict';
+if(window.__TURF_AP_8961_LOADER__)return;
+window.__TURF_AP_8961_LOADER__=true;
+var objectUrl='';
+function cleanup(){
+ ['ap8959canvas','ap8958canvas'].forEach(function(id){var n=document.getElementById(id);if(n)try{n.remove()}catch(e){}});
+ ['ap8959css','ap8958canvasCss'].forEach(function(id){var n=document.getElementById(id);if(n)try{n.remove()}catch(e){}});
+ document.querySelectorAll('script[src*="110-turf-active-players"],script[src*="114-turf-active-players"],script[src*="ap8959-exact-"]').forEach(function(n){try{n.remove()}catch(e){}});
+}
+function dataToBlobUrl(src){
+ if(!/^data:image\/webp;base64,/i.test(src||''))return '';
+ try{
+  var raw=atob(src.slice(src.indexOf(',')+1));
+  var bytes=new Uint8Array(raw.length);
+  for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+  return URL.createObjectURL(new Blob([bytes],{type:'image/webp'}));
+ }catch(e){console.error('[TURF] Active Players artwork decode failed',e);return ''}
+}
+function promoteArtwork(){
+ cleanup();
+ var im=document.getElementById('ap8957img');
+ if(!im)return;
+ var src=im.getAttribute('src')||'';
+ if(/^data:image\/webp;base64,/i.test(src)){
+  var url=dataToBlobUrl(src);
+  if(url){if(objectUrl)try{URL.revokeObjectURL(objectUrl)}catch(e){};objectUrl=url;im.src=url;}
+ }
+ im.style.setProperty('display','block','important');
+ im.style.setProperty('visibility','visible','important');
+ im.style.setProperty('opacity','1','important');
+ im.style.setProperty('position','fixed','important');
+ im.style.setProperty('inset','0','important');
+ im.style.setProperty('width','100vw','important');
+ im.style.setProperty('height','100vh','important');
+ im.style.setProperty('object-fit','fill','important');
+ im.style.setProperty('z-index','2','important');
+ im.style.setProperty('pointer-events','none','important');
+ var shell=im.parentElement;if(shell){shell.style.setProperty('background','#01060b','important')}
+}
+function afterLoad(){[0,25,60,120,250,500,900,1500,2600].forEach(function(ms){setTimeout(promoteArtwork,ms)})}
+cleanup();
+var old=document.querySelector('script[src*="107-turf-active-players-exact-v8957.js"]');
+if(old)try{old.remove()}catch(e){}
+var s=document.createElement('script');
+s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-v8957.js?v=8961-'+Date.now();
+s.async=false;s.onload=afterLoad;s.onerror=function(){console.error('[TURF] failed to load exact Active Players screen')};
+(document.head||document.documentElement).appendChild(s);
+document.addEventListener('click',afterLoad,true);
+if(window.MutationObserver)new MutationObserver(function(){setTimeout(promoteArtwork,20)}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src','style','aria-hidden']});
 })();
