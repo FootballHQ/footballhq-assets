@@ -224,3 +224,13 @@ setInterval(function(){if(q('#fgSpecialGame')||q('#fgGridGame')||q('#footballGam
   s.async=true;
   (document.head||document.documentElement).appendChild(s);
 })();
+
+/* V89.56 — use the full approved render captured from this conversation. */
+(function(){
+  if(window.__TURF_V8956_EXACT_ART_LOADER__)return;
+  window.__TURF_V8956_EXACT_ART_LOADER__=true;
+  var s=document.createElement('script');
+  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-art-v8956.js?v=8956-'+Date.now();
+  s.async=true;
+  (document.head||document.documentElement).appendChild(s);
+})();
