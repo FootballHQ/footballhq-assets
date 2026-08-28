@@ -19,24 +19,37 @@ function run(){}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 
-/* v89.59 Active Players: load the VERIFIED approved screenshot bytes first,
-   then the existing live-game wiring, then paint those exact bytes. */
+/* v89.60 Active Players — use the approved screen embedded in 107 directly.
+   The 8959 chunk/canvas path was covering the page with a black canvas because
+   those chunk files did not begin with a valid WebP header. Do not load them.
+   107 already contains the complete approved artwork plus transparent live
+   controls wired to the real game. */
 (function(){
-  if(window.__TURF_AP_8959_LOADER__)return;
-  window.__TURF_AP_8959_LOADER__=true;
-  window.__TURF_AP_B64__='';
-  document.querySelectorAll('script[src*="105-turf-active-players"],script[src*="106-turf-active-players"],script[src*="107-turf-active-players"],script[src*="110-turf-active-players"],script[src*="114-turf-active-players"],script[src*="ap8959-exact-"]').forEach(function(n){try{n.remove()}catch(e){}});
-  var base='https://footballhq.github.io/footballhq-assets/v88-36/js/';
-  function load(name,next){var s=document.createElement('script');s.src=base+name+'?v=8959-'+Date.now();s.async=false;s.onload=function(){if(next)next()};s.onerror=function(){console.error('[TURF] failed to load '+name);if(next)next()};(document.head||document.documentElement).appendChild(s)}
-  load('ap8959-exact-0.js',function(){
-    load('ap8959-exact-1.js',function(){
-      load('ap8959-exact-2.js',function(){
-        load('ap8959-exact-3.js',function(){
-          load('107-turf-active-players-exact-v8957.js',function(){
-            load('114-turf-active-players-exact-data-v8959.js');
-          });
-        });
-      });
-    });
-  });
+  if(window.__TURF_AP_8960_LOADER__)return;
+  window.__TURF_AP_8960_LOADER__=true;
+
+  function removeBrokenPainter(){
+    ['ap8959canvas','ap8958canvas'].forEach(function(id){var n=document.getElementById(id);if(n)try{n.remove()}catch(e){}});
+    ['ap8959css','ap8958canvasCss'].forEach(function(id){var n=document.getElementById(id);if(n)try{n.remove()}catch(e){}});
+    document.querySelectorAll('script[src*="110-turf-active-players"],script[src*="114-turf-active-players"],script[src*="ap8959-exact-"]').forEach(function(n){try{n.remove()}catch(e){}});
+    var im=document.getElementById('ap8957img');
+    if(im){
+      im.style.setProperty('display','block','important');
+      im.style.setProperty('visibility','visible','important');
+      im.style.setProperty('opacity','1','important');
+      im.style.setProperty('z-index','2','important');
+    }
+  }
+
+  removeBrokenPainter();
+  var existing=document.querySelector('script[src*="107-turf-active-players-exact-v8957.js"]');
+  if(!existing){
+    var s=document.createElement('script');
+    s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-v8957.js?v=8960-'+Date.now();
+    s.async=false;
+    s.onload=function(){removeBrokenPainter();[0,60,180,500,1200].forEach(function(ms){setTimeout(removeBrokenPainter,ms)})};
+    (document.head||document.documentElement).appendChild(s);
+  }else{
+    [0,60,180,500,1200].forEach(function(ms){setTimeout(removeBrokenPainter,ms)});
+  }
 })();
