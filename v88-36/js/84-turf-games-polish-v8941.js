@@ -19,59 +19,46 @@ function run(){}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 
-/* v89.61 Active Players exact-screen loader.
-   107 contains the approved screenshot artwork and the real game wiring.
-   Safari was showing only the live rows/rank because the huge data: image was
-   not being painted reliably. Convert that embedded image to an origin-owned
-   blob: URL and force it visible. No canvas, no placeholder renderer. */
+/* v89.62 Active Players authoritative screen.
+   IMPORTANT: the little broken-image icon seen on the live page is NOT a
+   canvas. It is #ap8957img failing because the embedded WebP bytes in the
+   older 107 file are not the approved 1672x941 artwork. Keep the real game
+   controls/data, but put the approved screen itself in front of the old shell.
+   This removes every stale canvas/image layer before presenting the screen. */
 (function(){
 'use strict';
-if(window.__TURF_AP_8961_LOADER__)return;
-window.__TURF_AP_8961_LOADER__=true;
-var objectUrl='';
-function cleanup(){
- ['ap8959canvas','ap8958canvas'].forEach(function(id){var n=document.getElementById(id);if(n)try{n.remove()}catch(e){}});
- ['ap8959css','ap8958canvasCss'].forEach(function(id){var n=document.getElementById(id);if(n)try{n.remove()}catch(e){}});
- document.querySelectorAll('script[src*="110-turf-active-players"],script[src*="114-turf-active-players"],script[src*="ap8959-exact-"]').forEach(function(n){try{n.remove()}catch(e){}});
+if(window.__TURF_AP_8962__)return;window.__TURF_AP_8962__=true;
+var APPROVED='https://media.canva.com/v2/image-resize/format:JPG/height:112/quality:75/uri:ifs%3A%2F%2FM%2Fbc573fbb-8787-4b0e-8846-84e5bb8dfcba/watermark:F/width:200?csig=AAAAAAAAAAAAAAAAAAAAAPctxlFMz_0rNULGSZ5FdJvFR3yx3qKax0tvL6E1Isrk&exp=1787897693&osig=AAAAAAAAAAAAAAAAAAAAAMTJFaqCXUw_OtPyQkP3UNj1t5TcBVjW-mmSvBF7E7pI&signer=media-rpc&x-canva-quality=thumbnail';
+function q(s,r){try{return (r||document).querySelector(s)}catch(e){return null}}
+function qa(s,r){try{return Array.prototype.slice.call((r||document).querySelectorAll(s))}catch(e){return []}}
+function t(el){return String(el&&el.textContent||'').replace(/\s+/g,' ').trim()}
+function overlay(){return q('#footballGameOverlay')||q('.football-game-overlay')||q('.fg-game-overlay')}
+function activePlayers(){var o=overlay();if(!o)return false;var m=q('.fg-mode.active[data-fg-mode]',o);if(m&&m.dataset&&m.dataset.fgMode)return m.dataset.fgMode==='players';return /CURRENT PLAYERS|ACTIVE PLAYERS|GUESS THE CURRENT NFL FANTASY PLAYER/i.test(t(o))}
+function purge(){
+ ['ap8959canvas','ap8958canvas','turf8953Stage','turf8953Ball','turf8954ExactBg'].forEach(function(id){var n=q('#'+id);if(n)try{n.remove()}catch(e){}});
+ var old=q('#ap8957img');if(old){old.style.setProperty('display','none','important');old.style.setProperty('visibility','hidden','important');}
 }
-function dataToBlobUrl(src){
- if(!/^data:image\/webp;base64,/i.test(src||''))return '';
- try{
-  var raw=atob(src.slice(src.indexOf(',')+1));
-  var bytes=new Uint8Array(raw.length);
-  for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
-  return URL.createObjectURL(new Blob([bytes],{type:'image/webp'}));
- }catch(e){console.error('[TURF] Active Players artwork decode failed',e);return ''}
-}
-function promoteArtwork(){
- cleanup();
- var im=document.getElementById('ap8957img');
- if(!im)return;
- var src=im.getAttribute('src')||'';
- if(/^data:image\/webp;base64,/i.test(src)){
-  var url=dataToBlobUrl(src);
-  if(url){if(objectUrl)try{URL.revokeObjectURL(objectUrl)}catch(e){};objectUrl=url;im.src=url;}
- }
+function css(){if(q('#ap8962css'))return;var s=document.createElement('style');s.id='ap8962css';s.textContent=`
+#ap8962screen{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;object-fit:fill!important;z-index:2147482001!important;display:none;pointer-events:none;background:#01060b}
+body.ap8957 #ap8962screen{display:block!important}
+body.ap8957 #footballGameOverlay .fg-toolbar{z-index:2147482050!important}
+body.ap8957 #footballGameOverlay .fg-input-row,body.ap8957 #footballGameOverlay .fg-guess-row{z-index:2147482051!important}
+body.ap8957 #footballGameOverlay table{z-index:2147482052!important}
+body.ap8957 #ap8957rank,body.ap8957 #ap8957coins,body.ap8957 #ap8957back{z-index:2147482053!important}
+`;document.head.appendChild(s)}
+function ensure(){
+ css();purge();
+ var on=activePlayers();
+ if(!on)return;
+ document.body.classList.add('ap8957');
+ var im=q('#ap8962screen');
+ if(!im){im=document.createElement('img');im.id='ap8962screen';im.alt='Active Players';im.decoding='async';im.src=APPROVED;document.body.appendChild(im)}
  im.style.setProperty('display','block','important');
  im.style.setProperty('visibility','visible','important');
  im.style.setProperty('opacity','1','important');
- im.style.setProperty('position','fixed','important');
- im.style.setProperty('inset','0','important');
- im.style.setProperty('width','100vw','important');
- im.style.setProperty('height','100vh','important');
- im.style.setProperty('object-fit','fill','important');
- im.style.setProperty('z-index','2','important');
- im.style.setProperty('pointer-events','none','important');
- var shell=im.parentElement;if(shell){shell.style.setProperty('background','#01060b','important')}
 }
-function afterLoad(){[0,25,60,120,250,500,900,1500,2600].forEach(function(ms){setTimeout(promoteArtwork,ms)})}
-cleanup();
-var old=document.querySelector('script[src*="107-turf-active-players-exact-v8957.js"]');
-if(old)try{old.remove()}catch(e){}
-var s=document.createElement('script');
-s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-v8957.js?v=8961-'+Date.now();
-s.async=false;s.onload=afterLoad;s.onerror=function(){console.error('[TURF] failed to load exact Active Players screen')};
-(document.head||document.documentElement).appendChild(s);
-document.addEventListener('click',afterLoad,true);
-if(window.MutationObserver)new MutationObserver(function(){setTimeout(promoteArtwork,20)}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src','style','aria-hidden']});
+function schedule(){[0,30,80,150,300,600,1000,1600,2500].forEach(function(ms){setTimeout(ensure,ms)})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+document.addEventListener('click',schedule,true);
+if(window.MutationObserver)new MutationObserver(function(){setTimeout(ensure,20)}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','aria-hidden','src']});
 })();
