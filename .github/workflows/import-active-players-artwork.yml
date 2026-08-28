@@ -1,0 +1,28 @@
+name: Import Active Players Artwork
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-active-players-artwork.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import-artwork:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download approved artwork
+        run: |
+          mkdir -p v88-36/art
+          curl -L --fail --retry 3 'https://media.canva.com/v2/image-resize/format:JPG/height:112/quality:75/uri:ifs%3A%2F%2FM%2Fbc573fbb-8787-4b0e-8846-84e5bb8dfcba/watermark:F/width:200?csig=AAAAAAAAAAAAAAAAAAAAAPctxlFMz_0rNULGSZ5FdJvFR3yx3qKax0tvL6E1Isrk&exp=1787897693&osig=AAAAAAAAAAAAAAAAAAAAAMTJFaqCXUw_OtPyQkP3UNj1t5TcBVjW-mmSvBF7E7pI&signer=media-rpc&x-canva-quality=thumbnail' -o v88-36/art/active-players-approved.jpg
+          file v88-36/art/active-players-approved.jpg
+      - name: Commit artwork
+        run: |
+          git config user.name 'TURF Asset Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add v88-36/art/active-players-approved.jpg
+          git commit -m 'Add approved Active Players artwork' || exit 0
+          git push
