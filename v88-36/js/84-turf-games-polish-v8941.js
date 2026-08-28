@@ -203,15 +203,16 @@ new MutationObserver(function(){clearTimeout(timer);timer=setTimeout(run,12)}).o
 setInterval(function(){if(q('#fgSpecialGame')||q('#fgGridGame')||q('#footballGameOverlay'))run()},250);
 })();
 
-/* V89.51 — load the approved Active Players full-screen visual skin.
-   This file is already part of the live Apps Script page, so use it as the
-   loader rather than relying on a newer script tag that the deployed HTML
-   does not yet know about. Auth/loading behavior is untouched. */
+/* V89.53 — force a fresh fetch of the approved Active Players cinematic page.
+   The prior loader used a stable 8951b query string, so Safari/GitHub Pages
+   could keep serving the old 89.52 build even after the source file changed. */
 (function(){
-  if(window.__TURF_V8951_LIVE_VISUAL_LOADER__)return;
-  window.__TURF_V8951_LIVE_VISUAL_LOADER__=true;
+  if(window.__TURF_V8953_LIVE_VISUAL_LOADER__)return;
+  window.__TURF_V8953_LIVE_VISUAL_LOADER__=true;
+  var old=document.querySelectorAll('script[src*="105-turf-active-players-cinematic-v8951.js"]');
+  old.forEach(function(n){try{n.remove()}catch(e){}});
   var s=document.createElement('script');
-  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8951b';
+  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8953-'+Date.now();
   s.async=true;
   (document.head||document.documentElement).appendChild(s);
 })();
