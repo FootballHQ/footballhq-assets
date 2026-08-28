@@ -19,23 +19,24 @@ function run(){}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 
-/* Active Players exact screen. 107 owns the existing live game wiring and
-   account overlays. 110 paints the approved raster through canvas so CSP
-   cannot replace it with a broken-image icon. */
+/* v89.59 Active Players: load the VERIFIED approved screenshot bytes first,
+   then the existing live-game wiring, then paint those exact bytes. */
 (function(){
-  if(window.__TURF_ACTIVE_PLAYERS_SINGLE_LOADER__)return;
-  window.__TURF_ACTIVE_PLAYERS_SINGLE_LOADER__=true;
-  document.querySelectorAll('script[src*="105-turf-active-players"],script[src*="106-turf-active-players"],script[src*="107-turf-active-players"],script[src*="110-turf-active-players"]').forEach(function(n){try{n.remove()}catch(e){}});
-  function loadCanvas(){
-    var c=document.createElement('script');
-    c.src='https://footballhq.github.io/footballhq-assets/v88-36/js/110-turf-active-players-canvas-v8958.js?v=8958-'+Date.now();
-    c.async=true;
-    (document.head||document.documentElement).appendChild(c);
-  }
-  var s=document.createElement('script');
-  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-v8957.js?v=8958-'+Date.now();
-  s.async=true;
-  s.onload=loadCanvas;
-  s.onerror=loadCanvas;
-  (document.head||document.documentElement).appendChild(s);
+  if(window.__TURF_AP_8959_LOADER__)return;
+  window.__TURF_AP_8959_LOADER__=true;
+  window.__TURF_AP_B64__='';
+  document.querySelectorAll('script[src*="105-turf-active-players"],script[src*="106-turf-active-players"],script[src*="107-turf-active-players"],script[src*="110-turf-active-players"],script[src*="114-turf-active-players"],script[src*="ap8959-exact-"]').forEach(function(n){try{n.remove()}catch(e){}});
+  var base='https://footballhq.github.io/footballhq-assets/v88-36/js/';
+  function load(name,next){var s=document.createElement('script');s.src=base+name+'?v=8959-'+Date.now();s.async=false;s.onload=function(){if(next)next()};s.onerror=function(){console.error('[TURF] failed to load '+name);if(next)next()};(document.head||document.documentElement).appendChild(s)}
+  load('ap8959-exact-0.js',function(){
+    load('ap8959-exact-1.js',function(){
+      load('ap8959-exact-2.js',function(){
+        load('ap8959-exact-3.js',function(){
+          load('107-turf-active-players-exact-v8957.js',function(){
+            load('114-turf-active-players-exact-data-v8959.js');
+          });
+        });
+      });
+    });
+  });
 })();
