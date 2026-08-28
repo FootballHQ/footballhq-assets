@@ -18,4 +18,24 @@ document.addEventListener('click',function(e){var item=e.target.closest&&e.targe
 function run(){}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
-(function(){if(window.__TURF_ACTIVE_PLAYERS_SINGLE_LOADER__)return;window.__TURF_ACTIVE_PLAYERS_SINGLE_LOADER__=true;document.querySelectorAll('script[src*="105-turf-active-players"],script[src*="106-turf-active-players"],script[src*="107-turf-active-players"]').forEach(function(n){try{n.remove()}catch(e){}});var s=document.createElement('script');s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-v8957.js?v=8957-'+Date.now();s.async=true;(document.head||document.documentElement).appendChild(s)})();
+
+/* Active Players exact screen. 107 owns the existing live game wiring and
+   account overlays. 110 paints the approved raster through canvas so CSP
+   cannot replace it with a broken-image icon. */
+(function(){
+  if(window.__TURF_ACTIVE_PLAYERS_SINGLE_LOADER__)return;
+  window.__TURF_ACTIVE_PLAYERS_SINGLE_LOADER__=true;
+  document.querySelectorAll('script[src*="105-turf-active-players"],script[src*="106-turf-active-players"],script[src*="107-turf-active-players"],script[src*="110-turf-active-players"]').forEach(function(n){try{n.remove()}catch(e){}});
+  function loadCanvas(){
+    var c=document.createElement('script');
+    c.src='https://footballhq.github.io/footballhq-assets/v88-36/js/110-turf-active-players-canvas-v8958.js?v=8958-'+Date.now();
+    c.async=true;
+    (document.head||document.documentElement).appendChild(c);
+  }
+  var s=document.createElement('script');
+  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/107-turf-active-players-exact-v8957.js?v=8958-'+Date.now();
+  s.async=true;
+  s.onload=loadCanvas;
+  s.onerror=loadCanvas;
+  (document.head||document.documentElement).appendChild(s);
+})();
