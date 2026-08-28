@@ -60,16 +60,19 @@ window.addEventListener('turf:auth-ready',function(e){accept(e&&e.detail&&e.deta
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 
-/* Active Players visual authority: pin the known exact-art interactive build.
-   jsDelivr serves this immutable commit with executable JavaScript MIME headers. */
+/* Active Players visual authority — V89.78.
+   This file is already executed inside the live Apps Script app, so loading the
+   exact screen here avoids cross-origin wrapper limitations and the unavailable
+   Cloudflare deploy path. It also replaces any retired Active Players loader. */
 (function(){
-  if(window.__TURF_V8977_EXACT_VISUAL_LOADER__)return;
-  window.__TURF_V8977_EXACT_VISUAL_LOADER__=true;
-  var old=document.querySelector('script[data-turf-active-players-loader]');
-  if(old)try{old.remove()}catch(e){}
+  if(window.__TURF_V8978_EXACT_VISUAL_LOADER__)return;
+  window.__TURF_V8978_EXACT_VISUAL_LOADER__=true;
+  try{
+    Array.prototype.slice.call(document.querySelectorAll('script[data-turf-active-players-loader],script[data-turf-exact-active-loader]')).forEach(function(n){try{n.remove()}catch(e){}});
+  }catch(e){}
   var s=document.createElement('script');
-  s.setAttribute('data-turf-active-players-loader','8977-exact');
-  s.src='https://cdn.jsdelivr.net/gh/FootballHQ/footballhq-assets@07bb270b5e977bc838d78aab774edbf05b3f103d/v88-36/js/105-turf-active-players-cinematic-v8951.js';
+  s.setAttribute('data-turf-active-players-loader','8978-exact-authoritative');
+  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/106-turf-active-players-approved-exact-v8978.js?v=8978-'+Date.now();
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
