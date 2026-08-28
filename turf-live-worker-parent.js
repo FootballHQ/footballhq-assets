@@ -1,12 +1,14 @@
-/* TURF production login bridge v46.
-   Worker authenticates. Existing Apps Script TURF remains the visual/runtime source of truth. */
+/* TURF production login bridge v47.
+   Worker authenticates. Existing Apps Script TURF remains the visual/runtime source of truth.
+   V47 injects the authoritative exact Active Players visual layer into the live iframe. */
 (function(){
 'use strict';
-if(window.__TURF_LIVE_WORKER_PARENT_V46__)return;
-window.__TURF_LIVE_WORKER_PARENT_V46__=true;
+if(window.__TURF_LIVE_WORKER_PARENT_V47__)return;
+window.__TURF_LIVE_WORKER_PARENT_V47__=true;
 
-var VERSION='worker-auth-46';
+var VERSION='worker-auth-47';
 var APP_SRC='https://script.google.com/macros/s/AKfycbyZztqggePyYXWVuxhn-m7qaIM5xtR2OW0SSrj-_csJ4EcjTsEtgz9aAUP3yIFcAOI3yQ/exec?turfv=89.50&bridge=8967';
+var EXACT_ACTIVE_SRC='https://footballhq.github.io/footballhq-assets/v88-36/js/106-turf-active-players-approved-exact-v8978.js';
 var GOOGLE_CLIENT_ID='981412579361-ebftqmubklnd2pk5k88s8kcbh27cj7i8.apps.googleusercontent.com';
 var activeProfile=null,bridgeWindow=null,bridgeOrigin='',appStarted=false,busy=false,googleRendered=false,revealed=false,revealTimer=null;
 var TOKEN_KEY='turfAuthAccountTokenV1',PROFILE_KEY='turfAuthCachedProfileV1';
@@ -29,21 +31,43 @@ function showChooser(message,isError){cancelReveal();revealed=false;document.bod
 function showLoading(message){var c=q('authChoices');if(c)c.style.display='none';var pulse=q('authPulse');if(pulse)pulse.style.display='block';status(message||'Opening TURF…',false)}
 function handoff(){if(!activeProfile||!activeProfile.token)return false;var a=app(),targetWindow=bridgeWindow||(a&&a.contentWindow);if(!targetWindow)return false;var target=bridgeWindow&&bridgeOrigin?bridgeOrigin:'*';try{targetWindow.postMessage({type:'turf-auth-resume',token:String(activeProfile.token),profile:activeProfile,version:VERSION},target);targetWindow.postMessage({type:'turf-auth-worker-profile',profile:activeProfile,version:VERSION},target);return true}catch(e){return false}}
 function queueHandoff(){[0,50,120,250,500,900,1500,2400,3800,6000,9000].forEach(function(ms){setTimeout(handoff,ms)})}
+
+/* Inject from the outer wrapper so stale inner Apps Script/GitHub caches cannot
+   keep an obsolete Active Players prototype alive. This works on production
+   because the Worker proxies the app at /app, making the iframe same-origin. */
+function injectExactActivePlayers(){
+  var a=app();if(!a)return false;
+  try{
+    var d=a.contentDocument||a.contentWindow.document;
+    if(!d||!d.documentElement)return false;
+    var old=d.querySelector('script[data-turf-exact-active-loader]');
+    if(old&&old.getAttribute('data-turf-exact-active-loader')==='8978')return true;
+    if(old)try{old.remove()}catch(e){}
+    var s=d.createElement('script');
+    s.setAttribute('data-turf-exact-active-loader','8978');
+    s.src=EXACT_ACTIVE_SRC+'?v=8978-'+Date.now();
+    s.async=false;
+    (d.head||d.documentElement).appendChild(s);
+    return true;
+  }catch(e){return false}
+}
+function queueExactActivePlayers(){[0,60,150,350,700,1200,2200,4000].forEach(function(ms){setTimeout(injectExactActivePlayers,ms)})}
+
 function startExistingTurf(profile){
   saveProfile(profile);showLoading('Opening TURF…');
   var a=app();if(!a)throw new Error('TURF app frame is unavailable.');
-  if(appStarted){handoff();queueHandoff();scheduleReveal(900);return}
+  if(appStarted){handoff();queueHandoff();queueExactActivePlayers();scheduleReveal(900);return}
   appStarted=true;
-  a.addEventListener('load',function(){status('Opening TURF…',false);handoff();queueHandoff();scheduleReveal(1400)});
+  a.addEventListener('load',function(){status('Opening TURF…',false);handoff();queueHandoff();queueExactActivePlayers();scheduleReveal(1400)});
   a.src=APP_SRC+(APP_SRC.indexOf('?')>=0?'&':'?')+'parentauth='+encodeURIComponent(VERSION)+'&accountToken='+encodeURIComponent(String(profile.token))+'&ts='+Date.now();
-  handoff();queueHandoff();
+  handoff();queueHandoff();queueExactActivePlayers();
 }
 function profileFromResult(res){if(res&&res.profile&&res.profile.token)return res.profile;if(res&&res.result&&res.result.profile&&res.result.profile.token)return res.result.profile;if(res&&res.data&&res.data.profile&&res.data.profile.token)return res.data.profile;if(res&&res.token)return res;return null}
 async function googleLogin(response){if(busy)return;var credential=response&&response.credential?String(response.credential):'';if(!credential){showChooser('Google did not return an account. Please try again.',true);return}setBusy(true);showLoading('Checking your Google account…');try{var res=await TurfAuth.googleSignIn(credential);var p=profileFromResult(res)||res;if(!p||!p.token)throw new Error('TURF did not return your account.');startExistingTurf(p)}catch(e){showChooser(String(e&&e.message||e||'Google sign-in failed.'),true)}}
 async function guestLogin(){if(busy)return;setBusy(true);showLoading('Opening your guest account…');try{var res=await TurfAuth.guestSignIn();var p=profileFromResult(res)||res;if(!p||!p.token)throw new Error('TURF did not return a guest account.');startExistingTurf(p)}catch(e){showChooser(String(e&&e.message||e||'Guest sign-in failed.'),true)}}
 function renderGoogle(){if(googleRendered)return true;var host=q('googleButton');if(!host||!(window.google&&google.accounts&&google.accounts.id))return false;try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:googleLogin,auto_select:false,cancel_on_tap_outside:true});google.accounts.id.renderButton(host,{type:'standard',theme:'filled_black',size:'large',text:'continue_with',shape:'rectangular',logo_alignment:'left',width:360});googleRendered=true;return true}catch(e){return false}}
 async function resumeSaved(){var t=savedToken();if(!t)return false;showLoading('Restoring your TURF account…');try{var res=await TurfApi.resolveAccountToken(t);var p=profileFromResult(res);if(!p)throw new Error('Saved account is no longer valid.');if(!p.token)p.token=t;startExistingTurf(p);return true}catch(e){clearSaved();return false}}
-window.addEventListener('message',function(e){var d=e&&e.data;if(!d||typeof d!=='object')return;var a=app();if(!a||e.source!==a.contentWindow||!trustedOrigin(e.origin))return;if(d.type==='turf-auth-bridge-ready'){bridgeWindow=e.source;bridgeOrigin=e.origin;handoff();queueHandoff();return}if(d.type==='turf-auth-ready'||d.type==='turf-worker-profile-request'){handoff();reveal();return}if(d.type==='turf-auth-resume-invalid'){clearSaved();showChooser('That saved TURF session expired. Choose an account to continue.',false);return}if(d.type==='turf-auth-error'||d.type==='turf-auth-needs-link'){showChooser(String(d.message||'TURF could not open that account.'),true);return}},true);
+window.addEventListener('message',function(e){var d=e&&e.data;if(!d||typeof d!=='object')return;var a=app();if(!a||e.source!==a.contentWindow||!trustedOrigin(e.origin))return;if(d.type==='turf-auth-bridge-ready'){bridgeWindow=e.source;bridgeOrigin=e.origin;handoff();queueHandoff();queueExactActivePlayers();return}if(d.type==='turf-auth-ready'||d.type==='turf-worker-profile-request'){handoff();queueExactActivePlayers();reveal();return}if(d.type==='turf-auth-resume-invalid'){clearSaved();showChooser('That saved TURF session expired. Choose an account to continue.',false);return}if(d.type==='turf-auth-error'||d.type==='turf-auth-needs-link'){showChooser(String(d.message||'TURF could not open that account.'),true);return}},true);
 async function boot(){try{await ensureAuthStack();var g=guestButton();if(g)g.addEventListener('click',guestLogin);var tries=0,t=setInterval(function(){tries++;if(renderGoogle()||tries>80)clearInterval(t)},100);if(!(await resumeSaved()))showChooser('Choose how you want to continue.',false)}catch(e){showChooser(String(e&&e.message||e||'TURF login could not initialize.'),true)}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
