@@ -60,12 +60,17 @@ window.addEventListener('turf:auth-ready',function(e){accept(e&&e.detail&&e.deta
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
 
-/* Load late visual authority patches without touching the auth/loading flow. */
+/* Load the single authoritative Active Players visual/game layer.
+   IMPORTANT: bump the query whenever that file changes so Safari/GitHub Pages
+   cannot keep serving an older cached prototype. */
 (function(){
-  if(window.__TURF_V8951_VISUAL_LOADER__)return;
-  window.__TURF_V8951_VISUAL_LOADER__=true;
+  if(window.__TURF_V8973_VISUAL_LOADER__)return;
+  window.__TURF_V8973_VISUAL_LOADER__=true;
+  var old=document.querySelector('script[data-turf-active-players-loader]');
+  if(old)try{old.remove()}catch(e){}
   var s=document.createElement('script');
-  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8951';
-  s.async=true;
+  s.setAttribute('data-turf-active-players-loader','8973');
+  s.src='https://footballhq.github.io/footballhq-assets/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8973';
+  s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
