@@ -61,15 +61,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 
 /* Active Players visual authority: pin the known exact-art interactive build.
-   This intentionally bypasses the current prototype file on main. */
+   jsDelivr serves this immutable commit with executable JavaScript MIME headers. */
 (function(){
-  if(window.__TURF_V8976_EXACT_VISUAL_LOADER__)return;
-  window.__TURF_V8976_EXACT_VISUAL_LOADER__=true;
+  if(window.__TURF_V8977_EXACT_VISUAL_LOADER__)return;
+  window.__TURF_V8977_EXACT_VISUAL_LOADER__=true;
   var old=document.querySelector('script[data-turf-active-players-loader]');
   if(old)try{old.remove()}catch(e){}
   var s=document.createElement('script');
-  s.setAttribute('data-turf-active-players-loader','8976-exact');
-  s.src='https://raw.githubusercontent.com/FootballHQ/footballhq-assets/07bb270b5e977bc838d78aab774edbf05b3f103d/v88-36/js/105-turf-active-players-cinematic-v8951.js?v=8976';
+  s.setAttribute('data-turf-active-players-loader','8977-exact');
+  s.src='https://cdn.jsdelivr.net/gh/FootballHQ/footballhq-assets@07bb270b5e977bc838d78aab774edbf05b3f103d/v88-36/js/105-turf-active-players-cinematic-v8951.js';
   s.async=false;
   (document.head||document.documentElement).appendChild(s);
 })();
