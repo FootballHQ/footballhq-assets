@@ -3,10 +3,10 @@
 Checkpoint updated September 4, 2026.
 
 ## Current progress
-- 2 ESPN 2026 leagues loaded
-- 320 total draft selections
-- 169 unique drafted players in the current sample
-- 237 manual picks and 83 auto-drafted picks
+- 3 ESPN 2026 leagues loaded
+- 480 total draft selections
+- 173 unique drafted players in the current sample
+- 340 manual picks and 140 auto-drafted picks
 - Browser-based analytics dashboard plus Excel workbook
 - Player headshots and NFL team logos
 - Per-league draft boards
@@ -21,8 +21,13 @@ Checkpoint updated September 4, 2026.
 - Early availability probabilities (for example, chance available at picks 20, 40, and 60)
 - Biggest reaches, fallers, and most volatile players
 
+Loaded league IDs:
+- 71826188
+- 1366438767
+- 331634958
+
 ## Important sample-size note
-With only 2 leagues, rates and availability percentages move in 50-point increments. These metrics are already functional, but they will become much more stable and useful as additional drafts are loaded.
+With 3 leagues, rates and availability percentages move in roughly 33-point increments. These metrics are functional and repeat patterns are beginning to emerge, but they will become much more stable and useful as additional drafts are loaded.
 
 ## Next planned steps
 As more leagues are added:
